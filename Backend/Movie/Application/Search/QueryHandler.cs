@@ -4,19 +4,16 @@ using MediatR;
 
 namespace Backend.Movie.Application.Search;
 
-public class Query : IRequest<QueryResponse>
-{
-    public string Title { get; set; }
-}
-public class QueryResponse
-{
-    public List<MovieDto> Movies { get; set; }
-}
+public record Query(string Title) : IRequest<QueryResponse>;
+
+public record QueryResponse(List<MovieDto> movieDtos);
 
 public class MovieDto
 {
     public string Title { get; set; }
     public int Id { get; set; }
+    public int ReleaseYear { get; set; }
+
 }
 
 public class QueryHandler : IRequestHandler<Query, QueryResponse>
@@ -27,27 +24,21 @@ public class QueryHandler : IRequestHandler<Query, QueryResponse>
     {
         _repository = repository;
     }
-
-
+    
     public async Task<QueryResponse> Handle(Query request, CancellationToken cancellationToken)
     {
-
-       var foundMovies = await _repository.SearchForMovie(request.Title);
-       var moviesToDto = new List<MovieDto>();
-       foreach (var foundMovie in foundMovies)
+        var foundMovies = await _repository.SearchForMovie(request.Title);
+        var moviesToDto = new List<MovieDto>();
+        foreach (var foundMovie in foundMovies)
         {
             moviesToDto.Add(new MovieDto
             {
+                Id = foundMovie.Id,
                 Title = foundMovie.Title,
-                Id = foundMovie.Id
+                ReleaseYear = foundMovie.ReleaseYear
             });
         }
 
-       return new QueryResponse
-       {
-           Movies = moviesToDto
-       };
+        return new QueryResponse(moviesToDto);
     }
-    
-    
 }

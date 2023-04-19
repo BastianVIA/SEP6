@@ -21,10 +21,7 @@ public class Controller: ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(string title)
     {
-        var query = new Query
-        {
-            Title = title
-        };
+        var query = new Query(title);
         var result = await _mediator.Send(query);
    
         return Ok(result);

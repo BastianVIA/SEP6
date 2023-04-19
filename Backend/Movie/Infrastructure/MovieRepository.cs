@@ -25,8 +25,9 @@ public class MovieRepository : IMovieRepository
         {
             domainMovies.Add(new Domain.Movie
             {
-                Title = serviceMovie.Title,
-                Id = serviceMovie.Id
+                Id = serviceMovie.Id,
+                ReleaseYear = serviceMovie.ReleaseYear,
+                Title = serviceMovie.Title
             });
         }
         return domainMovies;
