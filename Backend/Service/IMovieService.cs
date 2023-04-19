@@ -4,8 +4,9 @@ namespace Backend.Service;
 
 public class ServiceMovie
 {
-    public string Title;
     public int Id;
+    public string Title;
+    public int ReleaseYear;
 }
 public interface IMovieService
 {

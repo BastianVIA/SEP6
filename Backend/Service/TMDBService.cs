@@ -17,7 +17,7 @@ public class TMDBService : IMovieService
                              $"&query={keyWordSearch}";
         var httpClient = new HttpClient();
         var response = await httpClient.GetAsync(searchMovieURL);
-        MovieResponse? responseAsMovieResponse =  await response.Content.ReadFromJsonAsync<MovieResponse>();
+        MovieResponse? responseAsMovieResponse = await response.Content.ReadFromJsonAsync<MovieResponse>();
         var listOfMovies = new List<ServiceMovie>();
         foreach (var result in responseAsMovieResponse.Results)
         {
@@ -31,10 +31,12 @@ public class TMDBService : IMovieService
     {
         return new ServiceMovie
         {
+            Id = movie.Id,
             Title = movie.Title,
-            Id = movie.Id
+        //    ReleaseYear = movie.ReleaseDate
         };
     }
+
     public class MovieResponse
     {
         public Movie[] Results { get; set; }
@@ -57,5 +59,4 @@ public class TMDBService : IMovieService
         public bool Video { get; set; }
         public decimal VoteAverage { get; set; }
     }
-
 }

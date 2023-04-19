@@ -1,3 +1,4 @@
+using Backend.Database;
 using Backend.Movie.Infrastructure;
 using Backend.Service;
 
@@ -8,7 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
 builder.Services.AddControllers();
-builder.Services.AddSingleton<IMovieService, TMDBService>();
+builder.Services.AddSingleton<DataContext>();
+//builder.Services.AddSingleton<IMovieService, TMDBService>();
 builder.Services.AddSingleton<IMovieRepository, MovieRepository>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
