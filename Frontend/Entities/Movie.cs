@@ -5,4 +5,5 @@ public class Movie
 {
     public string Title { get; set; }
     public int Id { get; set; }
+    public int ReleaseYear { get; set; }
 }

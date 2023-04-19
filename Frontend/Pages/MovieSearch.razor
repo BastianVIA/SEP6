@@ -19,6 +19,7 @@
         <tr>
             <th>Id</th>
             <th>Title</th>
+            <th>ReleaseYear</th>
         </tr>
     </thead>
     <tbody>
@@ -27,6 +28,7 @@
             <tr>
                 <td>@movie.Id</td>
                 <td>@movie.Title</td>
+                <td>@movie.ReleaseYear</td>
             </tr>
         }
     </tbody>
@@ -40,7 +42,6 @@
     private async Task SearchForMovie()
     {
         movieList.Clear();
-        
         movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle);
     }
 

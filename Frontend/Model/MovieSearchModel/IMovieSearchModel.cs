@@ -1,8 +1,9 @@
 ﻿using Frontend.Entities;
+using Frontend.Service;
 
 namespace Frontend.Model.MovieSearchModel;
 
 public interface IMovieSearchModel
 {
-    Task<IList<Movie>> SearchForMovieAsync(string title);
+    Task<List<Movie>> SearchForMovieAsync(string title);
 }
