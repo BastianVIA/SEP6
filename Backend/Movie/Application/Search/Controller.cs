@@ -17,7 +17,7 @@ public class Controller: ControllerBase
     [HttpGet]
     [Route("Search")]
     [Tags("MovieApi")]
-    [ProducesResponseType(typeof(QueryResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MovieSearchResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(string title)
     {
