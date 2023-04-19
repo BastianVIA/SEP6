@@ -4,9 +4,9 @@ using MediatR;
 
 namespace Backend.Movie.Application.Search;
 
-public record Query(string Title) : IRequest<QueryResponse>;
+public record Query(string Title) : IRequest<MovieSearchResponse>;
 
-public record QueryResponse(List<MovieDto> movieDtos);
+public record MovieSearchResponse(List<MovieDto> movieDtos);
 
 public class MovieDto
 {
@@ -16,7 +16,7 @@ public class MovieDto
 
 }
 
-public class QueryHandler : IRequestHandler<Query, QueryResponse>
+public class QueryHandler : IRequestHandler<Query, MovieSearchResponse>
 {
     private IMovieRepository _repository;
 
@@ -25,7 +25,7 @@ public class QueryHandler : IRequestHandler<Query, QueryResponse>
         _repository = repository;
     }
     
-    public async Task<QueryResponse> Handle(Query request, CancellationToken cancellationToken)
+    public async Task<MovieSearchResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var foundMovies = await _repository.SearchForMovie(request.Title);
         var moviesToDto = new List<MovieDto>();
@@ -39,6 +39,6 @@ public class QueryHandler : IRequestHandler<Query, QueryResponse>
             });
         }
 
-        return new QueryResponse(moviesToDto);
+        return new MovieSearchResponse(moviesToDto);
     }
 }
