@@ -15,7 +15,7 @@ public class MovieRepository : IMovieRepository
 
     public async Task<List<Domain.Movie>> SearchForMovie(string title)
     {
-        var foundMovies = _database.Movies.Where(m => m.Title.Contains(title)).ToList();
+        var foundMovies = _database.Movies.Where(m => EF.Functions.Like(m.Title, $"%{title}%")).ToList();
 
         return ToDomain(foundMovies);
     }
