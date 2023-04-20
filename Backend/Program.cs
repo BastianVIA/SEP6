@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
+builder.Services.AddScoped<IImageService, TMDBImageService>();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<DataContext>();
 //builder.Services.AddSingleton<IMovieService, TMDBService>();

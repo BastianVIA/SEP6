@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Database;
 
-public class DataContext : Microsoft.EntityFrameworkCore.DbContext
+public class DataContext : DbContext
 {
     protected readonly IConfiguration Configuration;
 
