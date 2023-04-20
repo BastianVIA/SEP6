@@ -2,5 +2,5 @@
 
 public interface IImageService
 {
-    Task<Uri?> GetPathForPoster(int id);
+    Task<Uri?> GetPathForPoster(string id);
 }

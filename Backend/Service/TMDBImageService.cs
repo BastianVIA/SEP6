@@ -24,7 +24,7 @@ public class TMDBImageService : IImageService
         _client.SetConfig(tmdbConfig);
     }
 
-    public async Task<Uri?> GetPathForPoster(int id)
+    public async Task<Uri?> GetPathForPoster(string id)
     {
         var movie = await _client.GetMovieAsync(id);
         if (movie == null)
