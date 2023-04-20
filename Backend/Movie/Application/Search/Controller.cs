@@ -7,7 +7,7 @@ namespace Backend.Movie.Application.Search;
 
 public class Controller: ControllerBase
 {
-    private IMediator _mediator;
+    private readonly IMediator _mediator;
 
     public Controller(IMediator mediator)
     {
@@ -22,8 +22,8 @@ public class Controller: ControllerBase
     public async Task<IActionResult> Get(string title)
     {
         var query = new Query(title);
-        var result = await _mediator.Send(query);
+        var result = _mediator.Send(query);
    
-        return Ok(result);
+        return Ok(await result);
     }
 }

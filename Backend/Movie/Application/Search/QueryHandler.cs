@@ -11,18 +11,21 @@ public record MovieSearchResponse(List<MovieDto> movieDtos);
 public class MovieDto
 {
     public string Title { get; set; }
-    public int Id { get; set; }
+    public string Id { get; set; }
     public int ReleaseYear { get; set; }
+    public Uri? PathToPoster { get; set; }
 
 }
 
 public class QueryHandler : IRequestHandler<Query, MovieSearchResponse>
 {
-    private IMovieRepository _repository;
+    private readonly IMovieRepository _repository;
+    private readonly IImageService _imageService;
 
-    public QueryHandler(IMovieRepository repository)
+    public QueryHandler(IMovieRepository repository, IImageService imageService)
     {
         _repository = repository;
+        _imageService = imageService;
     }
     
     public async Task<MovieSearchResponse> Handle(Query request, CancellationToken cancellationToken)
@@ -31,11 +34,13 @@ public class QueryHandler : IRequestHandler<Query, MovieSearchResponse>
         var moviesToDto = new List<MovieDto>();
         foreach (var foundMovie in foundMovies)
         {
+            var posterPath = _imageService.GetPathForPoster(foundMovie.Id); 
             moviesToDto.Add(new MovieDto
             {
                 Id = foundMovie.Id,
                 Title = foundMovie.Title,
-                ReleaseYear = foundMovie.ReleaseYear
+                ReleaseYear = foundMovie.ReleaseYear,
+                PathToPoster = await posterPath
             });
         }
 

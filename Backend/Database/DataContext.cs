@@ -3,9 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Database;
 
-public class DataContext : Microsoft.EntityFrameworkCore.DbContext
+public class DataContext : DbContext
 {
     protected readonly IConfiguration Configuration;
+    public DbSet<MovieDAO> Movies { get; set; }   
 
     public DataContext(IConfiguration configuration)
     {
@@ -18,5 +19,4 @@ public class DataContext : Microsoft.EntityFrameworkCore.DbContext
         options.UseSqlite(Configuration.GetConnectionString("WebApiDatabase"));
     }
 
-    public DbSet<MovieDAO> Movies { get; set; }   
 }
