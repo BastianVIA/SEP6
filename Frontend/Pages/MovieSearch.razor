@@ -20,6 +20,7 @@
             <th>Id</th>
             <th>Title</th>
             <th>ReleaseYear</th>
+            <th>Poster</th>
         </tr>
     </thead>
     <tbody>
@@ -29,6 +30,7 @@
                 <td>@movie.Id</td>
                 <td>@movie.Title</td>
                 <td>@movie.ReleaseYear</td>
+                <td><img src="@movie.ImagePath" alt="Image" height="200" ></td>
             </tr>
         }
     </tbody>
@@ -49,8 +51,8 @@
     {
         movieList.Clear();
 
-        movieList.Add(new Movie{Id = 1, Title = "Spider Man"});
-        movieList.Add(new Movie{Id = 2, Title = "Harry Potter"});
+        movieList.Add(new Movie{Id = "1", Title = "Spider Man"});
+        movieList.Add(new Movie{Id = "2", Title = "Harry Potter"});
     }
     
 }

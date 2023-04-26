@@ -13,7 +13,7 @@ public class MovieSearchModel : IMovieSearchModel
         List<Movie> movies = new List<Movie>();
         foreach (var movie in response.MovieDtos)
         {
-            movies.Add(new Movie{Id = movie.Id, Title = movie.Title, ReleaseYear = movie.ReleaseYear});
+            movies.Add(new Movie{Id = movie.Id, Title = movie.Title, ReleaseYear = movie.ReleaseYear, ImagePath = movie.PathToPoster});
         }
         return movies;
     }
