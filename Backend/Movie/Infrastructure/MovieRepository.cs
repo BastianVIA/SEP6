@@ -28,7 +28,7 @@ public class MovieRepository : IMovieRepository
     public async Task<Domain.Movie> ReadMovieFromId(string id)
     {
 
-        var result = await  _database.Movies.Where(m => m.Id == id).FirstOrDefaultAsync();
+        var result = await  _database.Movies.Where(m => m.Id == id).Include(m => m.Rating).FirstOrDefaultAsync();
         
         if (result == null)
         {
