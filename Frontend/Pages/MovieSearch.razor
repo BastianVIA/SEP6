@@ -1,0 +1,58 @@
+﻿@page "/MovieSearch"
+@using Frontend.Entities
+@using Frontend.Model.MovieSearchModel
+@inject IMovieSearchModel MovieSearchModel
+
+<PageTitle>Movie Search</PageTitle>
+
+<h3>Movie Search</h3>
+
+ <form>
+  <label>Movie name:</label><br>
+     <input type="text" @bind="@movieTitle"/><br>
+ </form> 
+<button class="btn btn-primary" @onclick="SearchForMovie">Search Movie</button>
+<button class="btn btn-primary" @onclick="AddMoviesToTable">Add Dummy Movies</button>
+
+<table>
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>ReleaseYear</th>
+            <th>Poster</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var movie in movieList)
+        {
+            <tr>
+                <td>@movie.Id</td>
+                <td>@movie.Title</td>
+                <td>@movie.ReleaseYear</td>
+                <td><img src="@movie.ImagePath" alt="Image" height="200" ></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    
+    private IList<Movie> movieList = new List<Movie>();
+    private string movieTitle { get; set; }
+    
+    private async Task SearchForMovie()
+    {
+        movieList.Clear();
+        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle);
+    }
+
+    private void AddMoviesToTable()
+    {
+        movieList.Clear();
+
+        movieList.Add(new Movie{Id = "1", Title = "Spider Man"});
+        movieList.Add(new Movie{Id = "2", Title = "Harry Potter"});
+    }
+    
+}

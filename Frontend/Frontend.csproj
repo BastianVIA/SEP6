@@ -6,4 +6,28 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0-preview1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Backend\Backend.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Data\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Data\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Data\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="Data\**" />
+    </ItemGroup>
+
 </Project>
