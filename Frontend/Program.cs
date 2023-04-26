@@ -1,6 +1,8 @@
+using Frontend.Model.MovieDetailModel;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Frontend.Model.MovieSearchModel;
+using Frontend.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<IMovieSearchModel, MovieSearchModel>();
+builder.Services.AddScoped<IMovieDetailModel, MovieDetailModel>();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();

@@ -11,9 +11,25 @@ public class MovieSearchModel : IMovieSearchModel
         var api = new Client(BASEURI, new HttpClient());
         var response = await api.SearchAsync(title);
         List<Movie> movies = new List<Movie>();
+        Rating rating = new Rating();
         foreach (var movie in response.MovieDtos)
         {
-            movies.Add(new Movie{Id = movie.Id, Title = movie.Title, ReleaseYear = movie.ReleaseYear, ImagePath = movie.PathToPoster});
+            try
+            {
+                rating = new Rating { AverageRating = movie.Rating.AverageRating, RatingCount = movie.Rating.Votes };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            movies.Add(new Movie
+            {
+                Id = movie.Id, 
+                Title = movie.Title, 
+                ReleaseYear = movie.ReleaseYear, 
+                PosterUrl = movie.PathToPoster,
+                Rating = rating
+            });
         }
         return movies;
     }
