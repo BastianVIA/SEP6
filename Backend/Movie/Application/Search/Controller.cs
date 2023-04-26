@@ -24,7 +24,7 @@ public class Controller: ControllerBase
     {
         var query = new Query(title);
         var result = _mediator.Send(query);
-   
+
         return Ok(await result);
     }
 }

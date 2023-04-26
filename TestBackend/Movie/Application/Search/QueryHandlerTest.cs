@@ -18,7 +18,7 @@ public class QueryHandlerTest
         var request = new Query(title);
         var response = await handler.Handle(request, new CancellationToken());
         
-        Assert.Empty(response.movieDtos);
+        Assert.Empty(response.MovieDtos);
     }
 
 
@@ -44,10 +44,10 @@ public class QueryHandlerTest
         var response = await handler.Handle(request, new CancellationToken());
         
         
-        Assert.Single(response.movieDtos);
-        Assert.Equal(toReturn[0].Id, response.movieDtos[0].Id);
-        Assert.Equal(toReturn[0].ReleaseYear, response.movieDtos[0].ReleaseYear);
-        Assert.Equal(toReturn[0].Title, response.movieDtos[0].Title);
+        Assert.Single(response.MovieDtos);
+        Assert.Equal(toReturn[0].Id, response.MovieDtos[0].Id);
+        Assert.Equal(toReturn[0].ReleaseYear, response.MovieDtos[0].ReleaseYear);
+        Assert.Equal(toReturn[0].Title, response.MovieDtos[0].Title);
 
     }
 
@@ -84,10 +84,10 @@ public class QueryHandlerTest
         var request = new Query(title);
         var response = await handler.Handle(request, new CancellationToken());
         
-        Assert.Equal(toReturn.Count, response.movieDtos.Count);
-        Assert.Equal(toReturn[0].Title, response.movieDtos[0].Title);
-        Assert.Equal(toReturn[1].Title, response.movieDtos[1].Title);
-        Assert.Equal(toReturn[2].Title, response.movieDtos[2].Title);
+        Assert.Equal(toReturn.Count, response.MovieDtos.Count);
+        Assert.Equal(toReturn[0].Title, response.MovieDtos[0].Title);
+        Assert.Equal(toReturn[1].Title, response.MovieDtos[1].Title);
+        Assert.Equal(toReturn[2].Title, response.MovieDtos[2].Title);
     }
 
     [Fact]
