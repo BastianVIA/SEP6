@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Movie.Application.Search;
 
 [ApiController]
+[Route("movie")]
 
 public class Controller: ControllerBase
 {
@@ -15,7 +16,7 @@ public class Controller: ControllerBase
     }
     
     [HttpGet]
-    [Route("Search")]
+    [Route("search")]
     [Tags("MovieApi")]
     [ProducesResponseType(typeof(MovieSearchResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
