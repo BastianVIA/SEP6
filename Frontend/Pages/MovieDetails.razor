@@ -1,0 +1,51 @@
+﻿@page "/MovieDetails/{movieId}"
+@using Frontend.Entities
+@using Frontend.Model.MovieDetailModel
+@inject IMovieDetailModel MovieDetailModel
+
+<h3>Movie Details</h3>
+<div class="movie-detail">
+    <h2>@Movie.Title (@Movie.ReleaseYear)</h2>
+    <img src="@Movie.PosterUrl" alt="@Movie.Title poster" height="500" class="movie-poster" />
+    <div>
+        <h3>Actors</h3>
+        <ul>
+            @foreach (var actor in Movie.Actors)
+            {
+                <li>@actor.Name, @actor.BirthYear</li>
+            }
+        </ul>
+    </div>
+    <div>
+        <h3>Directors</h3>
+        <ul>
+            @foreach (var director in Movie.Directors)
+            {
+                <li>@director.Name, @director.BirthYear</li>
+            }
+        </ul>
+    </div>
+    <div>
+        <h3>Rating</h3>
+        <p>@Movie.Rating.AverageRating based on @Movie.Rating.RatingCount votes</p>
+    </div>
+    <div>
+        <h3>Resume</h3>
+        <p>@Movie.Resume</p>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string MovieId { get; set; }
+    private Movie Movie = new Movie{Actors = new List<Actor>(), Directors = new List<Director>(), Rating = new Rating()};
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Movie = await MovieDetailModel.GetMovieDetails(MovieId);
+            StateHasChanged(); 
+        }
+    }
+}
