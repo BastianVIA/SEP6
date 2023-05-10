@@ -63,42 +63,30 @@ a, .btn-link {
     color: white;
 }
 
-.blazor-error-boundary::after {
-    content: "An error has occurred."
+    .blazor-error-boundary::after {
+        content: "An error has occurred."
+    }
+
+.navbar {
+    background-color: #212529;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-/*!*Added from here*!*/
-/*.top-navbar {*/
-/*    background-color: #f8f9fa;*/
-/*    display: flex;*/
-/*    justify-content: flex-start;*/
-/*    align-items: center;*/
-/*    padding: 0.5rem 1rem;*/
-/*    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);*/
-/*    position: sticky;*/
-/*    top: 0;*/
-/*    z-index: 1000;*/
-/*}*/
+.navbar .nav-item {
+    display: inline-block;
+    margin-right: 15px;
+}
 
-/*.top-navbar .nav-pills .nav-link {*/
-/*    display: inline-block;*/
-/*    padding: 0.5rem 1rem;*/
-/*    margin-right: 0.5rem;*/
-/*    color: #495057;*/
-/*    text-decoration: none;*/
-/*}*/
-
-/*.top-navbar .nav-pills .nav-link:hover {*/
-/*    background-color: #f8f9fa;*/
-/*    color: #495057;*/
-/*    text-decoration: none;*/
-/*}*/
-
-/*.top-navbar .nav-pills .nav-link.active {*/
-/*    background-color: #495057;*/
-/*    color: white;*/
-/*    text-decoration: none;*/
-/*}*/
-    
-    
-    
+@media (max-width: 767px) {
+    .navbar .nav-item {
+        display: block;
+        margin-right: 0;
+    }
+}

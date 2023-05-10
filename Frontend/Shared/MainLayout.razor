@@ -3,29 +3,22 @@
 <PageTitle>Frontend</PageTitle>
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu/>
-    </div>
 
     <main>
+        <NavTop/>
+
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
 
-@* @inherits LayoutComponentBase *@
-@* *@
-@* <PageTitle>Frontend</PageTitle> *@
-@* *@
-@* <div class="page"> *@
-@*     <div class="top-row"> *@
-@*         <NavMenu/> *@
-@*     </div> *@
-@* *@
-@*     <main> *@
-@*         <article class="content px-4"> *@
-@*             @Body *@
-@*         </article> *@
-@*     </main> *@
-@* </div> *@
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+
+
+}

@@ -9,7 +9,7 @@ public class MovieSearchModel : IMovieSearchModel
     public async Task<List<Movie>> SearchForMovieAsync(string title)
     {
         var api = new Client(BASEURI, new HttpClient());
-        var response = await api.SearchAsync(title, MovieSortingKey._0, SortingDirection._0);
+        var response = await api.SearchAsync(title, MovieSortingKey.ReleaseYear, SortingDirection.ASC);
         List<Movie> movies = new List<Movie>();
         Rating rating = new Rating();
         foreach (var movie in response.MovieDtos)
