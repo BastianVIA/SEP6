@@ -1,10 +1,12 @@
 ﻿using Backend.Database;
+using Backend.Enum;
 using Backend.Movie.Domain;
 using Backend.Service;
 using Microsoft.AspNetCore.Html;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Movie.Infrastructure;
+
 
 public class MovieRepository : IMovieRepository
 {
@@ -16,29 +18,81 @@ public class MovieRepository : IMovieRepository
         _database = database;
     }
 
-    public async Task<List<Domain.Movie>> SearchForMovie(string title)
+    public async Task<List<Domain.Movie>> SearchForMovie(string title, MovieSortingKey movieSortingKey,
+        SortingDirection orderDirection)
     {
-        var foundMovies = _database.Movies.Include(m => m.Rating).Where(m => EF.Functions.Like(m.Title, $"%{title}%"))
-            .Take(NumberOfResults).ToListAsync();
+        Task<List<MovieDAO>> foundMovies;
+
+        switch (movieSortingKey)
+        {
+            case MovieSortingKey.Votes:
+                foundMovies = SearchForMoveOrderByVotesAsync(title, orderDirection);
+                break;
+            case MovieSortingKey.ReleaseYear:
+                foundMovies = SearchForMoveOrderByReleaseYearAsync(title, orderDirection);
+                break;
+            default:
+                throw new KeyNotFoundException($"{movieSortingKey} not a valid movie sorting key ");
+        }
+
 
         return ToDomain(await foundMovies);
     }
 
+    private Task<List<MovieDAO>> SearchForMoveOrderByVotesAsync(string title, SortingDirection orderDirection)
+    {
+        switch (orderDirection)
+        {
+            case SortingDirection.DESC:
+                return _database.Movies.Include(m => m.Rating)
+                    .Where(m => EF.Functions.Like(m.Title, $"%{title}%"))
+                    .OrderByDescending(movie => movie.Rating != null ? movie.Rating.Votes : 0)
+                    .Take(NumberOfResults).ToListAsync();
+            case SortingDirection.ASC:
+                return _database.Movies.Include(m => m.Rating)
+                    .Where(m => EF.Functions.Like(m.Title, $"%{title}%"))
+                    .OrderBy(movie => movie.Rating != null ? movie.Rating.Votes : 0)
+                    .Take(NumberOfResults).ToListAsync(); 
+            default:
+                throw new KeyNotFoundException($"{orderDirection} not a valid order direction ");
+        }
+    }
+
+    private Task<List<MovieDAO>> SearchForMoveOrderByReleaseYearAsync(string title, SortingDirection orderDirection)
+    {
+        switch (orderDirection)
+        {
+            case SortingDirection.DESC:
+                return                  _database.Movies.Include(m => m.Rating)
+                    .Where(m => EF.Functions.Like(m.Title, $"%{title}%"))
+                    .OrderByDescending(movie => movie.Year)
+                    .Take(NumberOfResults).ToListAsync();
+            case SortingDirection.ASC:
+                return _database.Movies.Include(m => m.Rating)
+                    .Where(m => EF.Functions.Like(m.Title, $"%{title}%"))
+                    .OrderBy(movie => movie.Year)
+                    .Take(NumberOfResults).ToListAsync(); 
+            default:
+                throw new KeyNotFoundException($"{orderDirection} not a valid order direction ");
+        }
+    }
+
+
 
     public async Task<Domain.Movie> ReadMovieFromId(string id)
     {
+        var result = await _database.Movies.Where(m => m.Id == id).Include(m => m.Rating).FirstOrDefaultAsync();
 
-        var result = await  _database.Movies.Where(m => m.Id == id).Include(m => m.Rating).FirstOrDefaultAsync();
-        
         if (result == null)
         {
             throw new KeyNotFoundException($"Could not find movie with id: {id}");
         }
+
         result.Actors = await _database.Persons.Where(p => p.ActedMovies.Contains(result)).Take(NumberOfResults)
             .ToListAsync();
         result.Directors = await _database.Persons.Where(p => p.DirectedMovies.Contains(result)).Take(NumberOfResults)
             .ToListAsync();
-        
+
         return ToDomain(result);
     }
 

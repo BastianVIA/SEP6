@@ -1,10 +1,11 @@
-﻿using Backend.Movie.Infrastructure;
+﻿using Backend.Enum;
+using Backend.Movie.Infrastructure;
 using Backend.Service;
 using MediatR;
 
 namespace Backend.Movie.Application.Search;
 
-public record Query(string Title) : IRequest<MovieSearchResponse>;
+public record Query(string Title, MovieSortingKey orderBy, SortingDirection sortingDirection) : IRequest<MovieSearchResponse>;
 
 public record MovieSearchResponse(List<MovieDto> MovieDtos);
 
@@ -32,7 +33,7 @@ public class QueryHandler : IRequestHandler<Query, MovieSearchResponse>
 
     public async Task<MovieSearchResponse> Handle(Query request, CancellationToken cancellationToken)
     {
-        var foundMovies = await _repository.SearchForMovie(request.Title);
+        var foundMovies = await _repository.SearchForMovie(request.Title, request.orderBy, request.sortingDirection);
         var moviesToDto = new List<MovieDto>();
         foreach (var foundMovie in foundMovies)
         {

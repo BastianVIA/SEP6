@@ -1,6 +1,10 @@
 using Backend.Database;
+using Backend.Enum;
 using Backend.Movie.Infrastructure;
 using Backend.Service;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
 builder.Services.AddScoped<IImageService, TMDBImageService>();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.Converters.Add(new StringEnumConverter());
+});
+
 builder.Services.AddScoped<DataContext>();
 //builder.Services.AddSingleton<IMovieService, TMDBService>();
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
