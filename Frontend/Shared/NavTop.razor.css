@@ -1,0 +1,50 @@
+﻿.navbar-toggler {
+    background-color: blue;
+}
+
+.top-row {
+    height: 3.5rem;
+    background-color: black; /*  the frontend text right now*/
+    display: flex;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    
+}
+
+.navbar-brand {
+    font-size: 1.1rem;
+}
+
+.oi {
+    width: 2rem;
+    font-size: 1.1rem;
+    vertical-align: text-top;
+    top: -2px;
+}
+
+.nav-item {
+    font-size: 1rem;
+    display:inline-block;
+}
+
+.nav-item:first-of-type {
+    padding-left: 20px;
+}
+
+
+@media (min-width: 641px) {
+    .navbar-toggler {
+        display: none;
+    }
+
+    .collapse {
+        display: block;
+    }
+
+    .nav-scrollable {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+    }
+}
+
