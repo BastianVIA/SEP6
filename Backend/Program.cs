@@ -23,7 +23,8 @@ builder.Services.AddScoped<DataContext>();
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => options.UseInlineDefinitionsForEnums());
+builder.Services.AddSwaggerGenNewtonsoftSupport();
 
 var app = builder.Build();
 

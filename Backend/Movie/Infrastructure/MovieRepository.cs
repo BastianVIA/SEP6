@@ -4,14 +4,14 @@ using Backend.Movie.Domain;
 using Backend.Service;
 using Microsoft.AspNetCore.Html;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Backend.Movie.Infrastructure;
-
 
 public class MovieRepository : IMovieRepository
 {
     private readonly DataContext _database;
-    private const int NumberOfResults = 10;
+    private const int NumberOfResultsPerPage = 10;
 
     public MovieRepository(DataContext database)
     {
@@ -19,64 +19,77 @@ public class MovieRepository : IMovieRepository
     }
 
     public async Task<List<Domain.Movie>> SearchForMovie(string title, MovieSortingKey movieSortingKey,
-        SortingDirection orderDirection)
+        SortingDirection sortingDirection, int requestPageNumber)
     {
-        Task<List<MovieDAO>> foundMovies;
+        var query = _database.Movies.Include(m => m.Rating)
+            .Where(m => EF.Functions.Like(m.Title, $"%{title}%"));
 
         switch (movieSortingKey)
         {
             case MovieSortingKey.Votes:
-                foundMovies = SearchForMoveOrderByVotesAsync(title, orderDirection);
+                query = SearchForMoveOrderByVotesAsync(query, sortingDirection);
                 break;
             case MovieSortingKey.ReleaseYear:
-                foundMovies = SearchForMoveOrderByReleaseYearAsync(title, orderDirection);
+                query = SearchForMoveOrderByReleaseYearAsync(query, sortingDirection);
+                break;
+            case MovieSortingKey.Rating:
+                query = SearchForMoveOrderByRatingAsync(query, sortingDirection);
                 break;
             default:
                 throw new KeyNotFoundException($"{movieSortingKey} not a valid movie sorting key ");
         }
 
+        Task<List<MovieDAO>> foundMovies = query
+            .Skip(NumberOfResultsPerPage * (requestPageNumber - 1))
+            .Take(NumberOfResultsPerPage)
+            .ToListAsync();
+
 
         return ToDomain(await foundMovies);
     }
 
-    private Task<List<MovieDAO>> SearchForMoveOrderByVotesAsync(string title, SortingDirection orderDirection)
+    private IOrderedQueryable<MovieDAO> SearchForMoveOrderByVotesAsync(IQueryable<MovieDAO> query,
+        SortingDirection sortingDirection)
     {
-        switch (orderDirection)
+        switch (sortingDirection)
         {
             case SortingDirection.DESC:
-                return _database.Movies.Include(m => m.Rating)
-                    .Where(m => EF.Functions.Like(m.Title, $"%{title}%"))
-                    .OrderByDescending(movie => movie.Rating != null ? movie.Rating.Votes : 0)
-                    .Take(NumberOfResults).ToListAsync();
+                return query.OrderByDescending(movie => movie.Rating != null ? movie.Rating.Votes : 0);
             case SortingDirection.ASC:
-                return _database.Movies.Include(m => m.Rating)
-                    .Where(m => EF.Functions.Like(m.Title, $"%{title}%"))
-                    .OrderBy(movie => movie.Rating != null ? movie.Rating.Votes : 0)
-                    .Take(NumberOfResults).ToListAsync(); 
+                return query.OrderBy(movie => movie.Rating != null ? movie.Rating.Votes : 0);
             default:
-                throw new KeyNotFoundException($"{orderDirection} not a valid order direction ");
+                throw new KeyNotFoundException($"{sortingDirection} not a valid order direction ");
         }
     }
 
-    private Task<List<MovieDAO>> SearchForMoveOrderByReleaseYearAsync(string title, SortingDirection orderDirection)
+    private IOrderedQueryable<MovieDAO> SearchForMoveOrderByRatingAsync(IQueryable<MovieDAO> query,
+        SortingDirection sortingDirection)
     {
-        switch (orderDirection)
+        switch (sortingDirection)
         {
             case SortingDirection.DESC:
-                return                  _database.Movies.Include(m => m.Rating)
-                    .Where(m => EF.Functions.Like(m.Title, $"%{title}%"))
-                    .OrderByDescending(movie => movie.Year)
-                    .Take(NumberOfResults).ToListAsync();
+                return query.OrderByDescending(movie => movie.Rating != null ? movie.Rating.Rating : 0);
             case SortingDirection.ASC:
-                return _database.Movies.Include(m => m.Rating)
-                    .Where(m => EF.Functions.Like(m.Title, $"%{title}%"))
-                    .OrderBy(movie => movie.Year)
-                    .Take(NumberOfResults).ToListAsync(); 
+                return query.OrderBy(movie => movie.Rating != null ? movie.Rating.Rating : 0);
             default:
-                throw new KeyNotFoundException($"{orderDirection} not a valid order direction ");
+                throw new KeyNotFoundException($"{sortingDirection} not a valid order direction ");
         }
     }
 
+
+    private IOrderedQueryable<MovieDAO> SearchForMoveOrderByReleaseYearAsync(IQueryable<MovieDAO> query,
+        SortingDirection sortingDirection)
+    {
+        switch (sortingDirection)
+        {
+            case SortingDirection.DESC:
+                return query.OrderByDescending(movie => movie.Year);
+            case SortingDirection.ASC:
+                return query.OrderBy(movie => movie.Year);
+            default:
+                throw new KeyNotFoundException($"{sortingDirection} not a valid order direction ");
+        }
+    }
 
 
     public async Task<Domain.Movie> ReadMovieFromId(string id)
@@ -88,9 +101,10 @@ public class MovieRepository : IMovieRepository
             throw new KeyNotFoundException($"Could not find movie with id: {id}");
         }
 
-        result.Actors = await _database.Persons.Where(p => p.ActedMovies.Contains(result)).Take(NumberOfResults)
+        result.Actors = await _database.Persons.Where(p => p.ActedMovies.Contains(result)).Take(NumberOfResultsPerPage)
             .ToListAsync();
-        result.Directors = await _database.Persons.Where(p => p.DirectedMovies.Contains(result)).Take(NumberOfResults)
+        result.Directors = await _database.Persons.Where(p => p.DirectedMovies.Contains(result))
+            .Take(NumberOfResultsPerPage)
             .ToListAsync();
 
         return ToDomain(result);
