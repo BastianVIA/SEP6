@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject NavigationManager NavManager;
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="flex-row">
         <a class="navbar-brand" href="">BMMS-DB</a>
 
@@ -8,12 +10,23 @@
             </NavLink>
         </div>
         <div class="nav-item">
-            <NavLink class="nav-link" href="moviesearch">
-                <span class="oi oi-video" aria-hidden="true"></span> Movie Search
-            </NavLink>
+            <div class="form-container">
+                <div class="form-container-item"><input type="text" @bind="@movieTitle"/><br></div>
+                <div class="form-container-item"><button class="btn btn-primary" @onclick="SearchForMovie">Search Movie</button></div>
+            </div>
         </div>
     </div>
-   
 
 </div>
+
+@code {
+    private string movieTitle { get; set; }
+
+    private void SearchForMovie()
+    {
+        NavManager.NavigateTo($"searchResult/{movieTitle}");
+    }
+
+}
+
 

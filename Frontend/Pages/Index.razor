@@ -1,21 +1,7 @@
 ﻿@page "/"
-@inject NavigationManager NavManager;
 
 <PageTitle>Index</PageTitle>
 
-<h3>Movie Search</h3>
-<form>
-    <label>Movie name:</label><br>
-    <input type="text" @bind="@movieTitle"/><br>
-</form> 
-<button class="btn btn-primary" @onclick="SearchForMovie">Search Movie</button>
-
 @code {
-    private string movieTitle { get; set; }
-
-    private void SearchForMovie()
-    {
-        NavManager.NavigateTo($"movieSearch/{movieTitle}");
-    }
 
 }

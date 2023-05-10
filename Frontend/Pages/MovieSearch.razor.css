@@ -1,0 +1,55 @@
+﻿.form-container {
+    display: flex;
+    align-items: center;
+}
+
+.form-container-item{
+    margin-right: 10px;
+}
+
+.sort-by{
+    float: right;
+}
+
+/* Style for the table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* Header row style */
+thead tr {
+    background-color: #f8f8f8;
+}
+
+/* Header cell style */
+th {
+    padding: 10px;
+    text-align: left;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+}
+
+/* Table body row style */
+tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Table body cell style */
+td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Hover effect on rows */
+tbody tr:hover {
+    background-color: #69858f;
+}
+
+.page-navigation {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    padding-left: 0px;
+}

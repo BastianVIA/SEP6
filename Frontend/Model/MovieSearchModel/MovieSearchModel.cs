@@ -6,10 +6,10 @@ namespace Frontend.Model.MovieSearchModel;
 public class MovieSearchModel : IMovieSearchModel
 {
     private const string BASEURI = "http://localhost:5276";
-    public async Task<List<Movie>> SearchForMovieAsync(string title)
+    public async Task<List<Movie>> SearchForMovieAsync(string title, MovieSortingKey? movieSortingKey = null,SortingDirection? sortingDirection = null, int? pageNumber = null)
     {
         var api = new Client(BASEURI, new HttpClient());
-        var response = await api.SearchAsync(title);
+        var response = await api.SearchAsync(title, movieSortingKey, sortingDirection, pageNumber);
         List<Movie> movies = new List<Movie>();
         Rating rating = new Rating();
         foreach (var movie in response.MovieDtos)

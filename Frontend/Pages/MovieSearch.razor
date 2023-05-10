@@ -1,20 +1,15 @@
-﻿@page "/MovieSearch/{movieTitle}"
+﻿@page "/SearchResult/{movieTitle}"
 @using Frontend.Entities
 @using Frontend.Model.MovieSearchModel
+@using Frontend.Service
 @inject IMovieSearchModel MovieSearchModel
 @inject NavigationManager NavManager
 
 <link rel="stylesheet" href="MovieSearch.razor.css">
 
-<PageTitle>Movie Search</PageTitle>
+<PageTitle>Search Result</PageTitle>
 
-<h3>Movie Search</h3>
-
-<div class="form-container">
-    <div class="form-container-item"><label>Movie name:</label><br></div>
-    <div class="form-container-item"><input type="text" @bind="@movieTitle"/><br></div>
-    <div class="form-container-item"><button class="btn btn-primary" @onclick="SearchForMovie">Search Movie</button></div>
-</div>
+<h3>Search Result</h3>
 
 <div class="sort-by">
     <label for="sortBy">Sort by:</label>
@@ -88,13 +83,13 @@
     private async Task SortByRating()
     {
         movieList.Clear();
-        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle); //+ SortType enum
+        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle, MovieSortingKey.Rating, SortingDirection.DESC, pageNumber);
     }
 
     private async Task SortByReleaseYear()
     {
         movieList.Clear();
-        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle); //+ SortType enum
+        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle, MovieSortingKey.ReleaseYear, SortingDirection.DESC, pageNumber);
     }
 
 }

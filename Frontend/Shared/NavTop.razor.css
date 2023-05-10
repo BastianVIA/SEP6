@@ -4,12 +4,11 @@
 
 .top-row {
     height: 3.5rem;
-    background-color: black; /*  the frontend text right now*/
+    background-color: black;
     display: flex;
     position: fixed;
     top: 0;
     width: 100%;
-    
 }
 
 .navbar-brand {
@@ -32,6 +31,15 @@
     padding-left: 20px;
 }
 
+.form-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.form-container-item{
+    margin-right: 10px;
+}
+
 
 @media (min-width: 641px) {
     .navbar-toggler {
@@ -47,4 +55,5 @@
         overflow-y: auto;
     }
 }
+
 
