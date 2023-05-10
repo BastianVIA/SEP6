@@ -4,47 +4,66 @@
 @inject IMovieSearchModel MovieSearchModel
 @inject NavigationManager NavManager
 
+<link rel="stylesheet" href="MovieSearch.razor.css">
+
 <PageTitle>Movie Search</PageTitle>
 
 <h3>Movie Search</h3>
 
- <form>
-  <label>Movie name:</label><br>
-     <input type="text" @bind="@movieTitle"/><br>
- </form> 
-<button class="btn btn-primary" @onclick="SearchForMovie">Search Movie</button>
+<div class="form-container">
+    <div class="form-container-item"><label>Movie name:</label><br></div>
+    <div class="form-container-item"><input type="text" @bind="@movieTitle"/><br></div>
+    <div class="form-container-item"><button class="btn btn-primary" @onclick="SearchForMovie">Search Movie</button></div>
+</div>
+
+<div class="sort-by">
+    <label for="sortBy">Sort by:</label>
+    <select name="sortBy">
+        <option value=""></option>
+        <option value="rating">Rating</option>
+        <option value="releaseYear">Release Year</option>
+    </select>
+</div>
 
 <table>
     <thead>
-        <tr>
-            <th>Poster</th>
-            <th>Title</th>
-            <th>ReleaseYear</th>
-            <th>Rating</th>
-        </tr>
+    <tr>
+        <th>Poster</th>
+        <th>Title</th>
+        <th>ReleaseYear <button class="btn btn-secondary" @onclick="SortByReleaseYear">V</button></th>
+        <th>Rating <button class="btn btn-secondary" @onclick="SortByRating">V</button></th>
+    </tr>
     </thead>
     <tbody>
-        @foreach (var movie in movieList)
-        {
-            <tr @onclick="@(() => OnMovieClick(movie.Id))">
-                <td><img src="@movie.PosterUrl" alt="Image" height="200" ></td>
-                <td>@movie.Title</td>
-                <td>@movie.ReleaseYear</td>
-                <td>@movie.Rating.AverageRating</td>
-            </tr>
-        }
+    @foreach (var movie in movieList)
+    {
+        <tr @onclick="@(() => OnMovieClick(movie.Id))">
+            <td><img src="@movie.PosterUrl" alt="Image" height="200"></td>
+            <td>@movie.Title</td>
+            <td>@movie.ReleaseYear</td>
+            <td>@movie.Rating.AverageRating</td>
+        </tr>
+    }
     </tbody>
 </table>
+
+<div class="page-navigation">
+    <button class="btn btn-secondary">{</button>
+    <p>Page @pageNumber</p>
+    <button class="btn btn-secondary">}</button>
+</div>
 
 @code {
     [Parameter]
     public string MovieTitle { get; set; }
     private IList<Movie> movieList = new List<Movie>();
     private string movieTitle { get; set; }
+    private int pageNumber { get; set; }
 
     protected override async void OnParametersSet()
     {
         movieTitle = MovieTitle;
+        pageNumber = 1;
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -64,6 +83,18 @@
     private void OnMovieClick(string movieId)
     {
         NavManager.NavigateTo($"movieDetails/{movieId}");
+    }
+
+    private async Task SortByRating()
+    {
+        movieList.Clear();
+        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle); //+ SortType enum
+    }
+
+    private async Task SortByReleaseYear()
+    {
+        movieList.Clear();
+        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle); //+ SortType enum
     }
 
 }

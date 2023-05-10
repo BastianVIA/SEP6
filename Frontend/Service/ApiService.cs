@@ -54,21 +54,29 @@ namespace Frontend.Service
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<MovieSearchResponse> SearchAsync(string title)
+        public virtual System.Threading.Tasks.Task<MovieSearchResponse> SearchAsync(string title, MovieSortingKey? orderBy, SortingDirection? sortingDirection)
         {
-            return SearchAsync(title, System.Threading.CancellationToken.None);
+            return SearchAsync(title, orderBy, sortingDirection, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<MovieSearchResponse> SearchAsync(string title, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<MovieSearchResponse> SearchAsync(string title, MovieSortingKey? orderBy, SortingDirection? sortingDirection, System.Threading.CancellationToken cancellationToken)
         {
+            if (title == null)
+                throw new System.ArgumentNullException("title");
+
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/movie/search?");
-            if (title != null)
+            urlBuilder_.Append(System.Uri.EscapeDataString("title") + "=").Append(System.Uri.EscapeDataString(ConvertToString(title, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            if (orderBy != null)
             {
-                urlBuilder_.Append(System.Uri.EscapeDataString("title") + "=").Append(System.Uri.EscapeDataString(ConvertToString(title, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+                urlBuilder_.Append(System.Uri.EscapeDataString("orderBy") + "=").Append(System.Uri.EscapeDataString(ConvertToString(orderBy, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (sortingDirection != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("sortingDirection") + "=").Append(System.Uri.EscapeDataString(ConvertToString(sortingDirection, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
 
@@ -349,11 +357,11 @@ namespace Frontend.Service
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v11.0.0.0))")]
     public partial class DetailsRatingDto
     {
-        [Newtonsoft.Json.JsonProperty("averageRating", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public float? AverageRating { get; set; }
+        [Newtonsoft.Json.JsonProperty("averageRating", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public float AverageRating { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("numberOfVotes", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? NumberOfVotes { get; set; }
+        [Newtonsoft.Json.JsonProperty("numberOfVotes", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int NumberOfVotes { get; set; }
 
     }
 
@@ -420,6 +428,16 @@ namespace Frontend.Service
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v11.0.0.0))")]
+    public enum MovieSortingKey
+    {
+
+        _0 = 0,
+
+        _1 = 1,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v11.0.0.0))")]
     public partial class ProblemDetails
     {
         [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -451,11 +469,21 @@ namespace Frontend.Service
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v11.0.0.0))")]
     public partial class RatingDto
     {
-        [Newtonsoft.Json.JsonProperty("averageRating", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public float? AverageRating { get; set; }
+        [Newtonsoft.Json.JsonProperty("averageRating", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public float AverageRating { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("votes", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? Votes { get; set; }
+        [Newtonsoft.Json.JsonProperty("votes", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int Votes { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v11.0.0.0))")]
+    public enum SortingDirection
+    {
+
+        _0 = 0,
+
+        _1 = 1,
 
     }
 
