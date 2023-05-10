@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Backend.Movie.Application.Search;
 
-public record Query(string Title, MovieSortingKey orderBy, SortingDirection sortingDirection) : IRequest<MovieSearchResponse>;
+public record Query(string Title, MovieSortingKey orderBy, SortingDirection sortingDirection, int pageNumber) : IRequest<MovieSearchResponse>;
 
 public record MovieSearchResponse(List<MovieDto> MovieDtos);
 
@@ -33,7 +33,7 @@ public class QueryHandler : IRequestHandler<Query, MovieSearchResponse>
 
     public async Task<MovieSearchResponse> Handle(Query request, CancellationToken cancellationToken)
     {
-        var foundMovies = await _repository.SearchForMovie(request.Title, request.orderBy, request.sortingDirection);
+        var foundMovies = await _repository.SearchForMovie(request.Title, request.orderBy, request.sortingDirection, request.pageNumber);
         var moviesToDto = new List<MovieDto>();
         foreach (var foundMovie in foundMovies)
         {

@@ -22,9 +22,9 @@ public class Controller: ControllerBase
     [Tags("MovieApi")]
     [ProducesResponseType(typeof(MovieSearchResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Get([Required] string title, MovieSortingKey orderBy = MovieSortingKey.Votes, SortingDirection sortingDirection = SortingDirection.DESC)
+    public async Task<IActionResult> Get([Required] string title, MovieSortingKey movieSortingKey = MovieSortingKey.Votes, SortingDirection sortingDirection = SortingDirection.DESC, int pageNumber = 1)
     {
-        var query = new Query(title, orderBy, sortingDirection);
+        var query = new Query(title, movieSortingKey, sortingDirection, pageNumber);
         var result = _mediator.Send(query);
 
         return Ok(await result);
