@@ -57,6 +57,7 @@ public class MovieDetailModel : IMovieDetailModel
             },
             Actors = actors,
             Directors = directors,
+            Resume = response.MovieDetailsDto.Resume
         };
 
         return movie;
