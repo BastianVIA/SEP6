@@ -48,7 +48,7 @@ public class QueryHandler :  IRequestHandler<Query, MovieDetailsResponse>
         return new MovieDetailsResponse(ToDto(await movie, await pathForPoster, await resume));
     }
 
-    public MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? resume)
+    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? resume)
     {
         var dtoMovie = new MovieDetailsDto
         {
@@ -69,7 +69,7 @@ public class QueryHandler :  IRequestHandler<Query, MovieDetailsResponse>
         return dtoMovie;
     }
 
-    public List<DetailsPersonsDto>? ToPersonDto(List<Person>? persons)
+    private List<DetailsPersonsDto>? ToPersonDto(List<Person>? persons)
     {
         if (persons == null || persons.Count == 0)
         {
