@@ -1,9 +1,10 @@
 ﻿@inject NavigationManager NavManager;
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="flex-row">
-        <a class="navbar-brand" href="">BMMS-DB</a>
-
+        <a class="navbar-brand" href="">BMMS-MDB</a>
         <div class="nav-item">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
@@ -12,7 +13,7 @@
         <div class="nav-item">
             <div class="form-container">
                 <div class="form-container-item"><input type="text" @bind="@movieTitle"/><br></div>
-                <div class="form-container-item"><button class="btn btn-primary" @onclick="SearchForMovie">Search Movie</button></div>
+                <div class="form-container-item"><button class="btn btn-primary" @onclick="SearchForMovie"><i class="fa fa-search"></i></button></div>
             </div>
         </div>
     </div>
