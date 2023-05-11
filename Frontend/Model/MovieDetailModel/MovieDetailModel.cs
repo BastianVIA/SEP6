@@ -1,48 +1,61 @@
-﻿using Frontend.Entities;
+﻿using System.Text.Json;
+using Frontend.Entities;
 using Frontend.Service;
-
 namespace Frontend.Model.MovieDetailModel;
 
-public class MovieDetailModel: IMovieDetailModel
+public class MovieDetailModel : IMovieDetailModel
+
 {
-    private const string BASEURI = "http://localhost:5276";
-    public async Task<Movie> GetMovieDetails(string movieId)
+    private static readonly Uri BASEURI = new Uri("http://localhost:5276");
+    private const string DEFAULT_POSTER_URL = "/Images/NoPosterAvailable.webp"; 
+
+    public async Task<Movie?> GetMovieDetails(string movieId)
     {
-        var api = new Client(BASEURI, new HttpClient());
-        var response = await api.MovieAsync(movieId);
+
+        var api = new Client(BASEURI.ToString(), new HttpClient());
+        MovieDetailsResponse? response;
+        response = await api.MovieAsync(movieId);
         List<Actor> actors = new List<Actor>();
         try
         {
-            foreach (var actor in response.MovieDetailsDto.Actors)
-            {
-                actors.Add(new Actor{ID = actor.Id, Name = actor.Name, BirthYear = actor.BirthYear});
-            }
+            response = await api.MovieAsync(movieId);
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
+            return null;
         }
-        
-        List<Director> directors = new List<Director>();
-        try
+
+        if (response == null || response.MovieDetailsDto == null)
         {
-            foreach (var director in response.MovieDetailsDto.Directors)
-            {
-                directors.Add(new Director{ID = director.Id, Name = director.Name, BirthYear = director.BirthYear});
-            }
+            return null;
         }
-        catch (Exception e)
+
+        var actors = response.MovieDetailsDto.Actors?.Select(actor => new Actor
         {
-            Console.WriteLine(e);
-        }
-        
-        Movie movie = new Movie
+            ID = actor.Id,
+            Name = actor.Name,
+            BirthYear = actor.BirthYear
+        }).ToList();
+
+        var directors = response.MovieDetailsDto.Directors?.Select(director => new Director
+        {
+            ID = director.Id,
+            Name = director.Name,
+            BirthYear = director.BirthYear
+        }).ToList();
+
+        var movie = new Movie
         {
             Id = response.MovieDetailsDto.Id,
             Title = response.MovieDetailsDto.Title,
             ReleaseYear = response.MovieDetailsDto.ReleaseYear,
-            PosterUrl = response.MovieDetailsDto.PathToPoster,
-            Rating = new Rating{AverageRating = response.MovieDetailsDto.Ratings.AverageRating, RatingCount = response.MovieDetailsDto.Ratings.NumberOfVotes},
+            PosterUrl = response.MovieDetailsDto.PathToPoster == null || string.IsNullOrWhiteSpace(response.MovieDetailsDto.PathToPoster.ToString()) ? new Uri(DEFAULT_POSTER_URL, UriKind.Relative) : response.MovieDetailsDto.PathToPoster,
+            Rating = new Rating
+            {
+                AverageRating = response.MovieDetailsDto.Ratings?.AverageRating ?? 0,
+                RatingCount = response.MovieDetailsDto.Ratings?.NumberOfVotes ?? 0
+            },
             Actors = actors,
             Directors = directors,
         };
