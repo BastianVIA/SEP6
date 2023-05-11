@@ -1,6 +1,12 @@
+using Frontend.Model.MovieDetailModel;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Frontend.Model.MovieSearchModel;
+using Frontend.Service;
+
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
+using Blazorise;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,10 +14,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<IMovieSearchModel, MovieSearchModel>();
+builder.Services.AddScoped<IMovieDetailModel, MovieDetailModel>();
 builder.Services.AddHttpClient();
 
-var app = builder.Build();
+builder.Services
+    .AddBlazorise( options =>
+    {
+        options.Immediate = true;
+    } )
+    .AddBootstrapProviders()
+    .AddFontAwesomeIcons();
 
+var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

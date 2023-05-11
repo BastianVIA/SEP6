@@ -5,32 +5,23 @@
 namespace Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class addingIndexToMovie : Migration
+    public partial class addIndexToPerson : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateIndex(
-                name: "IX_Movies_Id",
-                table: "Movies",
+                name: "IX_Persons_Id",
+                table: "Persons",
                 column: "Id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Movies_Title",
-                table: "Movies",
-                column: "Title");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropIndex(
-                name: "IX_Movies_Id",
-                table: "Movies");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Movies_Title",
-                table: "Movies");
+                name: "IX_Persons_Id",
+                table: "Persons");
         }
     }
 }

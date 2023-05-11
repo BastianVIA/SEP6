@@ -1,9 +1,97 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+@using Frontend.Entities
+@using Frontend.Model.MovieSearchModel
+@using Frontend.Service
+@inject IMovieSearchModel MovieSearchModel
+@inject NavigationManager NavManager
+@using Blazorise.LottieAnimation
+@using Blazorise
 
-<h1>Hello, world!</h1>
+<h2>Our Suggestions </h2>
 
-Welcome to your new app.
+<style>
+    .carousel-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* full viewport height */
+    }
 
-<SurveyPrompt Title="How is Blazor working for you?"/>
+    .carousel-image {
+        width: 300px;
+        height: 350px;
+    }
+</style>
+
+@if (moviesLoaded)
+{
+    <div class="carousel-container">
+        <Carousel ShowControls="true">
+            @foreach (var movie in movies)
+            {
+                <CarouselItem>
+                    <a href="@GetMovieDetailsUrl(movie.Id)">
+                        <img class="carousel-image" src="@movie.PosterUrl" alt="@movie.Title" />
+                    </a>
+                </CarouselItem>
+            }
+        </Carousel>
+        
+    </div>
+}
+else
+{
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px" />
+}
+
+
+
+@code {
+    private List<Movie> movies;
+    private int currentMovieIndex = 0;
+    private int moviesToLoad = 4;
+    private bool moviesLoaded = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMoviesAsync();
+    }
+
+    private async Task LoadMoviesAsync()
+    {
+        if (movies == null)
+        {
+            movies = new List<Movie>();
+        }
+
+        var movieTitles = new List<string>
+        {
+            "Harry Potter",
+            "Lord of the Rings",
+            "Star Wars",
+            "Pirates of the Caribbean"
+        };
+
+        for (int i = currentMovieIndex; i < currentMovieIndex + moviesToLoad && i < movieTitles.Count; i++)
+        {
+            var title = movieTitles[i];
+            var movieSearchModel = new MovieSearchModel();
+            var searchResults = await movieSearchModel.SearchForMovieAsync(title);
+            var movie = searchResults.FirstOrDefault();
+
+            if (movie != null)
+            {
+                movies.Add(movie);
+            }
+        }
+
+        currentMovieIndex += moviesToLoad;
+        moviesLoaded = true;
+    }
+
+    private string GetMovieDetailsUrl(string id)
+    {
+        return $"movieDetails/{id}";
+    }
+}

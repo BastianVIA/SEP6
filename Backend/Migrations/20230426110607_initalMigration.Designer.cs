@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230420153349_addingIndexToMovie")]
-    partial class addingIndexToMovie
+    [Migration("20230426110607_initalMigration")]
+    partial class initalMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,6 +38,37 @@ namespace Backend.Migrations
                     b.HasIndex("Title");
 
                     b.ToTable("Movies");
+                });
+
+            modelBuilder.Entity("Backend.Movie.Infrastructure.RatingDAO", b =>
+                {
+                    b.Property<string>("MovieId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<float>("Rating")
+                        .HasColumnType("REAL");
+
+                    b.Property<int>("Votes")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("MovieId");
+
+                    b.ToTable("Ratings");
+                });
+
+            modelBuilder.Entity("Backend.Movie.Infrastructure.RatingDAO", b =>
+                {
+                    b.HasOne("Backend.Movie.Infrastructure.MovieDAO", null)
+                        .WithOne("Rating")
+                        .HasForeignKey("Backend.Movie.Infrastructure.RatingDAO", "MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Backend.Movie.Infrastructure.MovieDAO", b =>
+                {
+                    b.Navigation("Rating")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

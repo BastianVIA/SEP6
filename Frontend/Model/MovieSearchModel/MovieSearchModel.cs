@@ -1,20 +1,43 @@
 ﻿using Frontend.Entities;
 using Frontend.Service;
 
-namespace Frontend.Model.MovieSearchModel;
-
-public class MovieSearchModel : IMovieSearchModel
+namespace Frontend.Model.MovieSearchModel
 {
-    private const string BASEURI = "http://localhost:5276";
-    public async Task<List<Movie>> SearchForMovieAsync(string title)
+    public class MovieSearchModel : IMovieSearchModel
     {
-        var api = new Client(BASEURI, new HttpClient());
-        var response = await api.SearchAsync(title);
-        List<Movie> movies = new List<Movie>();
-        foreach (var movie in response.MovieDtos)
+        private const string BASEURI = "http://localhost:5276";
+        private const string DEFAULT_POSTER_URL = "/Images/NoPosterAvailable.webp"; 
+
+        public async Task<List<Movie>> SearchForMovieAsync(string title, MovieSortingKey? movieSortingKey = null, SortingDirection? sortingDirection = null, int? pageNumber = null)
         {
-            movies.Add(new Movie{Id = movie.Id, Title = movie.Title, ReleaseYear = movie.ReleaseYear, ImagePath = movie.PathToPoster});
+            var api = new Client(BASEURI, new HttpClient());
+            var response = await api.SearchAsync(title, movieSortingKey, sortingDirection, pageNumber);
+            List<Movie> movies = new List<Movie>();
+            Rating rating = new Rating();
+            foreach (var movie in response.MovieDtos)
+            {
+                try
+                {
+                    rating = new Rating { AverageRating = movie.Rating.AverageRating, RatingCount = movie.Rating.Votes };
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                Uri.TryCreate(movie.PathToPoster?.ToString(), UriKind.Absolute, out Uri? posterUri);
+                movies.Add(new Movie
+                {
+                    Id = movie.Id, 
+                    Title = movie.Title, 
+                    ReleaseYear = movie.ReleaseYear, 
+                    PosterUrl = posterUri ?? new Uri(DEFAULT_POSTER_URL, UriKind.Relative),
+                    Rating = rating
+                });
+            }
+            return movies;
         }
-        return movies;
     }
 }
+
+
+

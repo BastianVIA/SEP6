@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using System.ComponentModel.DataAnnotations;
+using Backend.Enum;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Movie.Application.Search;
@@ -20,11 +22,11 @@ public class Controller: ControllerBase
     [Tags("MovieApi")]
     [ProducesResponseType(typeof(MovieSearchResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Get(string title)
+    public async Task<IActionResult> Get([Required] string title, MovieSortingKey movieSortingKey = MovieSortingKey.Votes, SortingDirection sortingDirection = SortingDirection.DESC, int pageNumber = 1)
     {
-        var query = new Query(title);
+        var query = new Query(title, movieSortingKey, sortingDirection, pageNumber);
         var result = _mediator.Send(query);
-   
+
         return Ok(await result);
     }
 }

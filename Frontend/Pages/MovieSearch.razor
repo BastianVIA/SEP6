@@ -1,58 +1,124 @@
-﻿@page "/MovieSearch"
+﻿@page "/SearchResult/{movieTitle}"
 @using Frontend.Entities
 @using Frontend.Model.MovieSearchModel
+@using Frontend.Service
 @inject IMovieSearchModel MovieSearchModel
+@inject NavigationManager NavManager
+@using Blazorise.LottieAnimation
+@using Blazorise
 
-<PageTitle>Movie Search</PageTitle>
+<PageTitle>Search Result</PageTitle>
 
-<h3>Movie Search</h3>
+<div class="page-content">
+<h3>Search Result</h3>
 
- <form>
-  <label>Movie name:</label><br>
-     <input type="text" @bind="@movieTitle"/><br>
- </form> 
-<button class="btn btn-primary" @onclick="SearchForMovie">Search Movie</button>
-<button class="btn btn-primary" @onclick="AddMoviesToTable">Add Dummy Movies</button>
+@if (!isDataFetched)
+{
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px" />
+}
+
+else if (movieList.Count == 0)
+{
+    <p size="20px">No such movie exists.</p>
+}
 
 <table>
     <thead>
-        <tr>
-            <th>Id</th>
-            <th>Title</th>
-            <th>ReleaseYear</th>
-            <th>Poster</th>
-        </tr>
+    <tr>
+       <th>Poster</th> 
+        <th>Title</th>
+        <th>ReleaseYear <button class="btn btn-secondary" @onclick="SortByReleaseYear"><Icon Name="IconName.AngleDown"/></button></th>
+        <th>Rating <button class="btn btn-secondary" @onclick="SortByRating"><Icon Name="IconName.AngleDown"/></button></th>
+    </tr>
     </thead>
     <tbody>
-        @foreach (var movie in movieList)
-        {
-            <tr>
-                <td>@movie.Id</td>
-                <td>@movie.Title</td>
-                <td>@movie.ReleaseYear</td>
-                <td><img src="@movie.ImagePath" alt="Image" height="200" ></td>
-            </tr>
-        }
+    @foreach (var movie in movieList)
+    {
+        <tr @onclick="@(() => OnMovieClick(movie.Id))">
+            <td><img src="@movie.PosterUrl" alt="Image" height="200"></td>
+            <td>@movie.Title</td>
+            <td>@movie.ReleaseYear</td>
+            <td>@movie.Rating.AverageRating</td>
+        </tr>
+    }
     </tbody>
 </table>
 
+<div class="page-navigation">
+    <button class="btn btn-secondary" @onclick="GoToPreviousPage"><Icon Name="IconName.AngleLeft"/></button>
+    <div class="page-number">
+        <p>Page @pageNumber</p>
+    </div>
+    <button class="btn btn-secondary" @onclick="GoToNextPage"><Icon Name="IconName.AngleRight"/></button>
+</div>
+
+</div>
+
 @code {
-    
+    [Parameter]
+    public string MovieTitle { get; set; }
     private IList<Movie> movieList = new List<Movie>();
     private string movieTitle { get; set; }
+    private int pageNumber { get; set; }
     
+    private bool isDataFetched = false;
+    private MovieSortingKey? sortingKey;
+    private SortingDirection? sortingDirection;
+    private int moviesPerPage;
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        movieTitle = MovieTitle;
+        pageNumber = 1;
+        isDataFetched = false;
+        await SearchForMovie();
+        isDataFetched = true;
+    }
+
     private async Task SearchForMovie()
     {
         movieList.Clear();
-        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle);
+        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle, sortingKey, sortingDirection, pageNumber);
     }
 
-    private void AddMoviesToTable()
+    private void OnMovieClick(string movieId)
     {
-        movieList.Clear();
-
-        movieList.Add(new Movie{Id = "1", Title = "Spider Man"});
-        movieList.Add(new Movie{Id = "2", Title = "Harry Potter"});
+        NavManager.NavigateTo($"movieDetails/{movieId}");
     }
-    
+
+    private async Task SortByRating()
+    {
+        sortingKey = MovieSortingKey.Rating;
+        pageNumber = 1;
+        await SearchForMovie();
+    }
+
+    private async Task SortByReleaseYear()
+    {
+        sortingKey = MovieSortingKey.ReleaseYear;
+        pageNumber = 1;
+        await SearchForMovie();
+    }
+
+    private async Task GoToNextPage()
+    {
+        if (movieList.Count < moviesPerPage)
+        {
+            return;
+        }
+        pageNumber++;
+        await SearchForMovie();
+    }
+
+    private async Task GoToPreviousPage()
+    {
+        if (pageNumber <= 1)
+        {
+            return;
+        }
+        pageNumber--;
+        await SearchForMovie();
+    }
 }
+
+
