@@ -7,6 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Blazorise.Bootstrap" Version="1.2.3" />
+      <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.2.3" />
+      <PackageReference Include="Blazorise.LottieAnimation" Version="1.2.3" />
       <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0-preview1" />
     </ItemGroup>
 
@@ -28,6 +31,10 @@
 
     <ItemGroup>
       <Content Remove="Data\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\js" />
     </ItemGroup>
 
 </Project>

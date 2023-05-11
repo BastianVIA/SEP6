@@ -10,10 +10,16 @@
             </NavLink>
         </div>
         <div class="nav-item">
-            <div class="form-container">
-                <div class="form-container-item"><input type="text" @bind="@movieTitle"/><br></div>
-                <div class="form-container-item"><button class="btn btn-primary" @onclick="SearchForMovie">Search Movie</button></div>
-            </div>
+            <form @onsubmit="@SearchForMovie">
+                <div class="form-container">
+                    <div class="form-container-item">
+                        <input type="text" @bind="@movieTitle"/><br>
+                    </div>
+                    <div class="form-container-item">
+                        <button class="btn btn-primary">Search Movie</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -28,5 +34,3 @@
     }
 
 }
-
-

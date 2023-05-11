@@ -4,6 +4,8 @@
 @using Frontend.Service
 @inject IMovieSearchModel MovieSearchModel
 @inject NavigationManager NavManager
+@using Blazorise.LottieAnimation
+@using Blazorise
 
 <link rel="stylesheet" href="MovieSearch.razor.css">
 
@@ -11,21 +13,46 @@
 
 <h3>Search Result</h3>
 
-<div class="sort-by">
-    <label for="sortBy">Sort by:</label>
-    <select name="sortBy">
-        <option value=""></option>
-        <option value="rating">Rating</option>
-        <option value="releaseYear">Release Year</option>
-    </select>
-</div>
+
+@if (!isDataFetched)
+{
+
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px" /> 
+
+}
+
+
+else if (movieList.Count == 0)
+{
+    <p size="20px">No such movie exists.</p>
+}
+else
+{
+    <div class="sort-by">
+        <label for="sortBy">Sort by:</label>
+        <select name="sortBy">
+            <option value=""></option>
+            <option value="rating">Rating</option>
+            <option value="releaseYear">Release Year</option>
+        </select>
+    </div>
+
+    <table>
+        <!-- table headers and body -->
+    </table>
+
+    <div class="page-navigation">
+        <!-- page navigation buttons -->
+    </div>
+}
+
 
 <table>
     <thead>
     <tr>
-        <th>Poster</th>
+       <th>Poster</th> 
         <th>Title</th>
-        <th>ReleaseYear <button class="btn btn-secondary" @onclick="SortByReleaseYear">V</button></th>
+        <th>ReleaseYear  <button class="btn btn-secondary" @onclick="SortByReleaseYear">V</button></th>
         <th>Rating <button class="btn btn-secondary" @onclick="SortByRating">V</button></th>
     </tr>
     </thead>
@@ -55,19 +82,27 @@
     private string movieTitle { get; set; }
     private int pageNumber { get; set; }
 
-    protected override async void OnParametersSet()
+    private bool isFirstRender = true;
+    private bool isDataFetched = false;
+
+
+    protected override async Task OnParametersSetAsync()
     {
         movieTitle = MovieTitle;
         pageNumber = 1;
+        isDataFetched = false;
+        await SearchForMovie();
+        isDataFetched = true;
     }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await SearchForMovie();
-            StateHasChanged(); 
-        }
-    }
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         StateHasChanged();
+    //     }
+    //
+    // }
 
     private async Task SearchForMovie()
     {
@@ -93,3 +128,5 @@
     }
 
 }
+
+
