@@ -26,25 +26,6 @@ else if (movieList.Count == 0)
 {
     <p size="20px">No such movie exists.</p>
 }
-else
-{
-    <div class="sort-by">
-        <label for="sortBy">Sort by:</label>
-        <select name="sortBy">
-            <option value=""></option>
-            <option value="rating">Rating</option>
-            <option value="releaseYear">Release Year</option>
-        </select>
-    </div>
-
-    <table>
-        <!-- table headers and body -->
-    </table>
-
-    <div class="page-navigation">
-        <!-- page navigation buttons -->
-    </div>
-}
 
 
 <table>
@@ -95,15 +76,7 @@ else
         isDataFetched = true;
     }
 
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (firstRender)
-    //     {
-    //         StateHasChanged();
-    //     }
-    //
-    // }
-
+ 
     private async Task SearchForMovie()
     {
         movieList.Clear();
