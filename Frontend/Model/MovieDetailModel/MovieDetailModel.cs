@@ -11,10 +11,11 @@ public class MovieDetailModel : IMovieDetailModel
 
     public async Task<Movie?> GetMovieDetails(string movieId)
     {
+
         var api = new Client(BASEURI.ToString(), new HttpClient());
-
         MovieDetailsResponse? response;
-
+        response = await api.MovieAsync(movieId);
+        List<Actor> actors = new List<Actor>();
         try
         {
             response = await api.MovieAsync(movieId);
@@ -61,6 +62,4 @@ public class MovieDetailModel : IMovieDetailModel
 
         return movie;
     }
-
-    
 }

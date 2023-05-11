@@ -3,16 +3,16 @@ using TMDbLib.Objects.General;
 
 namespace Backend.Service;
 
-public class TMDBImageService : IImageService
+public class TMDBService : IImageService, IResumeService
 {
-    private const string Apikey = "2fc86a533431c3559a968522a4955362";
     private const string DefaultImageSize = "original";
 
     private readonly TMDbClient _client;
 
-    public TMDBImageService()
+    public TMDBService(IConfiguration configuration)
     {
-        _client = new TMDbClient(Apikey);
+        
+        _client = new TMDbClient(configuration.GetConnectionString("TMDBApiKey"));
         var tmdbConfig = new TMDbConfig
         {
             Images = new ConfigImageTypes
@@ -34,5 +34,17 @@ public class TMDBImageService : IImageService
         }
 
         return _client.GetImageUrl(DefaultImageSize, movie.PosterPath);
+    }
+
+    public async Task<string?> GetResume(string id)
+    {
+        var movie = await _client.GetMovieAsync(id);
+        if (movie == null)
+        {
+            Console.WriteLine($"Could not find resume for movie with id: {id}");
+            return null;
+        }
+
+        return movie.Overview;
     }
 }

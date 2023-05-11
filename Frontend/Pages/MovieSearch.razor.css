@@ -1,4 +1,21 @@
-﻿.form-container {
+﻿.page-content{
+    width: 80%;
+    margin: 0 auto;
+}
+
+@media (max-width: 641px) {
+    .page-content{
+        width: 100%;
+    }
+}
+
+@media (min-width: 2000px) {
+    .page-content{
+        width: 50%;
+    }
+}
+
+.form-container {
     display: flex;
     align-items: center;
 }
@@ -44,10 +61,9 @@ td {
 
 /* Hover effect on rows */
 tbody tr:hover {
-    background-color: #69858f;
+    background-color: #007afd;
+    cursor: pointer;
 }
-
-
 
 /* Loading animation when searching for movies */ 
 .page-navigation {
@@ -82,5 +98,23 @@ tbody tr:hover {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+.page-navigation .btn {
+    height: 29px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.page-navigation .page-number{
+    height: 29px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.page-number p{
+    text-align: center;
 }
 

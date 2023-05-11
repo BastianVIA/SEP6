@@ -20,6 +20,8 @@ public class MovieDetailsDto
     public  DetailsRatingDto? Ratings { get; set; }
     public List<DetailsPersonsDto>? Actors { get; set; }
     public List<DetailsPersonsDto>? Directors { get; set; }
+    
+    public string? Resume { get; set; }
 }
 public record DetailsRatingDto(float AverageRating, int NumberOfVotes);
 
@@ -29,22 +31,24 @@ public class QueryHandler :  IRequestHandler<Query, MovieDetailsResponse>
 {
     private IMovieRepository _repository;
     private readonly IImageService _imageService;
+    private readonly IResumeService _resumeService;
 
-    public QueryHandler(IMovieRepository repository, IImageService imageService)
+    public QueryHandler(IMovieRepository repository, IImageService imageService, IResumeService resumeService)
     {
         _repository = repository;
         _imageService = imageService;
-
+        _resumeService = resumeService;
     }
 
     public async Task<MovieDetailsResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var movie =  _repository.ReadMovieFromId(request.Id);
         var pathForPoster = _imageService.GetPathForPoster(request.Id);
-        return new MovieDetailsResponse(ToDto(await movie, await pathForPoster));
+        var resume = _resumeService.GetResume(request.Id);
+        return new MovieDetailsResponse(ToDto(await movie, await pathForPoster, await resume));
     }
 
-    public MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser)
+    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? resume)
     {
         var dtoMovie = new MovieDetailsDto
         {
@@ -53,7 +57,8 @@ public class QueryHandler :  IRequestHandler<Query, MovieDetailsResponse>
             ReleaseYear = movie.ReleaseYear,
             PathToPoster = pathToPoser,
             Actors = ToPersonDto(movie.Actors),
-            Directors = ToPersonDto(movie.Directors)
+            Directors = ToPersonDto(movie.Directors),
+            Resume = resume
         };
         if (movie.Rating != null)
         {
@@ -64,7 +69,7 @@ public class QueryHandler :  IRequestHandler<Query, MovieDetailsResponse>
         return dtoMovie;
     }
 
-    public List<DetailsPersonsDto>? ToPersonDto(List<Person>? persons)
+    private List<DetailsPersonsDto>? ToPersonDto(List<Person>? persons)
     {
         if (persons == null || persons.Count == 0)
         {
