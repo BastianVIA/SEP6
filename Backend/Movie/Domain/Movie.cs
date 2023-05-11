@@ -8,4 +8,5 @@ public class Movie
     public Rating? Rating { get; set; }
     public List<Person>? Actors { get; set; }
     public List<Person>? Directors { get; set; }
+    
 }
