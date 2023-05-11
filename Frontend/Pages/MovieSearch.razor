@@ -4,28 +4,34 @@
 @using Frontend.Service
 @inject IMovieSearchModel MovieSearchModel
 @inject NavigationManager NavManager
-
-<link rel="stylesheet" href="MovieSearch.razor.css">
+@using Blazorise.LottieAnimation
+@using Blazorise
 
 <PageTitle>Search Result</PageTitle>
 
 <h3>Search Result</h3>
 
-<div class="sort-by">
-    <label for="sortBy">Sort by:</label>
-    <select name="sortBy">
-        <option value=""></option>
-        <option value="rating">Rating</option>
-        <option value="releaseYear">Release Year</option>
-    </select>
-</div>
+
+@if (!isDataFetched)
+{
+
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px" /> 
+
+}
+
+
+else if (movieList.Count == 0)
+{
+    <p size="20px">No such movie exists.</p>
+}
+
 
 <table>
     <thead>
     <tr>
-        <th>Poster</th>
+       <th>Poster</th> 
         <th>Title</th>
-        <th>ReleaseYear <button class="btn btn-secondary" @onclick="SortByReleaseYear">V</button></th>
+        <th>ReleaseYear  <button class="btn btn-secondary" @onclick="SortByReleaseYear">V</button></th>
         <th>Rating <button class="btn btn-secondary" @onclick="SortByRating">V</button></th>
     </tr>
     </thead>
@@ -55,20 +61,20 @@
     private string movieTitle { get; set; }
     private int pageNumber { get; set; }
 
-    protected override async void OnParametersSet()
+    private bool isFirstRender = true;
+    private bool isDataFetched = false;
+
+
+    protected override async Task OnParametersSetAsync()
     {
         movieTitle = MovieTitle;
         pageNumber = 1;
-    }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await SearchForMovie();
-            StateHasChanged(); 
-        }
+        isDataFetched = false;
+        await SearchForMovie();
+        isDataFetched = true;
     }
 
+ 
     private async Task SearchForMovie()
     {
         movieList.Clear();
@@ -93,3 +99,5 @@
     }
 
 }
+
+

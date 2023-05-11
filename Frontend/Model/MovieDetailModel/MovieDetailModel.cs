@@ -67,4 +67,10 @@ public class MovieDetailModel: IMovieDetailModel
 
         return movie;
     }
+    
+    
+    
+    
+    
+    
 }

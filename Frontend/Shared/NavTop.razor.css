@@ -40,6 +40,14 @@
     margin-right: 10px;
 }
 
+.btn {
+    height: 29px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 
 @media (min-width: 641px) {
     .navbar-toggler {
