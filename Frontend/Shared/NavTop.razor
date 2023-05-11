@@ -1,5 +1,6 @@
 ﻿@inject NavigationManager NavManager;
 @using Blazorise
+@using Frontend.Pages
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -9,6 +10,11 @@
         <div class="nav-item">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+        <div class="nav-item">
+            <NavLink class="nav-link" href="SignUp_Login">
+                <span class="oi oi-lock-locked" aria-hidden="true"></span> SignUp/Login
             </NavLink>
         </div>
         <div class="nav-item">
