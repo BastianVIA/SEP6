@@ -8,7 +8,6 @@ using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
 using Blazorise;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -23,11 +22,8 @@ builder.Services
     {
         options.Immediate = true;
     } )
-    
     .AddBootstrapProviders()
     .AddFontAwesomeIcons();
-
-
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.

@@ -1,4 +1,5 @@
 ﻿@inject NavigationManager NavManager;
+@using Blazorise
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -17,7 +18,7 @@
                         <input type="text" @bind="@movieTitle"/><br>
                     </div>
                     <div class="form-container-item">
-                        <button class="btn btn-primary">Search Movie</button>
+                        <button class="btn btn-primary"><Icon Name="IconName.Search"/></button>
                     </div>
                 </div>
             </form>
