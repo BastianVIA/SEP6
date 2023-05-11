@@ -9,30 +9,26 @@
 
 <PageTitle>Search Result</PageTitle>
 
+<div class="page-content">
 <h3>Search Result</h3>
-
 
 @if (!isDataFetched)
 {
-
-    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px" /> 
-
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px" />
 }
-
 
 else if (movieList.Count == 0)
 {
     <p size="20px">No such movie exists.</p>
 }
 
-
 <table>
     <thead>
     <tr>
        <th>Poster</th> 
         <th>Title</th>
-        <th>ReleaseYear  <button class="btn btn-secondary" @onclick="SortByReleaseYear">V</button></th>
-        <th>Rating <button class="btn btn-secondary" @onclick="SortByRating">V</button></th>
+        <th>ReleaseYear <button class="btn btn-secondary" @onclick="SortByReleaseYear"><Icon Name="IconName.AngleDown"/></button></th>
+        <th>Rating <button class="btn btn-secondary" @onclick="SortByRating"><Icon Name="IconName.AngleDown"/></button></th>
     </tr>
     </thead>
     <tbody>
@@ -49,9 +45,13 @@ else if (movieList.Count == 0)
 </table>
 
 <div class="page-navigation">
-    <button class="btn btn-secondary">{</button>
-    <p>Page @pageNumber</p>
-    <button class="btn btn-secondary">}</button>
+    <button class="btn btn-secondary" @onclick="GoToPreviousPage"><Icon Name="IconName.AngleLeft"/></button>
+    <div class="page-number">
+        <p>Page @pageNumber</p>
+    </div>
+    <button class="btn btn-secondary" @onclick="GoToNextPage"><Icon Name="IconName.AngleRight"/></button>
+</div>
+
 </div>
 
 @code {
@@ -60,11 +60,12 @@ else if (movieList.Count == 0)
     private IList<Movie> movieList = new List<Movie>();
     private string movieTitle { get; set; }
     private int pageNumber { get; set; }
-
-    private bool isFirstRender = true;
+    
     private bool isDataFetched = false;
-
-
+    private MovieSortingKey? sortingKey;
+    private SortingDirection? sortingDirection;
+    private int moviesPerPage;
+    
     protected override async Task OnParametersSetAsync()
     {
         movieTitle = MovieTitle;
@@ -74,11 +75,10 @@ else if (movieList.Count == 0)
         isDataFetched = true;
     }
 
- 
     private async Task SearchForMovie()
     {
         movieList.Clear();
-        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle);
+        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle, sortingKey, sortingDirection, pageNumber);
     }
 
     private void OnMovieClick(string movieId)
@@ -88,16 +88,37 @@ else if (movieList.Count == 0)
 
     private async Task SortByRating()
     {
-        movieList.Clear();
-        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle, MovieSortingKey.Rating, SortingDirection.DESC, pageNumber);
+        sortingKey = MovieSortingKey.Rating;
+        pageNumber = 1;
+        await SearchForMovie();
     }
 
     private async Task SortByReleaseYear()
     {
-        movieList.Clear();
-        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle, MovieSortingKey.ReleaseYear, SortingDirection.DESC, pageNumber);
+        sortingKey = MovieSortingKey.ReleaseYear;
+        pageNumber = 1;
+        await SearchForMovie();
     }
 
+    private async Task GoToNextPage()
+    {
+        if (movieList.Count < moviesPerPage)
+        {
+            return;
+        }
+        pageNumber++;
+        await SearchForMovie();
+    }
+
+    private async Task GoToPreviousPage()
+    {
+        if (pageNumber <= 1)
+        {
+            return;
+        }
+        pageNumber--;
+        await SearchForMovie();
+    }
 }
 
 
