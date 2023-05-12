@@ -6,29 +6,39 @@ namespace Frontend.Model.FirebaseModel;
 
 public class FirebaseModel : IFirebaseModel
 {
-    private const string API_KEY = "AIzaSyDt7-Qj0cqMjASG_Nj0CH_eNwevS5L36vQ";
-    private const string DOMAIN = "sep6-a072b.firebaseapp.com";
+    private string API_KEY;
+    private string DOMAIN;
     public string TokenValue { get; private set; }
-
-    static FirebaseAuthConfig config = new FirebaseAuthConfig
-    {
-        ApiKey = API_KEY,
-        AuthDomain = DOMAIN,
-        Providers = new FirebaseAuthProvider[]
-        {
-            new EmailProvider()
-        }
-    };
-
-    FirebaseAuthClient client = new FirebaseAuthClient(config);
+    public string DisplayName { get; set; }
+    public event Action<string> OnLogin;
     
+    private static FirebaseAuthConfig config;
+    private FirebaseAuthClient client;
+
+    public FirebaseModel(IConfiguration configuration)
+    {
+        API_KEY = configuration.GetConnectionString("FirebaseAPI");
+        DOMAIN = configuration.GetConnectionString("FirebaseDomain");
+        
+        config = new FirebaseAuthConfig
+        {
+            ApiKey = API_KEY,
+            AuthDomain = DOMAIN,
+            Providers = new FirebaseAuthProvider[]
+            {
+                new EmailProvider()
+            }
+        };
+
+        client = new FirebaseAuthClient(config);
+    }
+
     public async Task<bool> CreateUser(string displayName, string email, string password)
     {
         try
         {
             var userCredential = await client.CreateUserWithEmailAndPasswordAsync(email, password, displayName);
-            // TokenValue = userCredential.User.Credential.IdToken;
-            var token = userCredential.User.GetIdTokenAsync();
+            TokenValue = await userCredential.User.GetIdTokenAsync();
             return true;
         }
         catch (Exception e)
@@ -38,13 +48,28 @@ public class FirebaseModel : IFirebaseModel
             Console.WriteLine(e);
             return false;
         }
-        
+    }
+    public async Task<bool> Login(string email, string password)
+    {
+        try
+        {
+            var userCredential = await client.SignInWithEmailAndPasswordAsync(email, password);
+            TokenValue = await userCredential.User.GetIdTokenAsync();
+            DisplayName = userCredential.User.Info.DisplayName;
+            NotifyLogin();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            //WrongPassword
+            //UnknownEmailAddress
+            return false;
+        }
     }
 
-    public async Task Login()
+    private void NotifyLogin()
     {
-        var userCredential = await client.SignInWithEmailAndPasswordAsync("bastianthomsen@live.dk", "123Mathias");
-        var token = userCredential.User.GetIdTokenAsync();
-        var displayName = userCredential.User.Info.DisplayName;
+        OnLogin.Invoke(DisplayName);
     }
 }

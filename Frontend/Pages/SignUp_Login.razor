@@ -1,23 +1,45 @@
-﻿@page "/SignUp_Login"
+﻿@namespace Frontend.Components
+
+@page "/SignUp_Login"
 @using Blazorise
 
-<Signup SignupSuccess=@GetSignupSuccess/>
+@if (login)
+{
+    <Login ShowLoginComponent=@SetLoginComponent LoginSuccess=@GetLoginSuccess/>
+}
+else
+{
+    <Signup SignupSuccess=@GetSignupSuccess/>
+}
+
 
 <div class="signup-alert-container">
-<Alert Color="Color.Warning" @bind-Visible="@showAlertError" Margin="Margin.Is0">
-    <AlertMessage>Signup error!</AlertMessage>
-    <AlertDescription>User with this email already exists.</AlertDescription>
-</Alert>
-
-<Alert Color="Color.Success" @bind-Visible="@showAlertSuccess" Margin="Margin.Is0">
-    <AlertMessage>Signup succes!</AlertMessage>
-    <AlertDescription>You successfully created an account.</AlertDescription>
-</Alert>
+    <Alert Color="Color.Warning" @bind-Visible="@showAlertError" Margin="Margin.Is0">
+        <AlertMessage>Signup Error!</AlertMessage>
+        <AlertDescription>User with this email already exists.</AlertDescription>
+    </Alert>
+    <Alert Color="Color.Success" @bind-Visible="@showAlertSuccess" Margin="Margin.Is0">
+        <AlertMessage>Signup Success!</AlertMessage>
+        <AlertDescription>You successfully created an account.</AlertDescription>
+    </Alert>
+    
+    
+    <Alert Color="Color.Warning" @bind-Visible="@loginError" Margin="Margin.Is0">
+        <AlertMessage>Login Error!</AlertMessage>
+        <AlertDescription>You</AlertDescription>
+    </Alert>
+    <Alert Color="Color.Success" @bind-Visible="@loginSucces" Margin="Margin.Is0">
+        <AlertMessage>Login Success!</AlertMessage>
+        <AlertDescription>You have successfully logged in.</AlertDescription>
+    </Alert>
 </div>
 
 @code{
+    private bool login = true;
     private bool showAlertError = false;
     private bool showAlertSuccess = false;
+    private bool loginError = false;
+    private bool loginSucces = false;
 
     private void GetSignupSuccess(bool signupSuccess)
     {
@@ -33,4 +55,24 @@
             showAlertError = true;
         }
     }
+
+    private void SetLoginComponent(bool value)
+    {
+        login = value;
+    }
+
+    private void GetLoginSuccess(bool value)
+    {
+        loginError = false;
+        loginSucces = false;
+        if (value)
+        {
+            loginSucces = true;
+        }
+        else
+        {
+            loginError = true;
+        }
+    }
+
 }
