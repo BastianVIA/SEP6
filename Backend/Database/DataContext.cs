@@ -1,4 +1,5 @@
 ﻿using Backend.Movie.Infrastructure;
+using Backend.User.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Database;
@@ -9,6 +10,7 @@ public class DataContext : DbContext
     public DbSet<MovieDAO> Movies { get; set; }   
     public DbSet<RatingDAO> Ratings { get; set; }   
     public DbSet<PersonDAO> Persons { get; set; }   
+    public DbSet<UserDAO> Users { get; set; }
 
     public DataContext(IConfiguration configuration)
     {
@@ -37,7 +39,6 @@ public class DataContext : DbContext
             .HasMany(m => m.Directors)
             .WithMany(d => d.DirectedMovies)
             .UsingEntity(j => j.ToTable("Directors"));
-        
     }
     
 }
