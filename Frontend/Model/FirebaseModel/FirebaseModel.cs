@@ -1,4 +1,5 @@
-﻿using Firebase.Auth;
+﻿using System.Reflection.Metadata.Ecma335;
+using Firebase.Auth;
 using Firebase.Auth.Providers;
 
 namespace Frontend.Model.FirebaseModel;
@@ -7,6 +8,7 @@ public class FirebaseModel : IFirebaseModel
 {
     private const string API_KEY = "AIzaSyDt7-Qj0cqMjASG_Nj0CH_eNwevS5L36vQ";
     private const string DOMAIN = "sep6-a072b.firebaseapp.com";
+    public string TokenValue { get; private set; }
 
     static FirebaseAuthConfig config = new FirebaseAuthConfig
     {
@@ -20,9 +22,23 @@ public class FirebaseModel : IFirebaseModel
 
     FirebaseAuthClient client = new FirebaseAuthClient(config);
     
-    public async Task CreateUser()
+    public async Task<bool> CreateUser(string displayName, string email, string password)
     {
-        var userCredential = await client.CreateUserWithEmailAndPasswordAsync("bastianthomsen@live.dk", "123Mathias", "Bastian");
+        try
+        {
+            var userCredential = await client.CreateUserWithEmailAndPasswordAsync(email, password, displayName);
+            // TokenValue = userCredential.User.Credential.IdToken;
+            var token = userCredential.User.GetIdTokenAsync();
+            return true;
+        }
+        catch (Exception e)
+        {
+            //EmailExists
+            //InvalidEmailAddress
+            Console.WriteLine(e);
+            return false;
+        }
+        
     }
 
     public async Task Login()

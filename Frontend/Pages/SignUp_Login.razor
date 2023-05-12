@@ -1,6 +1,36 @@
 ﻿@page "/SignUp_Login"
-<h3>SignUp_Login</h3>
+@using Blazorise
 
-@code {
-    
+<Signup SignupSuccess=@GetSignupSuccess/>
+
+<div class="signup-alert-container">
+<Alert Color="Color.Warning" @bind-Visible="@showAlertError" Margin="Margin.Is0">
+    <AlertMessage>Signup error!</AlertMessage>
+    <AlertDescription>User with this email already exists.</AlertDescription>
+</Alert>
+
+<Alert Color="Color.Success" @bind-Visible="@showAlertSuccess" Margin="Margin.Is0">
+    <AlertMessage>Signup succes!</AlertMessage>
+    <AlertDescription>You successfully created an account.</AlertDescription>
+</Alert>
+</div>
+
+@code{
+    private bool showAlertError = false;
+    private bool showAlertSuccess = false;
+
+    private void GetSignupSuccess(bool signupSuccess)
+    {
+        showAlertSuccess = false;
+        showAlertError = false;
+        
+        if (signupSuccess)
+        {
+            showAlertSuccess = true;
+        }
+        else
+        {
+            showAlertError = true;
+        }
+    }
 }

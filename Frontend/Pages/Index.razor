@@ -46,11 +46,6 @@ else
     <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px" />
 }
 
-<Button Color="Color.Primary" Clicked="@CreateUser">Create User</Button>
-<Button Color="Color.Primary" Clicked="@Login">Login</Button>
-
-
-
 @code {
     private List<Movie> movies;
     private int currentMovieIndex = 0;
@@ -97,16 +92,6 @@ else
     private string GetMovieDetailsUrl(string id)
     {
         return $"movieDetails/{id}";
-    }
-
-    private async Task CreateUser()
-    {
-        await FirebaseModel.CreateUser();
-    }
-
-    private async Task Login()
-    {
-        await FirebaseModel.Login();
     }
 
 }
