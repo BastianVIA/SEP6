@@ -15,7 +15,7 @@ public class FirebaseModel : IFirebaseModel
     public event EventHandler<AlertEventArgs>? OnNotifyAlert; 
     private static FirebaseAuthConfig config;
     private FirebaseAuthClient client;
-    private AlertBoxHandler _alertBoxHandler;
+    private AlertBoxHelper _alertBoxHelper;
 
     public FirebaseModel(IConfiguration configuration)
     {
@@ -33,7 +33,7 @@ public class FirebaseModel : IFirebaseModel
         };
 
         client = new FirebaseAuthClient(config);
-        _alertBoxHandler = new AlertBoxHandler();
+        _alertBoxHelper = new AlertBoxHelper();
     }
 
     public async Task<bool> CreateUser(string displayName, string email, string password)
@@ -62,25 +62,26 @@ public class FirebaseModel : IFirebaseModel
             var userCredential = await client.SignInWithEmailAndPasswordAsync(email, password);
             TokenValue = await userCredential.User.GetIdTokenAsync();
             DisplayName = userCredential.User.Info.DisplayName;
-            
+            FireAlertEvent(AlertBoxHelper.AlertType.LoginSuccess, DisplayName);
             return true;
         }
         catch (FirebaseAuthException e)
         {
             Console.WriteLine(e);
-            var reason = e.Reason;
+            var reason = e.Reason.ToString();
             //WrongPassword
             //UnknownEmailAddress
-            
+            FireAlertEvent(AlertBoxHelper.AlertType.LoginFail, reason);
             return false;
         }
     }
 
-    private void FireAlertEvent(AlertBoxHandler.AlertType type, string data)
+    private void FireAlertEvent(AlertBoxHelper.AlertType type, string data)
     {
         OnNotifyAlert?.Invoke(this,new AlertEventArgs
         {
-            
+            Type = type,
+            Data = data
         });
     }
 

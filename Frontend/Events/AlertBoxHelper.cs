@@ -2,7 +2,7 @@
 
 namespace Frontend.Events;
 
-public class AlertBoxHandler
+public class AlertBoxHelper
 {
     public enum AlertType
     {
@@ -15,7 +15,9 @@ public class AlertBoxHandler
     private static readonly Dictionary<AlertType, Func<string, Alert>> Alerts = new()
     {
         { AlertType.LoginSuccess , LoginSuccess},
-        { AlertType.LoginFail , LoginFailed}
+        { AlertType.LoginFail , LoginFailed},
+        { AlertType.SignupSuccess , SignupSuccess},
+        { AlertType.SignupFail , SignupFailed}
     };
     
 
@@ -25,7 +27,7 @@ public class AlertBoxHandler
         {
             Success = true,
             Message = $"Welcome {name}!",
-            Description = $"You have successfully created an account."
+            Description = $"You have successfully logged in."
         };
     }
 
@@ -34,11 +36,31 @@ public class AlertBoxHandler
         return new Alert
         {
             Success = false,
-            Message = "Sign Up Failed!",
+            Message = "Login Failed!",
             Description = $"Reason: {reason}."
         };
     }
-    
+
+    private static Alert SignupSuccess(string text)
+    {
+        return new Alert
+        {
+            Success = true,
+            Message = "Signup Success!",
+            Description = $"You have successfully created an account."
+        };
+    }
+
+    private static Alert SignupFailed(string reason)
+    {
+        return new Alert
+        {
+            Success = false,
+            Message = "Signup Failed!",
+            Description = $"Reason: {reason}"
+        };
+    }
+
     public Alert? GetAlert(AlertType type, string data)
     {
         if (!Alerts.TryGetValue(type, out var alertMethod)) return null;

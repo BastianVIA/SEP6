@@ -50,19 +50,19 @@
 
     protected override void OnInitialized()
     {
-        //FirebaseModel.OnLogin += SetDisplayName;
+        FirebaseModel.OnNotifyAlert += SetDisplayName;
     }
 
 
-    // private void SetDisplayName(object sender, LoginEventArgs args)
-    // {
-    //     displayName = args.DisplayName;
-    //     StateHasChanged();
-    // }
-    //
+    private void SetDisplayName(object? sender, AlertEventArgs args)
+    {
+        displayName = args.Type == AlertBoxHelper.AlertType.LoginSuccess ? args.Data : "";
+        StateHasChanged();
+    }
+    
     public void Dispose()
     {
-        //FirebaseModel.OnLogin -= SetDisplayName;
+        FirebaseModel.OnNotifyAlert -= SetDisplayName;
     }
 
 }

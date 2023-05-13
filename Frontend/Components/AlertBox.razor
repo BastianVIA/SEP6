@@ -19,36 +19,33 @@
 @code {
     private Alert? Alert { get; set; }
     private bool _visibility;
-    private int _alertTime = 3;
-    private AlertBoxHandler _handler;
+    private int _alertTimeSeconds = 5;
+    private AlertBoxHelper _helper;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        _handler = new AlertBoxHandler();
+        _helper = new AlertBoxHelper();
         FirebaseModel.OnNotifyAlert += HandleAlertEvent;
     }
 
-    public void HandleAlertEvent(object sender, AlertEventArgs args)
+    private void HandleAlertEvent(object? sender, AlertEventArgs args)
     {
-        Console.WriteLine($"What is sender: {sender}" );
-
-
-        Alert = _handler.GetAlert(args.Type, args.Data);
+        Alert = _helper.GetAlert(args.Type, args.Data);
         if (Alert == null) return;
         
         _visibility = true;
         StateHasChanged();
-        //HideAlertTimer();
+        HideAlertTimer();
     }
 
     private void HideAlertTimer()
     {
-        Task.Delay(_alertTime * 1000).ContinueWith(task =>
+        Task.Delay(_alertTimeSeconds * 1000).ContinueWith(task =>
         {
             _visibility = false;
             Console.WriteLine("Alert should not be visible");
-            StateHasChanged();
+            InvokeAsync(StateHasChanged);
         });
     }
 
