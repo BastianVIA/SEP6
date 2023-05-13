@@ -1,4 +1,5 @@
 ﻿@namespace Frontend.Components
+@inject NavigationManager NavManager
 
 @page "/SignUp_Login"
 @using Blazorise
@@ -49,6 +50,7 @@ else
         if (signupSuccess)
         {
             showAlertSuccess = true;
+            ToHomePage();
         }
         else
         {
@@ -68,11 +70,17 @@ else
         if (value)
         {
             loginSucces = true;
+            ToHomePage();
         }
         else
         {
             loginError = true;
         }
+    }
+
+    private void ToHomePage()
+    {
+        NavManager.NavigateTo("/");
     }
 
 }

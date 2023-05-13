@@ -1,6 +1,7 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using Firebase.Auth;
+﻿using Firebase.Auth;
 using Firebase.Auth.Providers;
+using Frontend.Entities;
+using Frontend.Events;
 
 namespace Frontend.Model.FirebaseModel;
 
@@ -10,10 +11,11 @@ public class FirebaseModel : IFirebaseModel
     private string DOMAIN;
     public string TokenValue { get; private set; }
     public string DisplayName { get; set; }
-    public event Action<string> OnLogin;
-    
+
+    public event EventHandler<AlertEventArgs>? OnNotifyAlert; 
     private static FirebaseAuthConfig config;
     private FirebaseAuthClient client;
+    private AlertBoxHandler _alertBoxHandler;
 
     public FirebaseModel(IConfiguration configuration)
     {
@@ -31,6 +33,7 @@ public class FirebaseModel : IFirebaseModel
         };
 
         client = new FirebaseAuthClient(config);
+        _alertBoxHandler = new AlertBoxHandler();
     }
 
     public async Task<bool> CreateUser(string displayName, string email, string password)
@@ -39,13 +42,16 @@ public class FirebaseModel : IFirebaseModel
         {
             var userCredential = await client.CreateUserWithEmailAndPasswordAsync(email, password, displayName);
             TokenValue = await userCredential.User.GetIdTokenAsync();
+            
             return true;
         }
-        catch (Exception e)
+        catch (FirebaseAuthException e)
         {
             //EmailExists
             //InvalidEmailAddress
             Console.WriteLine(e);
+            var reason = e.Reason;
+            
             return false;
         }
     }
@@ -56,20 +62,26 @@ public class FirebaseModel : IFirebaseModel
             var userCredential = await client.SignInWithEmailAndPasswordAsync(email, password);
             TokenValue = await userCredential.User.GetIdTokenAsync();
             DisplayName = userCredential.User.Info.DisplayName;
-            NotifyLogin();
+            
             return true;
         }
-        catch (Exception e)
+        catch (FirebaseAuthException e)
         {
             Console.WriteLine(e);
+            var reason = e.Reason;
             //WrongPassword
             //UnknownEmailAddress
+            
             return false;
         }
     }
 
-    private void NotifyLogin()
+    private void FireAlertEvent(AlertBoxHandler.AlertType type, string data)
     {
-        OnLogin.Invoke(DisplayName);
+        OnNotifyAlert?.Invoke(this,new AlertEventArgs
+        {
+            
+        });
     }
+
 }
