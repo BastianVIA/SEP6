@@ -4,6 +4,8 @@ namespace Backend.User.Infrastructure;
 
 public class UserMovieDAO
 {
-    [Key]
     public string Id { get; set; }
+    public string UserId { get; set; }
+    public UserDAO User { get; set; }
+
 }

@@ -1,0 +1,50 @@
+﻿using System.ComponentModel.DataAnnotations;
+using Backend.Middleware;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using NLog;
+
+namespace Backend.User.Application.RemoveMovieFromFavorites;
+
+[ApiController]
+[Route("user")]
+
+public class Controller : ControllerBase
+{
+    private readonly IMediator _mediator;
+
+    public Controller(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
+
+    [HttpDelete]
+    [Route("favorite/{movieId}")]
+    [Tags("UserApi")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize]
+    public async Task<IActionResult> Put([Required] string movieId)
+    {
+        try
+        {
+            string userid = (string)HttpContext.Items[HttpContextKeys.UserId];
+            var command = new Command(userid, movieId);
+            await _mediator.Send(command);
+        }
+        catch (InvalidDataException e)
+        {
+            LogManager.GetCurrentClassLogger().Error(e.StackTrace);
+            return StatusCode(400, e.Message);
+        }
+        catch (Exception e)
+        {
+            LogManager.GetCurrentClassLogger().Error(e.StackTrace);
+            return StatusCode(500, e.Message);
+        }
+
+        return Ok();
+    }
+}

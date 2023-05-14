@@ -42,7 +42,7 @@ public class UserRepository : IUserRepository
         {
             user.FavoriteMovies = new List<UserMovieDAO>();
         }
-        user.FavoriteMovies = FromDomain(user.FavoriteMovies, domainUser.FavoriteMovies);
+        FromDomain(user.FavoriteMovies, domainUser.FavoriteMovies);
         _database.Users.Update(user);
         await _database.SaveChangesAsync();
     }
@@ -65,19 +65,16 @@ public class UserRepository : IUserRepository
         };
     }
     
-    private List<UserMovieDAO> FromDomain(List<UserMovieDAO> userDaoMovies, List<string> movieIds)
+    private void FromDomain(List<UserMovieDAO> userDaoMovies, List<string> movieIds)
     {
-        var userMovieDaos = new List<UserMovieDAO>();
-        userMovieDaos.AddRange(userDaoMovies);
+        userDaoMovies.RemoveAll(daoMovie => !movieIds.Contains(daoMovie.Id));
         foreach (var movieId in movieIds)
-        { 
+        {
             var movieExists = userDaoMovies.Any(daoMovie => daoMovie.Id == movieId);
             if (!movieExists)
             {
-                userMovieDaos.Add(new UserMovieDAO { Id = movieId });
+                userDaoMovies.Add(new UserMovieDAO { Id = movieId });
             }
         }
-
-        return userMovieDaos;
     }
 }
