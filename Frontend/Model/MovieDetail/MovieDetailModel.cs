@@ -1,7 +1,7 @@
-﻿using System.Text.Json;
-using Frontend.Entities;
+﻿using Frontend.Entities;
 using Frontend.Service;
-namespace Frontend.Model.MovieDetailModel;
+
+namespace Frontend.Model.MovieDetail;
 
 public class MovieDetailModel : IMovieDetailModel
 

@@ -1,9 +1,8 @@
 ﻿using Firebase.Auth;
 using Firebase.Auth.Providers;
-using Frontend.Entities;
 using Frontend.Events;
 
-namespace Frontend.Model.FirebaseModel;
+namespace Frontend.Model.Firebase;
 
 public class FirebaseModel : IFirebaseModel
 {
@@ -11,6 +10,7 @@ public class FirebaseModel : IFirebaseModel
     private string DOMAIN;
     public string TokenValue { get; private set; }
     public string DisplayName { get; set; }
+    public string UID { get; private set; }
 
     public event EventHandler<AlertEventArgs>? OnNotifyAlert; 
     private static FirebaseAuthConfig config;
@@ -43,6 +43,7 @@ public class FirebaseModel : IFirebaseModel
             var userCredential = await client.CreateUserWithEmailAndPasswordAsync(email, password, displayName);
             TokenValue = await userCredential.User.GetIdTokenAsync();
             DisplayName = userCredential.User.Info.DisplayName;
+            UID = userCredential.User.Uid;
             FireAlertEvent(AlertBoxHelper.AlertType.SignupSuccess);
             return true;
         }
@@ -63,6 +64,7 @@ public class FirebaseModel : IFirebaseModel
             var userCredential = await client.SignInWithEmailAndPasswordAsync(email, password);
             TokenValue = await userCredential.User.GetIdTokenAsync();
             DisplayName = userCredential.User.Info.DisplayName;
+            UID = userCredential.User.Uid;
             FireAlertEvent(AlertBoxHelper.AlertType.LoginSuccess);
             return true;
         }
