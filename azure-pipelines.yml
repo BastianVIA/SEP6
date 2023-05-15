@@ -48,6 +48,7 @@ stages:
     jobs:
       - job: DeployProductionVersion
         displayName: Deploy to Azure App Service
+        dependsOn: BuildDevVersionsJob
         steps:
 
           - checkout: self
@@ -60,11 +61,11 @@ stages:
               artifactName: 'BuildPackages'
               targetPath: output/
 
-          - task: CmdLine@2
+          - task: AzureCLI@2
             displayName: "Deploy to Azure App Service"
-            env:
-              AZURE_SUBSCRIPTION_ID: $(AzureSubscriptionId)
-              AZURE_RESOURCE_GROUP_NAME: $(AzureResourceGroupName)
-              AZURE_APP_SERVICE_NAME: $(AzureAppServiceName)
             inputs:
-              script: './build.cmd Deploy --no-logo'
+              azureSubscription: $(AzureSubscriptionId)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az webapp deployment source config-zip --src "output/Publish/app.zip" --name $(AzureAppServiceName) --resource-group $(AzureResourceGroupName)
