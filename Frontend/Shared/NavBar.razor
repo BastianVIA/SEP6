@@ -2,9 +2,11 @@
 @using Frontend.Events
 @using Frontend.Model.Firebase
 @using Frontend.Pages
+@using Frontend.Service
 @using Microsoft.OpenApi.Services
 @inject IFirebaseModel FirebaseModel
-@inject NavigationManager NavManager;
+@inject NavigationManager NavManager
+@inject CustomAuthenticationStateProvider AuthStateProvider
 
 <div class="navbar-container">
     <Bar Breakpoint="Breakpoint.Desktop"
@@ -50,7 +52,7 @@
                                 <DropdownMenu>
                                     <DropdownItem>Edit profile</DropdownItem>
                                     <DropdownDivider/>
-                                    <DropdownItem>Logout</DropdownItem>
+                                    <DropdownItem Clicked="Logout">Logout</DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
                         </BarItem>
@@ -95,6 +97,12 @@
     public void Dispose()
     {
         FirebaseModel.OnNotifyAlert -= SetDisplayName;
+    }
+
+    private void Logout()
+    {
+        FirebaseModel.Logout();
+        AuthStateProvider.SignOut();
     }
 
 }
