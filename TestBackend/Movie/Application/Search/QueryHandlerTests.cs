@@ -9,14 +9,14 @@ namespace TestBackend.Movie.Application.Search;
 
 public class QueryHandlerTests
 {
-    private readonly QueryHandler _sut;
+    private readonly QueryHandler _handler;
     private readonly IMovieRepository _movieRepository = Substitute.For<IMovieRepository>();
     private readonly IImageService _imageService = Substitute.For<IImageService>();
     private readonly Fixture _fixture = new();
     
     public QueryHandlerTests()
     {
-        _sut = new QueryHandler(_movieRepository, _imageService);
+        _handler = new QueryHandler(_movieRepository, _imageService);
     }
 
     [Fact]
@@ -29,7 +29,7 @@ public class QueryHandlerTests
             .Returns(expected);
         
         //Act
-        var result = await _sut.Handle(request, CancellationToken.None);
+        var result = await _handler.Handle(request, CancellationToken.None);
 
         //Assert
         Assert.NotNull(result);
@@ -50,7 +50,7 @@ public class QueryHandlerTests
             .Returns(expected);
 
         //Act
-        var result = await _sut.Handle(request, CancellationToken.None);
+        var result = await _handler.Handle(request, CancellationToken.None);
         //Assert
         Assert.NotNull(result);
         Assert.NotEmpty(result.MovieDtos);
@@ -73,7 +73,7 @@ public class QueryHandlerTests
             .Returns(returnedMovies);
 
         //Act
-        var result = await _sut.Handle(request, CancellationToken.None);
+        var result = await _handler.Handle(request, CancellationToken.None);
         //Assert
         Assert.NotNull(result);
         Assert.NotEmpty(result.MovieDtos);

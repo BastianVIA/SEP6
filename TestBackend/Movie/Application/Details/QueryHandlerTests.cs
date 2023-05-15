@@ -10,7 +10,7 @@ namespace TestBackend.Movie.Application.Details;
 
 public class QueryHandlerTests
 {
-    private QueryHandler _sut;
+    private QueryHandler _handler;
     private Fixture _fixture = new();
     private readonly IMovieRepository _repository = Substitute.For<IMovieRepository>();
     private readonly IImageService _imageService = Substitute.For<IImageService>();
@@ -18,7 +18,7 @@ public class QueryHandlerTests
 
     public QueryHandlerTests()
     {
-        _sut = new QueryHandler(_repository, _imageService, _resumeService);
+        _handler = new QueryHandler(_repository, _imageService, _resumeService);
     }
 
     [Fact]
@@ -28,7 +28,7 @@ public class QueryHandlerTests
         var query = _fixture.Create<Query>();
         _repository.ReadMovieFromId(query.Id).Throws<KeyNotFoundException>();
         //Act-Assert
-        await Assert.ThrowsAsync<KeyNotFoundException>(()=>_sut.Handle(query, CancellationToken.None));
+        await Assert.ThrowsAsync<KeyNotFoundException>(()=>_handler.Handle(query, CancellationToken.None));
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class QueryHandlerTests
         
         //Act
 
-        var result = await _sut.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, CancellationToken.None);
         //Assert
         Assert.Equal(expectedMovie.Id, result.MovieDetailsDto.Id);
         Assert.Equal(expectedMovie.Title, result.MovieDetailsDto.Title);
