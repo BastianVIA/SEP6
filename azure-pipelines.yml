@@ -48,7 +48,6 @@ stages:
     jobs:
       - job: DeployProductionVersion
         displayName: Deploy to Azure App Service
-        dependsOn: BuildDevVersionsJob
         steps:
 
           - checkout: self
