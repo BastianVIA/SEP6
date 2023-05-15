@@ -2,8 +2,10 @@
 @using System.ComponentModel.DataAnnotations
 @using Blazorise
 @using Frontend.Model.Firebase
+@using Frontend.Service
 @inject IFirebaseModel FirebaseModel;
 @namespace Frontend.Components
+@inject CustomAuthenticationStateProvider AuthStateProvider
 
 <div class="login-content">
     <Card>
@@ -79,6 +81,7 @@
 
         if (await FirebaseModel.Login(user.Email, user.Password))
         {
+            AuthStateProvider.SignIn();
             await LoginSuccess.InvokeAsync(true);
         }
         else

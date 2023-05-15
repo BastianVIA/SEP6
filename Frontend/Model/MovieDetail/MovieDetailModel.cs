@@ -12,7 +12,6 @@ public class MovieDetailModel : IMovieDetailModel
 
     public async Task<Movie?> GetMovieDetails(string movieId, string userToken)
     {
-
         HttpClient httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
         var api = new Client(BASEURI, httpClient);
