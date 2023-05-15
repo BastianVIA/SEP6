@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Backend.Movie.Application.Details;
 
-public record Query(string Id) : IRequest<MovieDetailsResponse>;
+public record Query(string Id, string? userId) : IRequest<MovieDetailsResponse>;
 
 public record MovieDetailsResponse(MovieDetailsDto MovieDetailsDto);
 
@@ -15,6 +15,7 @@ public class MovieDetailsDto
     public string Id { get; set; }
     public string Title { get; set; }
     public int ReleaseYear { get; set; }
+    public bool IsFavorite { get; set; }
     public Uri? PathToPoster { get; set; }
 
     public  DetailsRatingDto? Ratings { get; set; }
@@ -32,12 +33,14 @@ public class QueryHandler :  IRequestHandler<Query, MovieDetailsResponse>
     private IMovieRepository _repository;
     private readonly IImageService _imageService;
     private readonly IResumeService _resumeService;
+    private readonly IMediator _mediator;
 
-    public QueryHandler(IMovieRepository repository, IImageService imageService, IResumeService resumeService)
+    public QueryHandler(IMovieRepository repository, IImageService imageService, IResumeService resumeService, IMediator mediator)
     {
         _repository = repository;
         _imageService = imageService;
         _resumeService = resumeService;
+        _mediator = mediator;
     }
 
     public async Task<MovieDetailsResponse> Handle(Query request, CancellationToken cancellationToken)
@@ -45,10 +48,15 @@ public class QueryHandler :  IRequestHandler<Query, MovieDetailsResponse>
         var movie =  _repository.ReadMovieFromId(request.Id);
         var pathForPoster = _imageService.GetPathForPoster(request.Id);
         var resume = _resumeService.GetResume(request.Id);
-        return new MovieDetailsResponse(ToDto(await movie, await pathForPoster, await resume));
+        var isFavorite = false;
+        if (request.userId != null)
+        { 
+            isFavorite = await _mediator.Send(new User.Application.GetIfMovieIsFavorite.Query(request.userId, request.Id));
+        }
+        return new MovieDetailsResponse(ToDto(await movie, await pathForPoster, await resume, isFavorite));
     }
 
-    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? resume)
+    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? resume, bool isFavorite)
     {
         var dtoMovie = new MovieDetailsDto
         {
@@ -58,7 +66,8 @@ public class QueryHandler :  IRequestHandler<Query, MovieDetailsResponse>
             PathToPoster = pathToPoser,
             Actors = ToPersonDto(movie.Actors),
             Directors = ToPersonDto(movie.Directors),
-            Resume = resume
+            Resume = resume,
+            IsFavorite = isFavorite
         };
         if (movie.Rating != null)
         {

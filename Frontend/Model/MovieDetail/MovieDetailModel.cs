@@ -1,4 +1,5 @@
-﻿using Frontend.Entities;
+﻿using System.Net.Http.Headers;
+using Frontend.Entities;
 using Frontend.Service;
 
 namespace Frontend.Model.MovieDetail;
@@ -6,13 +7,14 @@ namespace Frontend.Model.MovieDetail;
 public class MovieDetailModel : IMovieDetailModel
 
 {
-    private static readonly Uri BASEURI = new Uri("http://localhost:5276");
+    private static readonly string BASEURI = "http://localhost:5276";
     private const string DEFAULT_POSTER_URL = "/Images/NoPosterAvailable.webp"; 
 
-    public async Task<Movie?> GetMovieDetails(string movieId)
+    public async Task<Movie?> GetMovieDetails(string movieId, string userToken)
     {
-        
-        var api = new Client(BASEURI.ToString(), new HttpClient());
+        HttpClient httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+        var api = new Client(BASEURI, httpClient);
         MovieDetailsResponse? response;
 
         try
@@ -43,12 +45,13 @@ public class MovieDetailModel : IMovieDetailModel
             Name = director.Name,
             BirthYear = director.BirthYear
         }).ToList();
-
+        
         var movie = new Movie
         {
             Id = response.MovieDetailsDto.Id,
             Title = response.MovieDetailsDto.Title,
             ReleaseYear = response.MovieDetailsDto.ReleaseYear,
+            IsFavorite = response.MovieDetailsDto.IsFavorite,
             PosterUrl = response.MovieDetailsDto.PathToPoster == null || string.IsNullOrWhiteSpace(response.MovieDetailsDto.PathToPoster.ToString()) ? new Uri(DEFAULT_POSTER_URL, UriKind.Relative) : response.MovieDetailsDto.PathToPoster,
             Rating = new Rating
             {

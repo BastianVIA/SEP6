@@ -4,5 +4,5 @@ namespace Frontend.Model.MovieDetail;
 
 public interface IMovieDetailModel
 {
-    Task<Movie> GetMovieDetails(string movieId);
+    Task<Movie> GetMovieDetails(string movieId, string userToken);
 }
