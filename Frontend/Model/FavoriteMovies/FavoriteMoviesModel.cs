@@ -10,7 +10,7 @@ public class FavoriteMoviesModel : IFavoriteMoviesModel
     private const string BASEURI = "http://localhost:5276";
     private const string DEFAULT_POSTER_URL = "/Images/NoPosterAvailable.webp";
 
-    public async Task<IList<Movie>> GetFavoriteMovies(string userToken, string UID)
+    public async Task<IList<Movie>> GetFavoriteMovies(string userToken = null, string UID = null)
     {
         HttpClient httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);

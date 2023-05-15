@@ -10,10 +10,13 @@ public class MovieDetailModel : IMovieDetailModel
     private static readonly string BASEURI = "http://localhost:5276";
     private const string DEFAULT_POSTER_URL = "/Images/NoPosterAvailable.webp"; 
 
-    public async Task<Movie?> GetMovieDetails(string movieId, string userToken)
+    public async Task<Movie?> GetMovieDetails(string movieId, string? userToken)
     {
         HttpClient httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+        if (userToken != null)
+        {
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+        }
         var api = new Client(BASEURI, httpClient);
         MovieDetailsResponse? response;
 

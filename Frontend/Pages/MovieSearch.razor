@@ -9,51 +9,55 @@
 
 <PageTitle>Search Result</PageTitle>
 
-<div class="page-content">
-<h3>Search Result</h3>
-
-@if (!isDataFetched)
+@if (isDataFetched)
 {
-    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px" />
-}
+    <div class="page-content">
+        <h3>Search Result</h3>
 
-else if (movieList.Count == 0)
-{
-    <p size="20px">No such movie exists.</p>
-}
+        @if (movieList.Count == 0)
+        {
+            <p size="20px">No such movie exists.</p>
+        }
+        <Table Hoverable Striped>
+            <TableHeader>
+                <TableRow>
+                    <TableHeaderCell>Poster</TableHeaderCell>
+                    <TableHeaderCell>Title</TableHeaderCell>
+                    <TableHeaderCell>Release Year <Button Color="Color.Secondary" Clicked="SortByReleaseYear"><Icon Name="@IconName.AngleDown"/></Button></TableHeaderCell>
+                    <TableHeaderCell>Rating <Button Color="Color.Secondary" Clicked="SortByRating"><Icon Name="@IconName.AngleDown"/></Button></TableHeaderCell>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                @foreach(Movie movie in movieList)
+                {
+                    <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
+                        <TableRowCell><img src="@movie.PosterUrl" height="200"/></TableRowCell>
+                        <TableRowCell>@movie.Title</TableRowCell>
+                        <TableRowCell>@movie.ReleaseYear</TableRowCell>
+                        <TableRowCell>@movie.Rating?.AverageRating</TableRowCell>
+                    </TableRow> 
+                }
+            </TableBody>
+        </Table>
 
-<table>
-    <thead>
-    <tr>
-       <th>Poster</th> 
-        <th>Title</th>
-        <th>ReleaseYear <button class="btn btn-secondary" @onclick="SortByReleaseYear"><Icon Name="IconName.AngleDown"/></button></th>
-        <th>Rating <button class="btn btn-secondary" @onclick="SortByRating"><Icon Name="IconName.AngleDown"/></button></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var movie in movieList)
-    {
-        <tr @onclick="@(() => OnMovieClick(movie.Id))">
-            <td><img src="@movie.PosterUrl" alt="Image" height="200"></td>
-            <td>@movie.Title</td>
-            <td>@movie.ReleaseYear</td>
-            <td>@movie.Rating.AverageRating</td>
-        </tr>
-    }
-    </tbody>
-</table>
+        <div class="page-navigation">
+            <button class="btn btn-secondary" @onclick="@GoToPreviousPage">
+                <Icon Name="@IconName.AngleLeft"/>
+            </button>
+            <div class="page-number">
+                <p>Page @pageNumber</p>
+            </div>
+            <button class="btn btn-secondary" @onclick="@GoToNextPage">
+                <Icon Name="@IconName.AngleRight"/>
+            </button>
+        </div>
 
-<div class="page-navigation">
-    <button class="btn btn-secondary" @onclick="GoToPreviousPage"><Icon Name="IconName.AngleLeft"/></button>
-    <div class="page-number">
-        <p>Page @pageNumber</p>
     </div>
-    <button class="btn btn-secondary" @onclick="GoToNextPage"><Icon Name="IconName.AngleRight"/></button>
-</div>
-
-</div>
-
+}
+else
+{
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="@(@"height: 200px")"/>
+}
 @code {
     [Parameter]
     public string MovieTitle { get; set; }
@@ -70,15 +74,15 @@ else if (movieList.Count == 0)
     {
         movieTitle = MovieTitle;
         pageNumber = 1;
-        isDataFetched = false;
         await SearchForMovie();
-        isDataFetched = true;
     }
 
     private async Task SearchForMovie()
     {
+        isDataFetched = false;
         movieList.Clear();
         movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle, sortingKey, sortingDirection, pageNumber);
+        isDataFetched = true;
     }
 
     private void OnMovieClick(string movieId)
