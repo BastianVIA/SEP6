@@ -1,12 +1,11 @@
-using Frontend.Model.MovieDetailModel;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Frontend.Model.MovieSearchModel;
-using Frontend.Service;
-
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
 using Blazorise;
+using Frontend.Model.FavoriteMovies;
+using Frontend.Model.Firebase;
+using Frontend.Model.MovieDetail;
+using Frontend.Model.MovieSearch;
+using Frontend.Model.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +14,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<IMovieSearchModel, MovieSearchModel>();
 builder.Services.AddScoped<IMovieDetailModel, MovieDetailModel>();
+builder.Services.AddScoped<IFirebaseModel, FirebaseModel>();
+builder.Services.AddScoped<IFavoriteMoviesModel, FavoriteMoviesModel>();
+builder.Services.AddScoped<IUserModel, UserModel>();
 builder.Services.AddHttpClient();
 
 builder.Services
@@ -44,3 +46,4 @@ app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
 app.Run();
+

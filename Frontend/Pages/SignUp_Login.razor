@@ -1,0 +1,67 @@
+﻿@namespace Frontend.Components
+@inject NavigationManager NavManager
+
+@page "/SignUp_Login"
+@using Blazorise
+
+@if (login)
+{
+    <Login ShowLoginComponent=@SetLoginComponent LoginSuccess=@GetLoginSuccess/>
+}
+else
+{
+    <Signup SignupSuccess=@GetSignupSuccess/>
+}
+
+
+
+
+@code{
+    private bool login = true;
+    private bool showAlertError = false;
+    private bool showAlertSuccess = false;
+    private bool loginError = false;
+    private bool loginSucces = false;
+
+    private void GetSignupSuccess(bool signupSuccess)
+    {
+        showAlertSuccess = false;
+        showAlertError = false;
+        
+        if (signupSuccess)
+        {
+            showAlertSuccess = true;
+            ToHomePage();
+        }
+        else
+        {
+            showAlertError = true;
+        }
+    }
+
+    private void SetLoginComponent(bool value)
+    {
+        login = value;
+    }
+
+    private void GetLoginSuccess(bool value)
+    {
+        loginError = false;
+        loginSucces = false;
+        if (value)
+        {
+            loginSucces = true;
+            ToHomePage();
+        }
+        else
+        {
+            loginError = true;
+        }
+    }
+
+    private void ToHomePage()
+    {
+        NavManager.NavigateTo("/");
+    }
+
+}
