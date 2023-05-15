@@ -1,0 +1,52 @@
+﻿@namespace Frontend.Components
+
+@using Blazorise
+@using Frontend.Events
+@using Frontend.Model.FirebaseModel
+@using Alert = Frontend.Entities.Alert
+@inject IFirebaseModel FirebaseModel;
+
+@if(Alert != null){
+    <div class="alert-container">
+        <Alert Color="@(Alert!.Success? Color.Success : Color.Warning)" @bind-Visible="@_visibility" Margin="Margin.Is0">
+            <AlertMessage>@Alert.Message</AlertMessage>
+            <AlertDescription>@Alert.Description</AlertDescription>
+        </Alert>
+    </div>
+}
+
+
+@code {
+    private Alert? Alert { get; set; }
+    private bool _visibility;
+    private int _alertTimeSeconds = 5;
+    private AlertBoxHelper _helper;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _helper = new AlertBoxHelper();
+        FirebaseModel.OnNotifyAlert += HandleAlertEvent;
+    }
+
+    private void HandleAlertEvent(object? sender, AlertEventArgs args)
+    {
+        Alert = _helper.GetAlert(args.Type, args.Data);
+        if (Alert == null) return;
+        
+        _visibility = true;
+        StateHasChanged();
+        HideAlertTimer();
+    }
+
+    private void HideAlertTimer()
+    {
+        Task.Delay(_alertTimeSeconds * 1000).ContinueWith(task =>
+        {
+            _visibility = false;
+            Console.WriteLine("Alert should not be visible");
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+}

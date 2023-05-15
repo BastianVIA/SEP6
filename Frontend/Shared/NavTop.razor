@@ -2,6 +2,7 @@
 @implements IDisposable
 @using Blazorise
 @using Frontend.Components
+@using Frontend.Events
 @using Frontend.Model.FirebaseModel
 @using Frontend.Pages
 @inject IFirebaseModel FirebaseModel
@@ -49,19 +50,19 @@
 
     protected override void OnInitialized()
     {
-        FirebaseModel.OnLogin += SetDisplayName;
+        FirebaseModel.OnNotifyAlert += SetDisplayName;
     }
 
 
-    private void SetDisplayName(string name)
+    private void SetDisplayName(object? sender, AlertEventArgs args)
     {
-        displayName = name;
+        displayName = args.Type == AlertBoxHelper.AlertType.LoginSuccess ? args.Data : "";
         StateHasChanged();
     }
-
+    
     public void Dispose()
     {
-        FirebaseModel.OnLogin += SetDisplayName;
+        FirebaseModel.OnNotifyAlert -= SetDisplayName;
     }
 
 }
