@@ -60,7 +60,14 @@
         <p>@Movie?.Resume</p>
     </div>
     <div>
-        <Button Color="Color.Primary" Clicked="StarClicked"><Icon Name="IconName.Star" /></Button>
+        @if (Movie != null && Movie.IsFavorite != null && Movie.IsFavorite.Value)
+        {
+            <Button Color="Color.Primary" Clicked="StarClicked"><Icon TextColor="TextColor.Black50" Name="IconName.Star"/></Button>
+        }
+        else
+        {
+            <Button Color="Color.Primary" Clicked="StarClicked"><Icon Name="IconName.Star"/></Button>
+        }
     </div>
 </div>
 
@@ -73,7 +80,7 @@
     {
         if (firstRender)
         {
-            Movie = await MovieDetailModel.GetMovieDetails(MovieId);
+            Movie = await MovieDetailModel.GetMovieDetails(MovieId, FirebaseModel.TokenValue);
             StateHasChanged(); 
         }
     }
