@@ -42,7 +42,8 @@ public class FirebaseModel : IFirebaseModel
         {
             var userCredential = await client.CreateUserWithEmailAndPasswordAsync(email, password, displayName);
             TokenValue = await userCredential.User.GetIdTokenAsync();
-            
+            DisplayName = userCredential.User.Info.DisplayName;
+            FireAlertEvent(AlertBoxHelper.AlertType.SignupSuccess);
             return true;
         }
         catch (FirebaseAuthException e)
@@ -50,8 +51,8 @@ public class FirebaseModel : IFirebaseModel
             //EmailExists
             //InvalidEmailAddress
             Console.WriteLine(e);
-            var reason = e.Reason;
-            
+            var reason = e.Reason.ToString();
+            FireAlertEvent(AlertBoxHelper.AlertType.SignupFail, reason);
             return false;
         }
     }
@@ -62,7 +63,7 @@ public class FirebaseModel : IFirebaseModel
             var userCredential = await client.SignInWithEmailAndPasswordAsync(email, password);
             TokenValue = await userCredential.User.GetIdTokenAsync();
             DisplayName = userCredential.User.Info.DisplayName;
-            FireAlertEvent(AlertBoxHelper.AlertType.LoginSuccess, DisplayName);
+            FireAlertEvent(AlertBoxHelper.AlertType.LoginSuccess);
             return true;
         }
         catch (FirebaseAuthException e)
@@ -76,12 +77,12 @@ public class FirebaseModel : IFirebaseModel
         }
     }
 
-    private void FireAlertEvent(AlertBoxHelper.AlertType type, string data)
+    private void FireAlertEvent(AlertBoxHelper.AlertType type, string? data = null)
     {
         OnNotifyAlert?.Invoke(this,new AlertEventArgs
         {
             Type = type,
-            Data = data
+            Reason = data
         });
     }
 

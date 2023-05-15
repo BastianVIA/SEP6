@@ -56,7 +56,7 @@
 
     private void SetDisplayName(object? sender, AlertEventArgs args)
     {
-        displayName = args.Type == AlertBoxHelper.AlertType.LoginSuccess ? args.Data : "";
+        displayName = args.Type == AlertBoxHelper.AlertType.LoginSuccess ? args.Reason : "";
         StateHasChanged();
     }
     

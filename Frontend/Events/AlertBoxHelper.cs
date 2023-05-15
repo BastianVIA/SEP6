@@ -21,12 +21,12 @@ public class AlertBoxHelper
     };
     
 
-    private static Alert LoginSuccess(string name)
+    private static Alert LoginSuccess(string ignored)
     {
         return new Alert()
         {
             Success = true,
-            Message = $"Welcome {name}!",
+            Message = $"Login Successful!",
             Description = $"You have successfully logged in."
         };
     }
@@ -41,7 +41,7 @@ public class AlertBoxHelper
         };
     }
 
-    private static Alert SignupSuccess(string text)
+    private static Alert SignupSuccess(string ignored)
     {
         return new Alert
         {

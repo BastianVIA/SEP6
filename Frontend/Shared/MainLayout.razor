@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@using Frontend.Components
 
 <PageTitle>Frontend</PageTitle>
 <Layout>
@@ -7,7 +8,9 @@
     </LayoutHeader>
     <LayoutContent>
         @Body
+        <AlertBox/>
     </LayoutContent>
+    
 </Layout>
 
 @code {

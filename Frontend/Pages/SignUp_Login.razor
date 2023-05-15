@@ -14,26 +14,7 @@ else
 }
 
 
-<div class="signup-alert-container">
-    <Alert Color="Color.Warning" @bind-Visible="@showAlertError" Margin="Margin.Is0">
-        <AlertMessage>Signup Error!</AlertMessage>
-        <AlertDescription>User with this email already exists.</AlertDescription>
-    </Alert>
-    <Alert Color="Color.Success" @bind-Visible="@showAlertSuccess" Margin="Margin.Is0">
-        <AlertMessage>Signup Success!</AlertMessage>
-        <AlertDescription>You successfully created an account.</AlertDescription>
-    </Alert>
-    
-    
-    <Alert Color="Color.Warning" @bind-Visible="@loginError" Margin="Margin.Is0">
-        <AlertMessage>Login Error!</AlertMessage>
-        <AlertDescription>You</AlertDescription>
-    </Alert>
-    <Alert Color="Color.Success" @bind-Visible="@loginSucces" Margin="Margin.Is0">
-        <AlertMessage>Login Success!</AlertMessage>
-        <AlertDescription>You have successfully logged in.</AlertDescription>
-    </Alert>
-</div>
+
 
 @code{
     private bool login = true;

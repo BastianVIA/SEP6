@@ -1,4 +1,5 @@
 ﻿@using Blazorise
+@using Frontend.Events
 @using Frontend.Model.FirebaseModel
 @using Frontend.Pages
 @using Microsoft.OpenApi.Services
@@ -69,19 +70,23 @@
 
     protected override void OnInitialized()
     {
-        FirebaseModel.OnLogin += SetDisplayName;
+        FirebaseModel.OnNotifyAlert += SetDisplayName;
     }
 
 
-    private void SetDisplayName(string name)
+    private void SetDisplayName(object? sender, AlertEventArgs args)
     {
+        if (args.Type != AlertBoxHelper.AlertType.LoginSuccess ||
+            args.Type != AlertBoxHelper.AlertType.SignupSuccess) return;
+        
         loggedIn = true;
-        displayName = name;
+        displayName = FirebaseModel.DisplayName;
         StateHasChanged();
     }
+    
 
     public void Dispose()
     {
-        FirebaseModel.OnLogin += SetDisplayName;
+        FirebaseModel.OnNotifyAlert -= SetDisplayName;
     }
 }
