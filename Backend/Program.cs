@@ -1,10 +1,19 @@
 using Backend.Database;
 using Backend.Enum;
+using Backend.Middleware;
 using Backend.Movie.Infrastructure;
 using Backend.Service;
+using Backend.User.Infrastructure;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
+using FirebaseAdmin.Auth;
+using NLog;
+using LogLevel = NLog.LogLevel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +28,32 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.Converters.Add(new StringEnumConverter());
 });
 
+var firebaseApp = FirebaseApp.Create(new AppOptions
+{
+    Credential = GoogleCredential.FromFile("fireBaseOptions.json")
+});
+
+builder.Services.AddSingleton<FirebaseAuth>(FirebaseAuth.DefaultInstance);
+
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://securetoken.google.com/sep6-a072b";
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = "https://securetoken.google.com/sep6-a072b",
+            ValidateAudience = true,
+            ValidAudience = "sep6-a072b",
+            ValidateLifetime = true
+        };
+    });
+
 builder.Services.AddScoped<DataContext>();
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
@@ -29,11 +62,30 @@ builder.Services.AddSwaggerGen(options =>
     options.UseInlineDefinitionsForEnums();
     options.SupportNonNullableReferenceTypes();
     options.UseAllOfToExtendReferenceSchemas();
-    
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
 });
 builder.Services.AddSwaggerGenNewtonsoftSupport();
 
 var app = builder.Build();
+app.UseMiddleware<FirebaseTokenMiddleware>();
+
+LogManager.Setup().LoadConfiguration(builder => {
+    builder.ForLogger().FilterMinLevel(LogLevel.Info).WriteToConsole();
+    builder.ForLogger().FilterMinLevel(LogLevel.Debug).WriteToFile(fileName: "log.txt");
+});
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -3,6 +3,7 @@ using System;
 using Backend.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230512095641_FavoriteMoveListCanBeNull")]
+    partial class FavoriteMoveListCanBeNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -88,12 +91,12 @@ namespace Backend.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("UserDAOId")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id", "UserId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserDAOId");
 
                     b.ToTable("UserMovieDAO");
                 });
@@ -139,13 +142,9 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.User.Infrastructure.UserMovieDAO", b =>
                 {
-                    b.HasOne("Backend.User.Infrastructure.UserDAO", "User")
+                    b.HasOne("Backend.User.Infrastructure.UserDAO", null)
                         .WithMany("FavoriteMovies")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
+                        .HasForeignKey("UserDAOId");
                 });
 
             modelBuilder.Entity("MovieDAOPersonDAO", b =>
