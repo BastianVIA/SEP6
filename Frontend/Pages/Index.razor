@@ -1,25 +1,29 @@
 ﻿@page "/"
-
+@namespace Frontend.Components
 @using Frontend.Entities
 @using Frontend.Model.MovieSearchModel
-@using Frontend.Service
 @inject IMovieSearchModel MovieSearchModel
 @inject NavigationManager NavManager
+@inject IFirebaseModel FirebaseModel
 @using Blazorise.LottieAnimation
 @using Blazorise
+@using Frontend.Events
+@using Frontend.Model.FirebaseModel
+@using Alert = Frontend.Entities.Alert
 
 <h2>Our Suggestions </h2>
+
+
 
 <style>
     .carousel-container {
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh; /* full viewport height */
+        padding: 20px;
     }
 
     .carousel-image {
-        width: 300px;
         height: 350px;
     }
 </style>
@@ -45,8 +49,6 @@ else
     <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px" />
 }
 
-
-
 @code {
     private List<Movie> movies;
     private int currentMovieIndex = 0;
@@ -68,9 +70,9 @@ else
         var movieTitles = new List<string>
         {
             "Harry Potter",
-            "Lord of the Rings",
-            "Star Wars",
-            "Pirates of the Caribbean"
+           // "Lord of the Rings",
+            //"Star Wars",
+           // "Pirates of the Caribbean"
         };
 
         for (int i = currentMovieIndex; i < currentMovieIndex + moviesToLoad && i < movieTitles.Count; i++)
@@ -94,4 +96,5 @@ else
     {
         return $"movieDetails/{id}";
     }
+
 }

@@ -64,7 +64,7 @@ else if (movieList.Count == 0)
     private bool isDataFetched = false;
     private MovieSortingKey? sortingKey;
     private SortingDirection? sortingDirection;
-    private int moviesPerPage;
+    private int moviesPerPage = 10;
     
     protected override async Task OnParametersSetAsync()
     {
