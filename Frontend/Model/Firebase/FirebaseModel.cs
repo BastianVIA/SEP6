@@ -1,9 +1,8 @@
 ﻿using Firebase.Auth;
 using Firebase.Auth.Providers;
-using Frontend.Entities;
 using Frontend.Events;
 
-namespace Frontend.Model.FirebaseModel;
+namespace Frontend.Model.Firebase;
 
 public class FirebaseModel : IFirebaseModel
 {

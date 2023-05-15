@@ -12,6 +12,7 @@
       <PackageReference Include="Blazorise.LottieAnimation" Version="1.2.3" />
       <PackageReference Include="FirebaseAuthentication.net" Version="4.0.2" />
       <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0-preview1" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.5" />
     </ItemGroup>
 
     <ItemGroup>

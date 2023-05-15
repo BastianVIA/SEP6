@@ -1,0 +1,47 @@
+﻿@page "/FavoriteMovies"
+@using Frontend.Entities
+@using Frontend.Model.FavoriteMovies
+@using Frontend.Model.Firebase
+@inject NavigationManager NavManager
+@inject IFirebaseModel FirebaseModel
+@inject IFavoriteMoviesModel FavoriteMoviesModel
+
+<h3>FavoriteMovies</h3>
+
+<Table Hoverable>
+    <TableHeader>
+        <TableRow>
+            <TableHeaderCell>Poster</TableHeaderCell>
+            <TableHeaderCell>Title</TableHeaderCell>
+            <TableHeaderCell>Release Year</TableHeaderCell>
+            <TableHeaderCell>Rating</TableHeaderCell>
+        </TableRow>
+    </TableHeader>
+    <TableBody>
+    @foreach(Movie movie in favoriteMovies)
+    {
+        <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
+            <TableRowCell><img src="@movie.PosterUrl"/></TableRowCell>
+            <TableRowCell>@movie.Title</TableRowCell>
+            <TableRowCell>@movie.ReleaseYear</TableRowCell>
+            <TableRowCell>@movie.Rating</TableRowCell>
+        </TableRow> 
+    }
+    </TableBody>
+</Table>
+
+@code {
+
+    private IList<Movie> favoriteMovies = new List<Movie>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.TokenValue);
+    }
+
+    private void OnMovieClick(string movieId)
+    {
+        NavManager.NavigateTo($"movieDetails/{movieId}");
+    }
+
+}

@@ -1,7 +1,7 @@
 ﻿using Frontend.Entities;
 using Frontend.Service;
 
-namespace Frontend.Model.MovieSearchModel;
+namespace Frontend.Model.MovieSearch;
 
 public interface IMovieSearchModel
 {

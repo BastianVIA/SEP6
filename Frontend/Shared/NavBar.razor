@@ -1,6 +1,6 @@
 ﻿@using Blazorise
 @using Frontend.Events
-@using Frontend.Model.FirebaseModel
+@using Frontend.Model.Firebase
 @using Frontend.Pages
 @using Microsoft.OpenApi.Services
 @inject IFirebaseModel FirebaseModel
@@ -19,6 +19,12 @@
                 <BarItem>
                     <BarLink To="">Home</BarLink>
                 </BarItem>
+                 @if (loggedIn)
+                 {
+                     <BarItem>
+                         <BarLink To="/FavoriteMovies">Favorite Movies</BarLink>
+                     </BarItem>
+                 }
             </BarStart>
             <BarEnd>
                 <BarItem>
@@ -76,7 +82,7 @@
 
     private void SetDisplayName(object? sender, AlertEventArgs args)
     {
-        if (args.Type != AlertBoxHelper.AlertType.LoginSuccess ||
+        if (args.Type != AlertBoxHelper.AlertType.LoginSuccess &&
             args.Type != AlertBoxHelper.AlertType.SignupSuccess) return;
         
         loggedIn = true;

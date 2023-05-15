@@ -1,8 +1,10 @@
 ﻿@using Blazorise
 @using System.ComponentModel.DataAnnotations
-@using Frontend.Model.FirebaseModel
-@inject IFirebaseModel FirebaseModel;
+@using Frontend.Model.Firebase
+@using Frontend.Model.User
+@inject IFirebaseModel FirebaseModel
 @namespace Frontend.Components
+@inject IUserModel UserModel
 
 <div class="signup-content">
     <Card>
@@ -108,6 +110,7 @@
 
         if (await FirebaseModel.CreateUser(user.DisplayName, user.Email, user.Password))
         {
+            await UserModel.CreateUser(FirebaseModel.TokenValue);
             await SignupSuccess.InvokeAsync(true);
         }
         else
