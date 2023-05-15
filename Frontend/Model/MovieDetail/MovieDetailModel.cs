@@ -11,7 +11,7 @@ public class MovieDetailModel : IMovieDetailModel
 
     public async Task<Movie?> GetMovieDetails(string movieId)
     {
-
+        
         var api = new Client(BASEURI.ToString(), new HttpClient());
         MovieDetailsResponse? response;
 
