@@ -1,4 +1,5 @@
-﻿using Backend.Middleware;
+﻿using System.Diagnostics;
+using Backend.Middleware;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using NLog;
@@ -27,7 +28,6 @@ public class Controller : ControllerBase
     {
         var query = new Query(userId);
         var result = await _mediator.Send(query);
-
         return Ok(result);
     }
     }

@@ -1,7 +1,13 @@
 ﻿@page "/MovieDetails/{movieId}"
 @using Frontend.Entities
-@using Frontend.Model.MovieDetailModel
+@using Frontend.Model.MovieDetail
+@using Blazorise
+@using Frontend.Model.FavoriteMovies
+@using Frontend.Model.Firebase
+@using Button = Blazorise.Bootstrap.Button
 @inject IMovieDetailModel MovieDetailModel
+@inject IFavoriteMoviesModel FavoriteMoviesModel
+@inject IFirebaseModel FirebaseModel
 
 <h3>Movie Details</h3>
 
@@ -53,6 +59,9 @@
         <h3>Resume</h3>
         <p>@Movie?.Resume</p>
     </div>
+    <div>
+        <Button Color="Color.Primary" Clicked="StarClicked"><Icon Name="IconName.Star" /></Button>
+    </div>
 </div>
 
 @code {
@@ -68,4 +77,10 @@
             StateHasChanged(); 
         }
     }
+
+    private void StarClicked()
+    {
+        FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.TokenValue, MovieId);
+    }
+
 }

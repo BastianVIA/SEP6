@@ -1,6 +1,6 @@
 ﻿using Frontend.Entities;
 
-namespace Frontend.Model.MovieDetailModel;
+namespace Frontend.Model.MovieDetail;
 
 public interface IMovieDetailModel
 {
