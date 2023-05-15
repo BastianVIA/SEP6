@@ -10,7 +10,7 @@ public class UserModel : IUserModel
     public async Task CreateUser(string userToken)
     {
         HttpClient httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer ", userToken);
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
         var api = new Client(BASEURI, httpClient);
 
         await api.UserAsync(userToken);

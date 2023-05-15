@@ -5,6 +5,8 @@
 @inject NavigationManager NavManager
 @inject IFirebaseModel FirebaseModel
 @inject IFavoriteMoviesModel FavoriteMoviesModel
+@using Blazorise
+@using System.Diagnostics
 
 <h3>FavoriteMovies</h3>
 
@@ -21,10 +23,10 @@
     @foreach(Movie movie in favoriteMovies)
     {
         <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
-            <TableRowCell><img src="@movie.PosterUrl"/></TableRowCell>
+            <TableRowCell><img src="@movie.PosterUrl" height="200"/></TableRowCell>
             <TableRowCell>@movie.Title</TableRowCell>
             <TableRowCell>@movie.ReleaseYear</TableRowCell>
-            <TableRowCell>@movie.Rating</TableRowCell>
+            <TableRowCell>@movie.Rating?.AverageRating</TableRowCell>
         </TableRow> 
     }
     </TableBody>
@@ -36,7 +38,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.TokenValue);
+        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.TokenValue, FirebaseModel.UID);
     }
 
     private void OnMovieClick(string movieId)

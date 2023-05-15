@@ -10,7 +10,7 @@ public class FavoriteMoviesModel : IFavoriteMoviesModel
     private const string BASEURI = "http://localhost:5276";
     private const string DEFAULT_POSTER_URL = "/Images/NoPosterAvailable.webp";
 
-    public async Task<IList<Movie>> GetFavoriteMovies(string userToken)
+    public async Task<IList<Movie>> GetFavoriteMovies(string userToken, string UID)
     {
         HttpClient httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
@@ -18,7 +18,7 @@ public class FavoriteMoviesModel : IFavoriteMoviesModel
         FavoriteMovesResponse response;
         try
         {
-            response = await api.FavoriteGETAsync(userToken);
+            response = await api.FavoriteGETAsync(UID);
         }
         catch (Exception e)
         {
