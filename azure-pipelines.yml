@@ -43,7 +43,6 @@ stages:
 
   - stage: DeployToAzure
     displayName: Deploy to Azure
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     dependsOn: BuildTestPackage
     jobs:
       - job: DeployProductionVersion
@@ -60,11 +59,11 @@ stages:
               artifactName: 'BuildPackages'
               targetPath: output/
 
-          - task: AzureCLI@2
+          - task: CmdLine@2
             displayName: "Deploy to Azure App Service"
+            env:
+              AZURE_SUBSCRIPTION_ID: $(AzureSubscriptionId)
+              AZURE_RESOURCE_GROUP_NAME: $(AzureResourceGroupName)
+              AZURE_APP_SERVICE_NAME: $(AzureAppServiceName)
             inputs:
-              azureSubscription: $(AzureSubscriptionId)
-              scriptType: 'bash'
-              scriptLocation: 'inlineScript'
-              inlineScript: |
-                az webapp deployment source config-zip --src "output/Publish/app.zip" --name $(AzureAppServiceName) --resource-group $(AzureResourceGroupName)
+              script: './build.cmd Deploy --no-logo'
