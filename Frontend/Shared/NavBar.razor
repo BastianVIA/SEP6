@@ -1,0 +1,87 @@
+﻿@using Blazorise
+@using Frontend.Model.FirebaseModel
+@using Frontend.Pages
+@using Microsoft.OpenApi.Services
+@inject IFirebaseModel FirebaseModel
+@inject NavigationManager NavManager;
+
+<div class="navbar-container">
+    <Bar Breakpoint="Breakpoint.Desktop"
+         Background="Background.Dark"
+         ThemeContrast="ThemeContrast.Dark">
+        <BarBrand>
+            FarligTigerMDB
+        </BarBrand>
+        <BarToggler />
+        <BarMenu>
+            <BarStart>
+                <BarItem>
+                    <BarLink To="">Home</BarLink>
+                </BarItem>
+            </BarStart>
+            <BarEnd>
+                <BarItem>
+                    <Addons>
+                        <Addon AddonType="AddonType.Body">
+                            <TextEdit @bind-Text="@movieTitle" Placeholder="Movie title" />
+                        </Addon>
+                        <Addon AddonType="AddonType.End">
+                            <Button Color="Color.Primary" Clicked="() => SearchForMovie()"><Icon Name="IconName.Search"/></Button>
+                        </Addon>
+                    </Addons>
+                </BarItem>
+                @if (loggedIn)
+                {
+                    <BarItem>
+                        <Dropdown>
+                            <DropdownToggle Color="Color.Primary" TextWeight="TextWeight.Bold">
+                                @displayName
+                            </DropdownToggle>
+                            <DropdownMenu>
+                                <DropdownItem>Edit profile</DropdownItem>
+                                <DropdownDivider />
+                                <DropdownItem>Logout</DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
+                    </BarItem>
+                }
+                else
+                {
+                    <BarItem>
+                        <BarLink To="SignUp_Login">Login</BarLink>
+                    </BarItem>
+                }
+            </BarEnd>
+        </BarMenu>
+    </Bar>
+</div>
+
+@code {
+    private string movieTitle;
+    private string displayName;
+    private bool loggedIn = false;
+
+    private void SearchForMovie()
+    {
+        if (movieTitle == null) return;
+        NavManager.NavigateTo($"searchResult/{movieTitle}");
+    }
+
+    protected override void OnInitialized()
+    {
+        FirebaseModel.OnLogin += SetDisplayName;
+    }
+
+
+    private void SetDisplayName(string name)
+    {
+        loggedIn = true;
+        displayName = name;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        FirebaseModel.OnLogin += SetDisplayName;
+    }
+}
