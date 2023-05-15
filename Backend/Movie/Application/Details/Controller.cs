@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Backend.Middleware;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Movie.Application.Details;
@@ -22,7 +23,9 @@ public class Controller : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDetailsOfMoveFromId(string id)
     {
-        var query = new Query(id);
+        var userid = (string?)HttpContext.Items[HttpContextKeys.UserId];
+
+        var query = new Query(id, userid);
         try
         {
             var result = _mediator.Send(query);

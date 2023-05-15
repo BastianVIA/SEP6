@@ -1,5 +1,4 @@
-﻿using Backend.Movie.Application.GetMovieInfo;
-using Backend.Movie.Application.Search;
+﻿using Backend.Movie.Application.GetInfoFromMovies;
 using Backend.User.Infrastructure;
 using MediatR;
 
@@ -34,11 +33,10 @@ public class QueryHandler : IRequestHandler<Query, FavoriteMovesResponse>
     public async Task<FavoriteMovesResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var userRequested = await _repository.ReadUserFromIdAsync(request.userId);
+        var moviesInfoResponse =await _mediator.Send(new Movie.Application.GetInfoFromMovies.Query(userRequested.FavoriteMovies));
         var movieDtos = new List<FavoriteMovieDto>();
-        foreach (var userFavoriteMovie in userRequested.FavoriteMovies)
+        foreach (var movieInfo in  moviesInfoResponse.MovieInfoDtos)
         {
-            var queryForMovie = new Movie.Application.GetMovieInfo.Query(userFavoriteMovie);
-            var movieInfo = await _mediator.Send(queryForMovie, cancellationToken);
             movieDtos.Add(toDto(movieInfo));
         }
 
