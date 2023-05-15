@@ -1,34 +1,102 @@
-# ASP.NET Core (.NET Framework)
-# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# .NET Desktop
+# Build and run tests for .NET Desktop or Windows classic desktop solutions.
 # Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
 trigger:
-- main
+  branches:
+    include:
+    - '*'
 
-pool:
-  vmImage: 'windows-latest'
+pool: Default
 
-variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+stages: 
 
-steps:
-- task: NuGetToolInstaller@1
+- stage: BuildTestPackage
+  displayName: Build, test, package
+  jobs:
+  - job: BuildDevVersionsJob
+    displayName: Build, test, package
+    steps:
 
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
+    - task: CmdLine@2
+      displayName: "Build process"
+      inputs:
+        script: './build.cmd CiBuild --BuildId $(Build.BuildId) --no-logo'
 
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    - task: PublishPipelineArtifact@1
+      displayName: 'Collect build artifacts'
+      inputs:
+       targetPath: packaging/
+       artifactName: 'BuildPackages'
+       artifactType: 'pipeline'
 
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    - task: PublishBuildArtifacts@1
+      displayName: "Collect test artifacts"
+      inputs:
+        artifactName: TestArtifact
+        pathtoPublish: 'artifacts'
+
+    - task: PublishTestResults@2
+      displayName: "Publish test results"
+      condition: always()
+      inputs:
+        testResultsFormat: 'XUnit'
+        testResultsFiles: 'artifacts\TestResults\*.xml'
+        failTaskOnFailedTests: true
+
+
+- stage: ReleaseTestVersion
+  displayName: Release for testing
+  dependsOn: BuildTestPackage
+  jobs:
+   - deployment: DeployForTest
+     pool:
+      vmImage: 'windows-latest'
+     environment: 'PublishEnvironment'
+   - job: DeployTestVersion
+     displayName: Deploy test binaries
+     steps:
+
+     - checkout: self
+       persistCredentials: true
+
+     - task: DownloadPipelineArtifact@2
+       displayName: 'Download pipeline artifacts'
+       inputs:
+        source: 'current'
+        artifactName: 'BuildPackages'
+        targetPath: packaging/
+
+     - task: CmdLine@2
+       displayName: "Release binaries"
+       inputs:
+        script: './build.cmd ReleaseTestVersion --BuildId $(Build.BuildId) --no-logo'
+
+- stage: ReleaseProductionVersion
+  displayName: Release to production
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  dependsOn: ReleaseTestVersion
+  jobs:
+   - deployment: DeployForProduction
+     pool:
+      vmImage: 'windows-latest'
+     environment: 'PublishEnvironment'
+
+   - job: DeployProductionVersion
+     displayName: Deploy production binaries
+     steps:
+     - checkout: self
+       persistCredentials: true
+
+     - task: DownloadPipelineArtifact@2
+       displayName: 'Download pipeline artifacts'
+       inputs:
+        source: 'current'
+        artifactName: 'BuildPackages'
+        targetPath: packaging/
+
+     - task: CmdLine@2
+       displayName: "Release binaries"
+       inputs:
+        script: './build.cmd ReleaseProductionVersion --BuildId $(Build.BuildId) --no-logo'
