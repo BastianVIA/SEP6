@@ -31,7 +31,8 @@
 
     private void HandleAlertEvent(object? sender, AlertEventArgs args)
     {
-        Alert = _helper.GetAlert(args.Type, args.Data);
+        Console.WriteLine("yessir");
+        Alert = _helper.GetAlert(args.Type, args.Reason);
         if (Alert == null) return;
         
         _visibility = true;
