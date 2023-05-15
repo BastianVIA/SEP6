@@ -1,21 +1,15 @@
-﻿@using Frontend.Components
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
 
 <PageTitle>Frontend</PageTitle>
-<div class="page">
-    
-    <main>
-        <NavTop/>
-        
-        <article class="content px-4">
-            @Body
-        </article>
-        <AlertBox/>
-    </main>
-</div>
+<Layout>
+    <LayoutHeader>
+        <NavBar/>
+    </LayoutHeader>
+    <LayoutContent>
+        @Body
+    </LayoutContent>
+</Layout>
 
 @code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    
 }
