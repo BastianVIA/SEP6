@@ -9,29 +9,63 @@
 @if (recommendationsLoaded)
 {
     <div class="card-deck-container">
-        <h2>Recommended Movies</h2>
-        <CardDeck>
-            @foreach (Movie movie in recommendations)
-            {
-                <Card @onclick="@(() => OnMovieClick(movie.Id))">
-                    <CardImage Source="@movie.PosterUrl.ToString()" Alt="poster"/>
-                    <CardBody>
-                        <CardTitle Size="6" TextWeight="TextWeight.Bold">
-                            @movie.Title
-                        </CardTitle>
-                        <CardText >
-                            @movie.Rating.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/>
-                        </CardText>
-                    </CardBody>
-                </Card>
-                counter++;
-                if (amountOfMoviesToShow <= counter)
-                {
-                    counter = 0;
-                    break;
-                }
-            }
-        </CardDeck>
+        <Carousel SelectedSlideChanged="LoadRecommendedMovies" Crossfade="true" Autoplay="false" ShowControls="false" ShowIndicators="false" SelectedSlide="@selectedSlide.ToString()">
+            <CarouselSlide Name="1">
+                <Div Display="Display.Flex" Flex="Flex.JustifyContent.Between" Margin="Margin.Is2.FromBottom">
+                    <h2>Recommended Movies</h2>
+                    <Button Color="Color.Primary" Clicked="NextSlide" Height="Height.Is75"><Icon Name="IconName.Sync"/></Button>
+                </Div>
+                <CardDeck>
+                    @foreach (Movie movie in recommendations)
+                    {
+                        <Card @onclick="@(() => OnMovieClick(movie.Id))">
+                            <CardImage Source="@movie.PosterUrl.ToString()" Alt="poster"/>
+                            <CardBody Padding="Padding.Is1.FromStart.Is1.FromEnd.Is2.FromTop">
+                                <CardTitle TextWeight="TextWeight.Bold">
+                                    @movie.Title
+                                </CardTitle>
+                                <CardText Position="Position.Absolute.Bottom.Is0" Margin="Margin.Is1.FromBottom">
+                                    @movie.Rating.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/>
+                                </CardText>
+                            </CardBody>
+                        </Card>
+                        counter++;
+                        if (amountOfMoviesToShow <= counter)
+                        {
+                            counter = 0;
+                            break;
+                        }
+                    }
+                </CardDeck>
+            </CarouselSlide>
+            <CarouselSlide Name="2">
+                <h2>Recommended Movies</h2>
+                <Button Color="Color.Primary" Clicked="NextSlide" Margin="Margin.Is3.FromTop">Refresh Recommendations</Button>
+                <CardDeck>
+                    @foreach (Movie movie in recommendations)
+                    {
+                        <Card @onclick="@(() => OnMovieClick(movie.Id))">
+                            <CardImage Source="@movie.PosterUrl.ToString()" Alt="poster"/>
+                            <CardBody Padding="Padding.Is1.FromStart.Is1.FromEnd.Is2.FromTop">
+                                <CardTitle TextWeight="TextWeight.Bold">
+                                    @movie.Title
+                                </CardTitle>
+                                <CardText Position="Position.Absolute.Bottom.Is0" Margin="Margin.Is1.FromBottom">
+                                    @movie.Rating.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/>
+                                </CardText>
+                            </CardBody>
+                        </Card>
+                        counter++;
+                        if (amountOfMoviesToShow <= counter)
+                        {
+                            counter = 0;
+                            break;
+                        }
+                    }
+                </CardDeck>
+            </CarouselSlide>
+        </Carousel>
+        
     </div>
 }
 
@@ -46,6 +80,7 @@ else
     private bool recommendationsLoaded = false;
     private int amountOfMoviesToShow = 8;
     private int counter = 0;
+    private int selectedSlide = 1;
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,5 +96,10 @@ else
     private void OnMovieClick(string movieId)
     {
         NavManager.NavigateTo($"movieDetails/{movieId}");
+    }
+
+    private void NextSlide()
+    {
+        selectedSlide++;
     }
 }
