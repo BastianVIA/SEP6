@@ -6,5 +6,6 @@ public class UserRatingDAO
     public string MovieId { get; set; }
     public int NumberOfStars { get; set; }
     public UserDAO User { get; set; }
+    
 
 }
