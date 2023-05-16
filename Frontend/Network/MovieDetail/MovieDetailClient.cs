@@ -34,7 +34,7 @@ public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
             Title = response.MovieDetailsDto.Title,
             ReleaseYear = response.MovieDetailsDto.ReleaseYear,
             IsFavorite = response.MovieDetailsDto.IsFavorite,
-            //UserRating = response.MovieDetailsDto.,
+            UserRating = response.MovieDetailsDto.UserRating,
             PosterUrl = response.MovieDetailsDto.PathToPoster == null || string.IsNullOrWhiteSpace(response.MovieDetailsDto.PathToPoster.ToString()) ? new Uri(DEFAULT_POSTER_URL, UriKind.Relative) : response.MovieDetailsDto.PathToPoster,
             Rating = new Rating
             {

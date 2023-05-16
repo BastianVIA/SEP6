@@ -856,6 +856,9 @@ namespace Frontend.Service
         [Newtonsoft.Json.JsonProperty("isFavorite", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool IsFavorite { get; set; }
 
+        [Newtonsoft.Json.JsonProperty("userRating", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? UserRating { get; set; }
+
         [Newtonsoft.Json.JsonProperty("pathToPoster", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Uri PathToPoster { get; set; }
 
