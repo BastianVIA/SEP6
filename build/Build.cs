@@ -31,10 +31,16 @@ class Build : NukeBuild
 
     AbsolutePath OutputDirectory => RootDirectory / "output";
 
-    Target Clean => _ => _
+    Target Clean => _ => _.Before(Compile)
         .Executes(() =>
         {
-            EnsureCleanDirectory(OutputDirectory);
+            var projectsToClean = Solution.AllProjects.Where(project => project.Name != "_build");
+
+            foreach (var project in projectsToClean)
+            {
+                EnsureCleanDirectory(project.Directory / "bin");
+                EnsureCleanDirectory(project.Directory / "obj");
+            }
         });
 
     Target Restore => _ => _
