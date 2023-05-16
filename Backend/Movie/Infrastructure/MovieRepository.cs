@@ -10,18 +10,19 @@ namespace Backend.Movie.Infrastructure;
 
 public class MovieRepository : IMovieRepository
 {
-    private readonly DataContext _database;
     private const int NumberOfResultsPerPage = 10;
+    private IConfiguration _configuration;
 
-    public MovieRepository(DataContext database)
+    public MovieRepository(IConfiguration configuration)
     {
-        _database = database;
+        _configuration = configuration;
     }
 
     public async Task<List<Domain.Movie>> SearchForMovie(string title, MovieSortingKey movieSortingKey,
         SortingDirection sortingDirection, int requestPageNumber)
     {
-        var query = _database.Movies.Include(m => m.Rating)
+        await using var database = new DataContext(_configuration);
+        var query = database.Movies.Include(m => m.Rating)
             .Where(m => EF.Functions.Like(m.Title, $"%{title}%"));
 
         switch (movieSortingKey)
@@ -94,16 +95,17 @@ public class MovieRepository : IMovieRepository
 
     public async Task<Domain.Movie> ReadMovieFromId(string id)
     {
-        var result = await _database.Movies.Where(m => m.Id == id).Include(m => m.Rating).FirstOrDefaultAsync();
+        await using var database = new DataContext(_configuration);
+        var result = await database.Movies.Where(m => m.Id == id).Include(m => m.Rating).FirstOrDefaultAsync();
 
         if (result == null)
         {
             throw new KeyNotFoundException($"Could not find movie with id: {id}");
         }
 
-        result.Actors = await _database.Persons.Where(p => p.ActedMovies.Contains(result)).Take(NumberOfResultsPerPage)
+        result.Actors = await database.Persons.Where(p => p.ActedMovies.Contains(result)).Take(NumberOfResultsPerPage)
             .ToListAsync();
-        result.Directors = await _database.Persons.Where(p => p.DirectedMovies.Contains(result))
+        result.Directors = await database.Persons.Where(p => p.DirectedMovies.Contains(result))
             .Take(NumberOfResultsPerPage)
             .ToListAsync();
 
@@ -112,12 +114,30 @@ public class MovieRepository : IMovieRepository
 
     public async Task<List<Domain.Movie>> ReadMoviesFromList(List<string> movieIds, int requestedPageNumber)
     {
-        var foundMovies = _database.Movies.Include(m => m.Rating)
+        await using var database = new DataContext(_configuration);
+
+        var foundMovies = database.Movies.Include(m => m.Rating)
             .Where(m => movieIds.Contains(m.Id))
             .Skip(NumberOfResultsPerPage * (requestedPageNumber - 1))
             .Take(NumberOfResultsPerPage)
             .ToListAsync();
         return ToDomain(await foundMovies);
+    }
+
+    public async Task<List<Domain.Movie>> GetRecommendedMovies(int minVotes, float minRating)
+    {
+        await using var database = new DataContext(_configuration);
+        var random = new Random();
+        var movies = database.Movies
+            .Include(m => m.Rating)
+            .Where(m => m.Rating != null && m.Rating.Votes > 100 && m.Rating.Rating > 7)
+            .OrderBy(m => m.Rating.Votes * m.Rating.Rating)
+            .Take(200)
+            .ToList()
+            .OrderBy(m => random.Next())
+            .Take(NumberOfResultsPerPage)
+            .ToList();
+        return ToDomain(movies);
     }
 
     private List<Domain.Movie> ToDomain(List<MovieDAO> movieDaos)
