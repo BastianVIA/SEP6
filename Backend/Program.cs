@@ -1,5 +1,4 @@
 using Backend.Database;
-using Backend.Enum;
 using Backend.Middleware;
 using Backend.Movie.Infrastructure;
 using Backend.Service;
@@ -8,7 +7,6 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using FirebaseAdmin.Auth;

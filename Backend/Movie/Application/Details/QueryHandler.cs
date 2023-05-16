@@ -16,6 +16,7 @@ public class MovieDetailsDto
     public string Title { get; set; }
     public int ReleaseYear { get; set; }
     public bool IsFavorite { get; set; }
+    public int? UserRating { get; set; }
     public Uri? PathToPoster { get; set; }
 
     public  DetailsRatingDto? Ratings { get; set; }
