@@ -80,7 +80,7 @@
 
     private void StarClicked()
     {
-        FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.TokenValue, MovieId);
+        FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, MovieId);
     }
 
 }

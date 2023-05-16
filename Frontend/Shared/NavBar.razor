@@ -86,7 +86,7 @@
             args.Type != AlertBoxHelper.AlertType.SignupSuccess) return;
         
         loggedIn = true;
-        displayName = FirebaseModel.DisplayName;
+        displayName = FirebaseModel.CurrentUser.DisplayName;
         StateHasChanged();
     }
     

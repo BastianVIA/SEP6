@@ -38,7 +38,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.TokenValue, FirebaseModel.UID);
+        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID);
     }
 
     private void OnMovieClick(string movieId)
