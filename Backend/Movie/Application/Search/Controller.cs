@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Backend.Enum;
+using Backend.Middleware;
+using FirebaseAdmin.Auth;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Movie.Application.Search;
@@ -16,7 +19,7 @@ public class Controller: ControllerBase
     {
         _mediator = mediator;
     }
-    
+
     [HttpGet]
     [Route("search")]
     [Tags("MovieApi")]

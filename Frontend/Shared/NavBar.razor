@@ -1,0 +1,108 @@
+﻿@using Blazorise
+@using Frontend.Events
+@using Frontend.Model.Firebase
+@using Frontend.Pages
+@using Frontend.Service
+@using Microsoft.OpenApi.Services
+@inject IFirebaseModel FirebaseModel
+@inject NavigationManager NavManager
+@inject CustomAuthenticationStateProvider AuthStateProvider
+
+<div class="navbar-container">
+    <Bar Breakpoint="Breakpoint.Desktop"
+         Background="Background.Dark"
+         ThemeContrast="ThemeContrast.Dark">
+        <BarBrand>
+            FarligTigerMDB
+        </BarBrand>
+        <BarToggler/>
+        <BarMenu>
+            <BarStart>
+                <BarItem>
+                    <BarLink To="">Home</BarLink>
+                </BarItem>
+                <AuthorizeView>
+                    <Authorized>
+                        <BarItem>
+                            <BarLink To="/FavoriteMovies">Favorite Movies</BarLink>
+                        </BarItem>
+                    </Authorized>
+                </AuthorizeView>
+            </BarStart>
+            <BarEnd>
+                <BarItem>
+                    <Addons>
+                        <Addon AddonType="AddonType.Body">
+                            <TextEdit @bind-Text="@movieTitle" Placeholder="Movie title"/>
+                        </Addon>
+                        <Addon AddonType="AddonType.End">
+                            <Button Color="Color.Primary" Clicked="() => SearchForMovie()">
+                                <Icon Name="IconName.Search"/>
+                            </Button>
+                        </Addon>
+                    </Addons>
+                </BarItem>
+                <AuthorizeView>
+                    <Authorized>
+                        <BarItem>
+                            <Dropdown>
+                                <DropdownToggle Color="Color.Primary" TextWeight="TextWeight.Bold">
+                                    @displayName
+                                </DropdownToggle>
+                                <DropdownMenu>
+                                    <DropdownItem>Edit profile</DropdownItem>
+                                    <DropdownDivider/>
+                                    <DropdownItem Clicked="Logout">Logout</DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
+                        </BarItem>
+                    </Authorized>
+                    <NotAuthorized>
+                        <BarItem>
+                            <BarLink To="SignUp_Login">Login</BarLink>
+                        </BarItem>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </BarEnd>
+        </BarMenu>
+    </Bar>
+</div>
+
+@code {
+    private string movieTitle;
+    private string displayName;
+
+    private void SearchForMovie()
+    {
+        if (movieTitle == null) return;
+        NavManager.NavigateTo($"searchResult/{movieTitle}");
+    }
+
+    protected override void OnInitialized()
+    {
+        FirebaseModel.OnNotifyAlert += SetDisplayName;
+    }
+
+
+    private void SetDisplayName(object? sender, AlertEventArgs args)
+    {
+        if (args.Type != AlertBoxHelper.AlertType.LoginSuccess &&
+            args.Type != AlertBoxHelper.AlertType.SignupSuccess) return;
+
+        displayName = FirebaseModel.CurrentUser.DisplayName;
+        StateHasChanged();
+    }
+
+
+    public void Dispose()
+    {
+        FirebaseModel.OnNotifyAlert -= SetDisplayName;
+    }
+
+    private void Logout()
+    {
+        FirebaseModel.Logout();
+        AuthStateProvider.SignOut();
+    }
+
+}

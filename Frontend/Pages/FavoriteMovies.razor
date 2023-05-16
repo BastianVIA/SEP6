@@ -1,0 +1,65 @@
+﻿@page "/FavoriteMovies"
+@using Frontend.Entities
+@using Frontend.Model.FavoriteMovies
+@using Frontend.Model.Firebase
+@inject NavigationManager NavManager
+@inject IFirebaseModel FirebaseModel
+@inject IFavoriteMoviesModel FavoriteMoviesModel
+@using Blazorise
+@using Blazorise.LottieAnimation
+@attribute [Authorize]
+
+@if (favoriteMoviesLoaded)
+{
+    <div class="page-content">
+        <h3>Favorite Movies</h3>
+
+        <Table Hoverable Striped>
+            <TableHeader>
+                <TableRow>
+                    <TableHeaderCell>Poster</TableHeaderCell>
+                    <TableHeaderCell>Title</TableHeaderCell>
+                    <TableHeaderCell>Release Year</TableHeaderCell>
+                    <TableHeaderCell>Rating</TableHeaderCell>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                @foreach(Movie movie in favoriteMovies)
+                {
+                    <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
+                        <TableRowCell><img src="@movie.PosterUrl" height="200"/></TableRowCell>
+                        <TableRowCell>@movie.Title</TableRowCell>
+                        <TableRowCell>@movie.ReleaseYear</TableRowCell>
+                        <TableRowCell>@movie.Rating?.AverageRating</TableRowCell>
+                    </TableRow> 
+                }
+            </TableBody>
+        </Table>
+    </div>
+}
+else
+{
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
+}
+
+@code {
+
+    private IList<Movie> favoriteMovies = new List<Movie>();
+    private bool favoriteMoviesLoaded = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFavoriteMovies();
+    }
+
+    private async Task LoadFavoriteMovies()
+    {
+        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID);
+        favoriteMoviesLoaded = true;
+    }
+
+    private void OnMovieClick(string movieId)
+    {
+        NavManager.NavigateTo($"movieDetails/{movieId}");
+    }
+}

@@ -112,6 +112,18 @@ public class MovieRepository : IMovieRepository
         return ToDomain(result);
     }
 
+    public async Task<List<Domain.Movie>> ReadMoviesFromList(List<string> movieIds, int requestedPageNumber)
+    {
+        await using var database = new DataContext(_configuration);
+
+        var foundMovies = database.Movies.Include(m => m.Rating)
+            .Where(m => movieIds.Contains(m.Id))
+            .Skip(NumberOfResultsPerPage * (requestedPageNumber - 1))
+            .Take(NumberOfResultsPerPage)
+            .ToListAsync();
+        return ToDomain(await foundMovies);
+    }
+
     public async Task<List<Domain.Movie>> GetRecommendedMovies(int minVotes, float minRating)
     {
         await using var database = new DataContext(_configuration);

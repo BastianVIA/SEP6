@@ -1,0 +1,44 @@
+﻿@namespace Frontend.Components
+@inject NavigationManager NavManager
+@attribute [AllowAnonymous]
+@page "/SignUp_Login"
+
+@if (login)
+{
+    <Login ShowLoginComponent=@SetLoginComponent LoginSuccess=@GetLoginSuccess/>
+}
+else
+{
+    <Signup SignupSuccess=@GetSignupSuccess/>
+}
+
+@code{
+    private bool login = true;
+
+    private void GetSignupSuccess(bool signupSuccess)
+    {
+        if (signupSuccess)
+        {
+            ToHomePage();
+        }
+    }
+
+    private void SetLoginComponent(bool value)
+    {
+        login = value;
+    }
+
+    private void GetLoginSuccess(bool value)
+    {
+        if (value)
+        {
+            ToHomePage();
+        }
+    }
+
+    private void ToHomePage()
+    {
+        NavManager.NavigateTo("/");
+    }
+
+}

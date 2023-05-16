@@ -3,6 +3,7 @@ using AutoFixture;
 using Backend.Movie.Application.Details;
 using Backend.Movie.Infrastructure;
 using Backend.Service;
+using MediatR;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 
@@ -15,10 +16,11 @@ public class QueryHandlerTests
     private readonly IMovieRepository _repository = Substitute.For<IMovieRepository>();
     private readonly IImageService _imageService = Substitute.For<IImageService>();
     private readonly IResumeService _resumeService = Substitute.For<IResumeService>();
+    private readonly IMediator _mediator = Substitute.For<IMediator>();
 
     public QueryHandlerTests()
     {
-        _handler = new QueryHandler(_repository, _imageService, _resumeService);
+        _handler = new QueryHandler(_repository, _imageService, _resumeService, _mediator);
     }
 
     [Fact]

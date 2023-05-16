@@ -1,23 +1,22 @@
-﻿using System.Text.Json;
+﻿using System.Net.Http.Headers;
 using Frontend.Entities;
 using Frontend.Service;
-namespace Frontend.Model.MovieDetailModel;
 
-public class MovieDetailModel : IMovieDetailModel
+namespace Frontend.Network.MovieDetail;
 
+public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
 {
-    private static readonly Uri BASEURI = new Uri("http://localhost:5276");
-    private const string DEFAULT_POSTER_URL = "/Images/NoPosterAvailable.webp"; 
-
-    public async Task<Movie?> GetMovieDetails(string movieId)
+    public async Task<Movie> GetMovieDetails(string movieId, string? userToken)
     {
+        if (userToken != null)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+        }
 
-        var api = new Client(BASEURI.ToString(), new HttpClient());
         MovieDetailsResponse? response;
-
         try
         {
-            response = await api.MovieAsync(movieId);
+            response = await _api.MovieAsync(movieId);
         }
         catch (Exception e)
         {

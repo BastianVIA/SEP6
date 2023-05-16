@@ -73,6 +73,31 @@ namespace Backend.Migrations
                     b.ToTable("Ratings");
                 });
 
+            modelBuilder.Entity("Backend.User.Infrastructure.UserDAO", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Backend.User.Infrastructure.UserMovieDAO", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserMovieDAO");
+                });
+
             modelBuilder.Entity("MovieDAOPersonDAO", b =>
                 {
                     b.Property<string>("ActedMoviesId")
@@ -112,6 +137,17 @@ namespace Backend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Backend.User.Infrastructure.UserMovieDAO", b =>
+                {
+                    b.HasOne("Backend.User.Infrastructure.UserDAO", "User")
+                        .WithMany("FavoriteMovies")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MovieDAOPersonDAO", b =>
                 {
                     b.HasOne("Backend.Movie.Infrastructure.MovieDAO", null)
@@ -145,6 +181,11 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Movie.Infrastructure.MovieDAO", b =>
                 {
                     b.Navigation("Rating");
+                });
+
+            modelBuilder.Entity("Backend.User.Infrastructure.UserDAO", b =>
+                {
+                    b.Navigation("FavoriteMovies");
                 });
 #pragma warning restore 612, 618
         }

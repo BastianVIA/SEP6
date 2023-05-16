@@ -1,19 +1,19 @@
 ﻿@inherits LayoutComponentBase
+@using Frontend.Components
+@using Blazorise
 
 <PageTitle>Frontend</PageTitle>
-<div class="page">
+<Layout>
+    <LayoutHeader>
+        <NavBar/>
+    </LayoutHeader>
+    <LayoutContent>
+        @Body
+        <AlertBox/>
+    </LayoutContent>
     
-    <main>
-        <NavTop/>
-        
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+</Layout>
 
 @code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    
 }
