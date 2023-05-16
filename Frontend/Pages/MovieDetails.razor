@@ -112,13 +112,13 @@ else
 
     private async Task LoadMovieDetails()
     {
-        Movie = await MovieDetailModel.GetMovieDetails(MovieId, FirebaseModel.TokenValue);
+        Movie = await MovieDetailModel.GetMovieDetails(MovieId, FirebaseModel.CurrentUser.TokenValue);
         movieLoaded = true;
     }
 
     private async Task StarClicked()
     {
-        await FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.TokenValue, MovieId);
+        await FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, MovieId);
         StateHasChanged();
     }
 

@@ -54,7 +54,7 @@ else
 
     private async Task LoadFavoriteMovies()
     {
-        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.TokenValue, FirebaseModel.UID);
+        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID);
         favoriteMoviesLoaded = true;
     }
 

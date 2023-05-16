@@ -89,7 +89,7 @@
         if (args.Type != AlertBoxHelper.AlertType.LoginSuccess &&
             args.Type != AlertBoxHelper.AlertType.SignupSuccess) return;
 
-        displayName = FirebaseModel.DisplayName;
+        displayName = FirebaseModel.CurrentUser.DisplayName;
         StateHasChanged();
     }
 

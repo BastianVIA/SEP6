@@ -6,6 +6,11 @@ using Frontend.Model.Firebase;
 using Frontend.Model.MovieDetail;
 using Frontend.Model.MovieSearch;
 using Frontend.Model.User;
+using Frontend.Network.FavoriteMovies;
+using Frontend.Network.Firebase;
+using Frontend.Network.MovieDetail;
+using Frontend.Network.MovieSearch;
+using Frontend.Network.User;
 using Frontend.Service;
 using Microsoft.AspNetCore.Components.Authorization;
 
@@ -14,6 +19,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddScoped<IFavoriteMoviesClient, FavoriteMoviesClient>();
+builder.Services.AddScoped<IFirebaseClient, FirebaseClient>();
+builder.Services.AddScoped<IMovieDetailClient, MovieDetailClient>();
+builder.Services.AddScoped<IMovieSearchClient, MovieSearchClient>();
+builder.Services.AddScoped<IUserClient, UserClient>();
 builder.Services.AddScoped<IMovieSearchModel, MovieSearchModel>();
 builder.Services.AddScoped<IMovieDetailModel, MovieDetailModel>();
 builder.Services.AddScoped<IFirebaseModel, FirebaseModel>();

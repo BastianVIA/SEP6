@@ -1,40 +1,21 @@
 ﻿using Frontend.Entities;
+using Frontend.Network;
+using Frontend.Network.MovieSearch;
 using Frontend.Service;
 
 namespace Frontend.Model.MovieSearch
 {
-    public class MovieSearchModel : IMovieSearchModel
+    public class MovieSearchModel : NSwagBaseClient, IMovieSearchModel
     {
-        private const string BASEURI = "http://localhost:5276";
-        private const string DEFAULT_POSTER_URL = "/Images/NoPosterAvailable.webp"; 
+        private IMovieSearchClient _client;
+        public MovieSearchModel(IMovieSearchClient client)
+        {
+            _client = client;
+        }
 
         public async Task<List<Movie>> SearchForMovieAsync(string title, MovieSortingKey? movieSortingKey = null, SortingDirection? sortingDirection = null, int? pageNumber = null)
         {
-            var api = new Client(BASEURI, new HttpClient());
-            var response = await api.SearchAsync(title, movieSortingKey, sortingDirection, pageNumber);
-            List<Movie> movies = new List<Movie>();
-            Rating rating = new Rating();
-            foreach (var movie in response.MovieDtos)
-            {
-                try
-                {
-                    rating = new Rating { AverageRating = movie.Rating.AverageRating, RatingCount = movie.Rating.Votes };
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-                Uri.TryCreate(movie.PathToPoster?.ToString(), UriKind.Absolute, out Uri? posterUri);
-                movies.Add(new Movie
-                {
-                    Id = movie.Id, 
-                    Title = movie.Title, 
-                    ReleaseYear = movie.ReleaseYear, 
-                    PosterUrl = posterUri ?? new Uri(DEFAULT_POSTER_URL, UriKind.Relative),
-                    Rating = rating
-                });
-            }
-            return movies;
+            return await _client.SearchForMovieAsync(title, movieSortingKey, sortingDirection, pageNumber);
         }
     }
 }

@@ -110,7 +110,7 @@
 
         if (await FirebaseModel.CreateUser(user.DisplayName, user.Email, user.Password))
         {
-            await UserModel.CreateUser(FirebaseModel.TokenValue);
+            await UserModel.CreateUser(FirebaseModel.CurrentUser.TokenValue);
             await SignupSuccess.InvokeAsync(true);
         }
         else
