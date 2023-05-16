@@ -21,7 +21,7 @@ public record MovieRecommendationRatingDto(float AverageRating, int Votes);
 
 public class QueryHandler : IRequestHandler<Query, MovieRecommendationsResponse>
 {
-    private const int MinVotesBeforeRecommending = 100;
+    private const int MinVotesBeforeRecommending = 500000;
     private const float MinRatingBeforeRecommending = 7f;
     
     private readonly IMovieRepository _repository;

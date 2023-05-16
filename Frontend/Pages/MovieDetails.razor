@@ -114,7 +114,7 @@ else
 
     private async Task LoadMovieDetails()
     {
-        movie = await MovieDetailModel.GetMovieDetails(MovieId, FirebaseModel.CurrentUser.TokenValue);
+        Movie = await MovieDetailModel.GetMovieDetails(MovieId, FirebaseModel.CurrentUser?.TokenValue);
         movieLoaded = true;
     }
 

@@ -130,7 +130,7 @@ public class MovieRepository : IMovieRepository
         var random = new Random();
         var movies = database.Movies
             .Include(m => m.Rating)
-            .Where(m => m.Rating != null && m.Rating.Votes > 100 && m.Rating.Rating > 7)
+            .Where(m => m.Rating != null && m.Rating.Votes > minVotes && m.Rating.Rating > minRating)
             .OrderBy(m => m.Rating.Votes * m.Rating.Rating)
             .Take(200)
             .ToList()
