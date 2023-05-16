@@ -1,99 +1,65 @@
 ﻿@page "/"
-@namespace Frontend.Components
-@using Frontend.Entities
-@inject IMovieSearchModel MovieSearchModel
-@inject NavigationManager NavManager
-@inject IFirebaseModel FirebaseModel
-@using Blazorise.LottieAnimation
 @using Blazorise
-@using Frontend.Events
-@using Frontend.Model.Firebase
-@using Frontend.Model.MovieSearch
-@using Alert = Frontend.Entities.Alert
+@using Frontend.Entities
+@using Frontend.Model.Recommendations
+@inject NavigationManager NavManager
+@inject IRecommendationsModel RecommendationsModel
+@using Blazorise.LottieAnimation
 
-<h2>Our Suggestions </h2>
-
-
-
-<style>
-    .carousel-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-    }
-
-    .carousel-image {
-        height: 350px;
-    }
-</style>
-
-@if (moviesLoaded)
+@if (recommendationsLoaded)
 {
-    <div class="carousel-container">
-        <Carousel ShowControls="true">
-            @foreach (var movie in movies)
+    <div class="card-deck-container">
+        <h2>Recommended Movies</h2>
+        <CardDeck>
+            @foreach (Movie movie in recommendations)
             {
-                <CarouselItem>
-                    <a href="@GetMovieDetailsUrl(movie.Id)">
-                        <img class="carousel-image" src="@movie.PosterUrl" alt="@movie.Title" />
-                    </a>
-                </CarouselItem>
+                <Card @onclick="@(() => OnMovieClick(movie.Id))">
+                    <CardImage Source="@movie.PosterUrl.ToString()" Alt="poster"/>
+                    <CardBody>
+                        <CardTitle Size="6" TextWeight="TextWeight.Bold">
+                            @movie.Title
+                        </CardTitle>
+                        <CardText >
+                            @movie.Rating.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/>
+                        </CardText>
+                    </CardBody>
+                </Card>
+                counter++;
+                if (amountOfMoviesToShow <= counter)
+                {
+                    counter = 0;
+                    break;
+                }
             }
-        </Carousel>
-        
+        </CardDeck>
     </div>
 }
+
 else
 {
-    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px" />
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
 }
 
 @code {
-    private List<Movie> movies;
-    private int currentMovieIndex = 0;
-    private int moviesToLoad = 4;
-    private bool moviesLoaded = false;
+
+    private IList<Movie> recommendations = new List<Movie>();
+    private bool recommendationsLoaded = false;
+    private int amountOfMoviesToShow = 8;
+    private int counter = 0;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadMoviesAsync();
+        await LoadRecommendedMovies();
     }
 
-    private async Task LoadMoviesAsync()
+    private async Task LoadRecommendedMovies()
     {
-        if (movies == null)
-        {
-            movies = new List<Movie>();
-        }
-
-        var movieTitles = new List<string>
-        {
-            "Harry Potter",
-           // "Lord of the Rings",
-            //"Star Wars",
-           // "Pirates of the Caribbean"
-        };
-
-        for (int i = currentMovieIndex; i < currentMovieIndex + moviesToLoad && i < movieTitles.Count; i++)
-        {
-            var title = movieTitles[i];
-            var searchResults = await MovieSearchModel.SearchForMovieAsync(title);
-            var movie = searchResults.FirstOrDefault();
-
-            if (movie != null)
-            {
-                movies.Add(movie);
-            }
-        }
-
-        currentMovieIndex += moviesToLoad;
-        moviesLoaded = true;
+        recommendations = await RecommendationsModel.GetRecommendations();
+        recommendationsLoaded = true;
     }
 
-    private string GetMovieDetailsUrl(string id)
+    private void OnMovieClick(string movieId)
     {
-        return $"movieDetails/{id}";
+        NavManager.NavigateTo($"movieDetails/{movieId}");
     }
-
 }

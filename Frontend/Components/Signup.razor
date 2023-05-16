@@ -2,9 +2,11 @@
 @using System.ComponentModel.DataAnnotations
 @using Frontend.Model.Firebase
 @using Frontend.Model.User
+@using Frontend.Service
 @inject IFirebaseModel FirebaseModel
 @namespace Frontend.Components
 @inject IUserModel UserModel
+@inject CustomAuthenticationStateProvider AuthStateProvider
 
 <div class="signup-content">
     <Card>
@@ -111,6 +113,7 @@
         if (await FirebaseModel.CreateUser(user.DisplayName, user.Email, user.Password))
         {
             await UserModel.CreateUser(FirebaseModel.CurrentUser.TokenValue);
+            AuthStateProvider.SignIn();
             await SignupSuccess.InvokeAsync(true);
         }
         else

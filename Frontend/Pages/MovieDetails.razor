@@ -46,7 +46,7 @@
                             @if (IsOnFavoriteMovies())
                             {
                                 <Button Color="@Color.Primary" Clicked="@StarClicked">
-                                    <Icon Name="@IconName.Star"/>
+                                    <Icon TextColor="TextColor.White" Name="@IconName.Star"/>
                                 </Button>
                             }
                             else
@@ -112,7 +112,7 @@ else
 
     private async Task LoadMovieDetails()
     {
-        Movie = await MovieDetailModel.GetMovieDetails(MovieId, FirebaseModel.CurrentUser.TokenValue);
+        Movie = await MovieDetailModel.GetMovieDetails(MovieId, FirebaseModel.CurrentUser?.TokenValue);
         movieLoaded = true;
     }
 
