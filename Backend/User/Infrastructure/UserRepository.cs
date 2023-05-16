@@ -25,7 +25,8 @@ public class UserRepository : IUserRepository
     public async Task<Domain.User> ReadUserWithRatingsFromIdAsync(string userId)
     {
         await using var _database = new DataContext(_configuration);
-        var user = await _database.Users.Include(u => u.FavoriteMovies).SingleAsync(user => user.Id == userId);
+        var user = await _database.Users.Include(u => u.UserRatings)
+            .SingleAsync(user => user.Id == userId);
         return ToDomain(user);
     }
 
