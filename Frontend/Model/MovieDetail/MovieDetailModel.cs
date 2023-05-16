@@ -15,8 +15,13 @@ public class MovieDetailModel :NSwagBaseClient, IMovieDetailModel
         _client = client;
     }
 
-    public async Task<Movie> GetMovieDetails(string movieId, string userToken)
+    public async Task<Movie?> GetMovieDetails(string movieId, string userToken)
     {
         return await _client.GetMovieDetails(movieId, userToken);
+    }
+
+    public async Task SetMovieRating(string? userToken, string movieId, int? rating = null)
+    {
+        await _client.SetMovieRating(userToken, movieId, rating);
     }
 }
