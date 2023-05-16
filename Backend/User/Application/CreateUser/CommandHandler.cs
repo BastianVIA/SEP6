@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Backend.Database.TransactionManager;
 using Backend.User.Infrastructure;
 using MediatR;
 
@@ -9,14 +10,25 @@ public record Command(string userId) : IRequest;
 public class CommandHandler : IRequestHandler<Command>
 {
     private readonly IUserRepository _repository;
-    
-    public CommandHandler(IUserRepository userRepository, IMediator mediator)
+    private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
+   
+    public CommandHandler(IUserRepository userRepository, IMediator mediator, IDatabaseTransactionFactory databaseTransactionFactory)
     {
         _repository = userRepository;
+        _databaseTransactionFactory = databaseTransactionFactory;
     }
 
     public async Task Handle(Command request, CancellationToken cancellationToken)
     {
-        await _repository.CreateUserAsync(request.userId);
+       await using var transaction = await _databaseTransactionFactory.BeginTransactionAsync();
+       try
+       {
+           await _repository.CreateUserAsync(request.userId, transaction);
+       }
+       catch (Exception e)
+       {
+           await transaction.RollbackTransactionAsync();
+           throw;
+       }
     }
 }
