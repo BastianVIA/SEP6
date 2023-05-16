@@ -8,5 +8,6 @@ public class UserDAO
     [Key]
     public string Id { get; set; }
     public List<UserMovieDAO>? FavoriteMovies { get; set; }
-    
+    public List<UserRatingDAO>? UserRatings { get; set; }
+
 }

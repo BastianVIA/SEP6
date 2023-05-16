@@ -1,16 +1,19 @@
 ﻿using System.Data.Common;
+using Backend.Movie.Domain;
 using NLog;
 
 namespace Backend.User.Domain;
 
-public class User
+public class User : Foundation.BaseDomain
 {
     public string Id { get; set; }
     public List<string> FavoriteMovies { get; set; }
+    public List<UserRating> Ratings { get; set; }
 
     public User()
     {
         FavoriteMovies = new List<string>();
+        Ratings = new List<UserRating>();
     }
     public bool HasAlreadyFavoritedMovie(string movieId)
     {
@@ -22,5 +25,46 @@ public class User
             }
         }
         return false;
+    }
+
+    public bool HasAlreadyRatedMovie(string movieId)
+    {
+        foreach (var r in Ratings)
+        {
+            if (r.MovieId == movieId)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void AddRating(string movieId, int rating)
+    {
+        Ratings.Add(new UserRating(movieId, rating));
+        AddDomainEvent(new UpdatedRatingEvent
+        {
+            UserId = Id,
+            MovieId = movieId,
+            NewRating = rating
+        });
+    }
+    
+    public void RemoveRating(string movieId)
+    {
+        foreach (var rating in Ratings)
+        {
+            if (movieId == rating.MovieId)
+            {
+                Ratings.Remove(rating);
+                AddDomainEvent(new UpdatedRatingEvent
+                {
+                    UserId = Id,
+                    MovieId = movieId
+                });
+                return;
+            }
+        }
     }
 }
