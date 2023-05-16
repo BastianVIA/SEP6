@@ -79,6 +79,12 @@ public class FirebaseModel : IFirebaseModel
         }
     }
 
+    public void Logout()
+    {
+        client.SignOut();
+        FireAlertEvent(AlertBoxHelper.AlertType.LogoutSuccess);
+    }
+
     private void FireAlertEvent(AlertBoxHelper.AlertType type, string? data = null)
     {
         OnNotifyAlert?.Invoke(this,new AlertEventArgs
