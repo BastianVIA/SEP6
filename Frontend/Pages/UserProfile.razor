@@ -1,0 +1,50 @@
+﻿@page "/userprofile"
+@using Frontend.Model.MovieDetail
+@using Frontend.Model.FavoriteMovies
+@using Frontend.Model.UserProfiles
+@using Frontend.Entities
+@inject IUserProfilesModel UserProfilesModel
+@inject NavigationManager NavManager
+@inject IMovieDetailModel MovieDetailModel
+@inject IFavoriteMoviesModel FavoriteMoviesModel
+<h3>User Profile</h3>
+
+@if (user == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div>
+        <h4>@user.Username</h4>
+        <p>@user.Email</p>
+        <p>@user.Bio</p>
+
+        <h5>Favorite Movies</h5>
+        @if (user.FavoriteMovies != null && user.FavoriteMovies.Any())
+        {
+            <ul>
+                @foreach (var movie in user.FavoriteMovies)
+                {
+                    <li>@movie.Title</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>No favorite movies yet.</p>
+        }
+    </div>
+}
+
+@code {
+    private User user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        string userId = "some_user_id";
+        string userToken = "some_user_token"; 
+
+        user = await UserProfilesModel.GetUserProfile(userId, userToken);
+    }
+}

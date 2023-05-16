@@ -1,0 +1,71 @@
+﻿@page "/SearchUser"
+@using Frontend.Entities
+@using Frontend.Service
+@inject IUserSearchModel UserSearchModel
+@inject NavigationManager NavManager
+@using Blazorise
+@using Frontend.Model.UserSearch
+
+<PageTitle>Search User</PageTitle>
+
+@if (isDataFetched)
+{
+    <div class="page-content">
+        <h3>Search Result</h3>
+
+        @if (userList.Count == 0)
+        {
+            <p size="20px">No such user exists.</p>
+        }
+        <Table Hoverable Striped>
+            <TableHeader>
+                <TableRow>
+                    <TableHeaderCell>Profile Picture</TableHeaderCell>
+                    <TableHeaderCell>Username</TableHeaderCell>
+                    <TableHeaderCell>Email</TableHeaderCell>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                @foreach(User user in userList)
+                {
+                    <TableRow @onclick="@(() => OnUserClick(user.Id))">
+                        <TableRowCell><img src="@user.ProfilePicture" height="200"/></TableRowCell>
+                        <TableRowCell>@user.Username</TableRowCell>
+                        <TableRowCell>@user.Email</TableRowCell>
+                    </TableRow> 
+                }
+            </TableBody>
+        </Table>
+    </div>
+}
+else
+{
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="@(@"height: 200px")"/>
+}
+
+@code {
+    [Parameter]
+    public string SearchTerm { get; set; }
+    private IList<User> userList = new List<User>();
+    private string username { get; set; }
+    private bool isDataFetched = false;
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        username = SearchTerm;
+        await SearchForUser();
+    }
+
+    private async Task SearchForUser()
+    {
+        isDataFetched = false;
+        userList.Clear();
+        userList = await UserSearchModel.SearchForUserAsync(username);
+        isDataFetched = true;
+    }
+
+    private void OnUserClick(string userId)
+    {
+        NavManager.NavigateTo($"userProfile/{userId}");
+    }
+}

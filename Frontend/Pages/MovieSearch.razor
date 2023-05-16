@@ -70,9 +70,19 @@ else
     private SortingDirection? sortingDirection;
     private int moviesPerPage = 10;
     
+    [Parameter]
+    public string SearchTerm { get; set; }
+    
+    // protected override async Task OnParametersSetAsync()
+    // {
+    //     movieTitle = MovieTitle;
+    //     pageNumber = 1;
+    //     await SearchForMovie();
+    // }
+    
     protected override async Task OnParametersSetAsync()
     {
-        movieTitle = MovieTitle;
+        movieTitle = SearchTerm;
         pageNumber = 1;
         await SearchForMovie();
     }
