@@ -17,7 +17,7 @@ public class FavoriteMoviesModel : NSwagBaseClient, IFavoriteMoviesModel
         _client = client;
     }
 
-    public async Task<IList<Movie>> GetFavoriteMovies(string userToken, string UID)
+    public async Task<IList<Movie>> GetFavoriteMovies(string userToken = null, string UID = null)
     {
         return await _client.GetFavoriteMovies(userToken, UID);
     }

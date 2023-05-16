@@ -43,6 +43,11 @@ public class FirebaseClient : IFirebaseClient
         return CreateFirebaseUser(userCredential, tokenValue);
     }
 
+    public void SignOut()
+    {
+        client.SignOut();
+    }
+
     private FirebaseUser CreateFirebaseUser(UserCredential credential, string tokenValue)
     {
         return new FirebaseUser

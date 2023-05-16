@@ -31,7 +31,6 @@
 
     private void HandleAlertEvent(object? sender, AlertEventArgs args)
     {
-        Console.WriteLine("yessir");
         Alert = _helper.GetAlert(args.Type, args.Reason);
         if (Alert == null) return;
         
@@ -45,7 +44,6 @@
         Task.Delay(_alertTimeSeconds * 1000).ContinueWith(task =>
         {
             _visibility = false;
-            Console.WriteLine("Alert should not be visible");
             InvokeAsync(StateHasChanged);
         });
     }

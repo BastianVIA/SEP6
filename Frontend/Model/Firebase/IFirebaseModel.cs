@@ -9,4 +9,6 @@ public interface IFirebaseModel
     public FirebaseUser CurrentUser { get; }
     public Task<bool> CreateUser(string displayName, string email, string password);
     public Task<bool> Login(string email, string password);
+    public void Logout();
+    
 }

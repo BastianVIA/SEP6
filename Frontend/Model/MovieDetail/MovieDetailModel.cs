@@ -1,4 +1,4 @@
-﻿using Frontend.Entities;
+using Frontend.Entities;
 using Frontend.Network;
 using Frontend.Network.MovieDetail;
 using Frontend.Service;
@@ -15,8 +15,8 @@ public class MovieDetailModel :NSwagBaseClient, IMovieDetailModel
         _client = client;
     }
 
-    public async Task<Movie?> GetMovieDetails(string movieId)
+    public async Task<Movie> GetMovieDetails(string movieId, string userToken)
     {
-        return await _client.GetMovieDetails(movieId);
+        return await _client.GetMovieDetails(movieId, userToken);
     }
 }

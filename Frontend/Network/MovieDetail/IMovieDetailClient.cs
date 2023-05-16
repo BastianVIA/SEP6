@@ -4,6 +4,6 @@ namespace Frontend.Network.MovieDetail;
 
 public interface IMovieDetailClient
 {
-    public Task<Movie?> GetMovieDetails(string movieId);
+    public Task<Movie> GetMovieDetails(string movieId, string? userToken);
 
 }

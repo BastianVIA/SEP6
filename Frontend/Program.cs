@@ -11,6 +11,8 @@ using Frontend.Network.Firebase;
 using Frontend.Network.MovieDetail;
 using Frontend.Network.MovieSearch;
 using Frontend.Network.User;
+using Frontend.Service;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,9 @@ builder.Services.AddScoped<IFirebaseModel, FirebaseModel>();
 builder.Services.AddScoped<IFavoriteMoviesModel, FavoriteMoviesModel>();
 builder.Services.AddScoped<IUserModel, UserModel>();
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<CustomAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
+builder.Services.AddAuthorizationCore();
 
 builder.Services
     .AddBlazorise( options =>

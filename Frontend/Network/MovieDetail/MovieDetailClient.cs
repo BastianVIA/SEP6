@@ -1,13 +1,18 @@
-﻿using Frontend.Entities;
+﻿using System.Net.Http.Headers;
+using Frontend.Entities;
 using Frontend.Service;
 
 namespace Frontend.Network.MovieDetail;
 
 public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
 {
-    public async Task<Movie?> GetMovieDetails(string movieId)
+    public async Task<Movie> GetMovieDetails(string movieId, string? userToken)
     {
-        
+        if (userToken != null)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+        }
+
         MovieDetailsResponse? response;
         try
         {
