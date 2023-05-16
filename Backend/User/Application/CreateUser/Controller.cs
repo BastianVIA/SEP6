@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Backend.Middleware;
 using Backend.Movie.Application.Search;
 using FirebaseAdmin.Auth;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.User.Application.CreateUser;
@@ -21,11 +23,24 @@ public class Controller : ControllerBase
     [HttpPost]
     [Tags("UserApi")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult Post([FromBody]string userId)
+    [Authorize]
+    public IActionResult Post()
     {
-        var command = new Command(userId);
-        var result = _mediator.Send(command);
+        try
+        {
+            var userid = (string?)HttpContext.Items[HttpContextKeys.UserId];
+            if (userid == null)
+            {
+                return BadRequest("No token provided to create the user");
+            }
+            var command = new Command(userid);
+            var result = _mediator.Send(command);
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, $"Internal server error {e.Message}");
+        }
 
-        return Ok(result);
     }
 }
