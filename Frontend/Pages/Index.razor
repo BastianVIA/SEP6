@@ -78,8 +78,7 @@ else
         for (int i = currentMovieIndex; i < currentMovieIndex + moviesToLoad && i < movieTitles.Count; i++)
         {
             var title = movieTitles[i];
-            var movieSearchModel = new MovieSearchModel();
-            var searchResults = await movieSearchModel.SearchForMovieAsync(title);
+            var searchResults = await MovieSearchModel.SearchForMovieAsync(title);
             var movie = searchResults.FirstOrDefault();
 
             if (movie != null)

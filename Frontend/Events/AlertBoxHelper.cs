@@ -9,7 +9,8 @@ public class AlertBoxHelper
         LoginSuccess,
         LoginFail,
         SignupSuccess,
-        SignupFail
+        SignupFail,
+        LogoutSuccess
     }
 
     private static readonly Dictionary<AlertType, Func<string, Alert>> Alerts = new()
@@ -17,9 +18,9 @@ public class AlertBoxHelper
         { AlertType.LoginSuccess , LoginSuccess},
         { AlertType.LoginFail , LoginFailed},
         { AlertType.SignupSuccess , SignupSuccess},
-        { AlertType.SignupFail , SignupFailed}
+        { AlertType.SignupFail , SignupFailed},
+        { AlertType.LogoutSuccess , LogoutSuccess}
     };
-    
 
     private static Alert LoginSuccess(string ignored)
     {
@@ -58,6 +59,16 @@ public class AlertBoxHelper
             Success = false,
             Message = "Signup Failed!",
             Description = $"Reason: {reason}"
+        };
+    }
+    
+    private static Alert LogoutSuccess(string arg)
+    {
+        return new Alert()
+        {
+            Success = true,
+            Message = $"Logout Successful!",
+            Description = $"You have successfully logged out."
         };
     }
 

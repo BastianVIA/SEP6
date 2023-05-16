@@ -110,6 +110,16 @@ public class MovieRepository : IMovieRepository
         return ToDomain(result);
     }
 
+    public async Task<List<Domain.Movie>> ReadMoviesFromList(List<string> movieIds, int requestedPageNumber)
+    {
+        var foundMovies = _database.Movies.Include(m => m.Rating)
+            .Where(m => movieIds.Contains(m.Id))
+            .Skip(NumberOfResultsPerPage * (requestedPageNumber - 1))
+            .Take(NumberOfResultsPerPage)
+            .ToListAsync();
+        return ToDomain(await foundMovies);
+    }
+
     private List<Domain.Movie> ToDomain(List<MovieDAO> movieDaos)
     {
         var listOfDomainMovies = new List<Domain.Movie>();

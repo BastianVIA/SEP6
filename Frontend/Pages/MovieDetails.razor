@@ -8,79 +8,122 @@
 @inject IMovieDetailModel MovieDetailModel
 @inject IFavoriteMoviesModel FavoriteMoviesModel
 @inject IFirebaseModel FirebaseModel
+@using Blazorise.LottieAnimation
 
-<h3>Movie Details</h3>
-
-<div class="movie-detail">
-    <h2>@Movie?.Title (@Movie?.ReleaseYear)</h2>
-
-    <img src="@Movie?.PosterUrl" alt="@Movie?.Title poster" class="movie-poster" />
-
-    <div>
-        <h3>Actors</h3>
-        <ul>
-            @if (Movie?.Actors != null)
-            {
-                foreach (var actor in Movie.Actors)
-                {
-                    <li>@actor.Name, @actor.BirthYear</li>
-                }
-            }
-            else
-            {
-                <li>No actors listed</li>
-            }
-        </ul>
+@if (movieLoaded)
+{
+    <div class="movie-container">
+        <Row>
+            <Column ColumnSize="ColumnSize.Is12">
+                <h2>@Movie.Title</h2>
+            </Column>
+        </Row>
+        <Row>
+            <Column ColumnSize="ColumnSize.Is4">
+                <img src="@Movie.PosterUrl" alt="poster" class="movie-poster"/>
+            </Column>
+            <Column ColumnSize="ColumnSize.Is6">
+                <h4>Actors</h4>
+                <ul>
+                    @if (Movie.Actors != null)
+                    {
+                        foreach (var actor in Movie.Actors)
+                        {
+                            <li>@actor.Name, @actor.BirthYear</li>
+                        }
+                    }
+                    else
+                    {
+                        <li>No actors listed</li>
+                    }
+                </ul>
+            </Column>
+            <Column ColumnSize="ColumnSize.Is2">
+                <AuthorizeView>
+                    <Authorized>
+                        <div>
+                            <h4>Favorite</h4>
+                            @if (IsOnFavoriteMovies())
+                            {
+                                <Button Color="@Color.Primary" Clicked="@StarClicked">
+                                    <Icon Name="@IconName.Star"/>
+                                </Button>
+                            }
+                            else
+                            {
+                                <Button Color="@Color.Primary" Clicked="@StarClicked">
+                                    <Icon TextColor="@TextColor.Black50" Name="@IconName.Star"/>
+                                </Button>
+                            }
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+            </Column>
+        </Row>
+        <Row>
+            <Column ColumnSize="ColumnSize.Is4">
+                <h4>Directors</h4>
+                <ul>
+                    @if (Movie.Directors != null)
+                    {
+                        foreach (var director in Movie.Directors)
+                        {
+                            <li>@director.Name, @director.BirthYear</li>
+                        }
+                    }
+                    else
+                    {
+                        <li>No directors listed</li>
+                    }
+                </ul>
+            </Column>
+            <Column ColumnSize="ColumnSize.Is4">
+                <h4>Rating</h4>
+                <p>@(Movie?.Rating?.AverageRating.ToString() ?? "N/A") based on @(Movie?.Rating?.RatingCount.ToString() ?? "N/A") votes</p>
+            </Column>
+            <Column ColumnSize="ColumnSize.Is4">
+                <h4>Release Year</h4>
+                <p>@Movie.ReleaseYear</p>
+            </Column>
+        </Row>
+        <Row>
+            <Column ColumnSize="ColumnSize.Is12">
+                <h4>Resume</h4>
+                <p>@Movie.Resume</p>
+            </Column>
+        </Row>
     </div>
-
-    <div>
-        <h3>Directors</h3>
-        <ul>
-            @if (Movie?.Directors != null)
-            {
-                foreach (var director in Movie.Directors)
-                {
-                    <li>@director.Name, @director.BirthYear</li>
-                }
-            }
-            else
-            {
-                <li>No directors listed</li>
-            }
-        </ul>
-    </div>
-
-    <div>
-        <h3>Rating</h3>
-        <p>@(Movie?.Rating?.AverageRating.ToString() ?? "N/A") based on @(Movie?.Rating?.RatingCount.ToString() ?? "N/A") votes</p>
-    </div>
-
-    <div>
-        <h3>Resume</h3>
-        <p>@Movie?.Resume</p>
-    </div>
-    <div>
-        <Button Color="Color.Primary" Clicked="StarClicked"><Icon Name="IconName.Star" /></Button>
-    </div>
-</div>
+}
+else
+{
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
+}
 
 @code {
     [Parameter]
     public string MovieId { get; set; }
     private Movie Movie;
-    
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private bool movieLoaded = false;
+
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            Movie = await MovieDetailModel.GetMovieDetails(MovieId);
-            StateHasChanged(); 
-        }
+        await LoadMovieDetails();
     }
 
-    private void StarClicked()
+    private async Task LoadMovieDetails()
     {
-        FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.TokenValue, MovieId);
+        Movie = await MovieDetailModel.GetMovieDetails(MovieId, FirebaseModel.CurrentUser.TokenValue);
+        movieLoaded = true;
     }
 
+    private async Task StarClicked()
+    {
+        await FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, MovieId);
+        StateHasChanged();
+    }
+
+    private bool IsOnFavoriteMovies()
+    {
+        return (Movie != null && Movie.IsFavorite != null && Movie.IsFavorite.Value);
+    }
 }
