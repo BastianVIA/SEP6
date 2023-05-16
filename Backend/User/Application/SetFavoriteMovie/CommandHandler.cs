@@ -34,13 +34,16 @@ public class CommandHandler : IRequestHandler<Command>
 
         if (user.HasAlreadyFavoritedMovie(request.movieId))
         {
+            user.FavoriteMovies.Remove(request.movieId);
             LogManager.GetCurrentClassLogger()
-                .Error(
-                    $"User with id: {request.userId}, tired to add: {request.movieId} to favorite list but it is already in the favorite list");
-            throw new InvalidDataException($"Movie with Id: {request.movieId} Already In Favorite list");
+                .Info($"Movie with id: {request.movieId} removed from favorites of user with id: {request.userId}");
         }
-  
-        user.FavoriteMovies.Add(request.movieId);
+        else
+        {
+            user.FavoriteMovies.Add(request.movieId);
+            LogManager.GetCurrentClassLogger()
+                .Info($"User with id: {request.userId} added movie with id: {request.movieId} to favorite list");
+        }
         await _repository.Update(user);
     }
 }

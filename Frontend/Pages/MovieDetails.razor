@@ -13,53 +13,53 @@
 @if (movieLoaded)
 {
     <div class="movie-container">
-        <Row>
-            <Column ColumnSize="ColumnSize.Is12">
-                <h2>@Movie.Title</h2>
-            </Column>
-        </Row>
-        <Row>
-            <Column ColumnSize="ColumnSize.Is4">
-                <img src="@Movie.PosterUrl" alt="poster" class="movie-poster"/>
-            </Column>
-            <Column ColumnSize="ColumnSize.Is6">
-                <h4>Actors</h4>
-                <ul>
-                    @if (Movie.Actors != null)
-                    {
-                        foreach (var actor in Movie.Actors)
-                        {
-                            <li>@actor.Name, @actor.BirthYear</li>
-                        }
-                    }
-                    else
-                    {
-                        <li>No actors listed</li>
-                    }
-                </ul>
-            </Column>
-            <Column ColumnSize="ColumnSize.Is2">
-                <AuthorizeView>
-                    <Authorized>
-                        <div>
-                            <h4>Favorite</h4>
-                            @if (IsOnFavoriteMovies())
+                <Row>
+                    <Column ColumnSize="ColumnSize.Is12">
+                        <h2>@Movie.Title</h2>
+                    </Column>
+                </Row>
+                <Row>
+                    <Column ColumnSize="ColumnSize.Is4">
+                        <img src="@Movie.PosterUrl" alt="poster" class="movie-poster"/>
+                    </Column>
+                    <Column ColumnSize="ColumnSize.Is6">
+                        <h4>Actors</h4>
+                        <ul>
+                            @if (Movie.Actors != null)
                             {
-                                <Button Color="@Color.Primary" Clicked="@StarClicked">
-                                    <Icon Name="@IconName.Star"/>
-                                </Button>
+                                foreach (var actor in Movie.Actors)
+                                {
+                                    <li>@actor.Name, @actor.BirthYear</li>
+                                }
                             }
                             else
                             {
-                                <Button Color="@Color.Primary" Clicked="@StarClicked">
-                                    <Icon TextColor="@TextColor.Black50" Name="@IconName.Star"/>
-                                </Button>
+                                <li>No actors listed</li>
                             }
-                        </div>
-                    </Authorized>
-                </AuthorizeView>
+                        </ul>
+                    </Column>
+            <Column ColumnSize="ColumnSize.Is2">
+              <AuthorizeView>
+                  <Authorized>
+                      <div>
+                          <h4>Favorite</h4>
+                          @if (IsOnFavoriteMovies())
+                          {
+                              <Button Color="@Color.Primary" Clicked="@StarClicked">
+                                  <Icon Name="@IconName.Star"/>
+                              </Button>
+                          }
+                          else
+                          {
+                              <Button Color="@Color.Secondary" Clicked="@StarClicked">
+                                  <Icon TextColor="@TextColor.Black50" Name="@IconName.Star"/>
+                              </Button>
+                          }
+                      </div>
+                  </Authorized>
+              </AuthorizeView>
             </Column>
-        </Row>
+ </Row>
         <Row>
             <Column ColumnSize="ColumnSize.Is4">
                 <h4>Directors</h4>
@@ -91,8 +91,7 @@
                 <h4>Resume</h4>
                 <p>@Movie.Resume</p>
             </Column>
-        </Row>
-    </div>
+        </Row>    </div>
 }
 else
 {
@@ -115,15 +114,34 @@ else
         Movie = await MovieDetailModel.GetMovieDetails(MovieId, FirebaseModel.CurrentUser.TokenValue);
         movieLoaded = true;
     }
-
+    
+    
     private async Task StarClicked()
     {
-        await FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, MovieId);
+        try
+        {
+            if (IsOnFavoriteMovies())
+            {
+                await FavoriteMoviesModel.DeleteFavoriteMovie(FirebaseModel.CurrentUser.TokenValue, MovieId);
+                Movie.IsFavorite = false;
+            }
+            else
+            {
+                await FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, MovieId);
+                Movie.IsFavorite = true;
+            }
+        }
+        catch (Exception e)
+        { 
+        }
+    
         StateHasChanged();
     }
 
+    
+    
     private bool IsOnFavoriteMovies()
     {
-        return (Movie != null && Movie.IsFavorite != null && Movie.IsFavorite.Value);
+        return (Movie != null && Movie.IsFavorite.HasValue && Movie.IsFavorite.Value);
     }
 }
