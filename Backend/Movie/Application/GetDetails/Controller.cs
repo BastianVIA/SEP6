@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.Movie.Application.Details;
+namespace Backend.Movie.Application.GetDetails;
 
 [ApiController]
 [Route("movie")]
