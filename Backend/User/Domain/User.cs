@@ -70,7 +70,7 @@ public class User : Foundation.BaseDomain
 
     public bool HasAlreadyRatedMovie(string movieId)
     {
-        if (FavoriteMovies == null)
+        if (Ratings == null)
         {
             return false;
         }
@@ -85,8 +85,7 @@ public class User : Foundation.BaseDomain
 
         return false;
     }
-
-
+    
     public void AddFavoriteMovie(string movieId)
     {
         if (FavoriteMovies == null)
