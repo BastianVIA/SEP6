@@ -2,6 +2,6 @@
 
 public interface IUserProfileClient
 {
-    public Task<Entities.User> GetUserProfile(string userId, string? userToken);
+    public Task<Entities.User> GetUserProfile(string userId);
 
 }

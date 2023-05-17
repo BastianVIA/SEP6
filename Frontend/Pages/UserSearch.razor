@@ -1,4 +1,4 @@
-﻿@page "/SearchUser"
+﻿@page "/userSearch"
 @using Frontend.Entities
 @using Frontend.Service
 @inject IUserSearchModel UserSearchModel
@@ -53,7 +53,7 @@ else
     private int pageNumber { get; set; }
     private string? sortingAlphabet;
     private SortingDirection? sortingDirection;
-    private int moviesPerPage = 10;
+    private int usersPerPage = 10;
 
     
     protected override async Task OnParametersSetAsync()

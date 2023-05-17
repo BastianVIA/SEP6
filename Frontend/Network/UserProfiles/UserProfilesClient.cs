@@ -2,48 +2,48 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using Frontend.Entities;
 using Frontend.Pages;
 using Frontend.Service;
 
-namespace Frontend.Network.UserProfiles;
-
-public class UserProfileClient : NSwagBaseClient, IUserProfileClient
+namespace Frontend.Network.UserProfiles
 {
-    public async Task<Entities.User> GetUserProfile(string userId, string? userToken)
+    public class UserProfileClient : NSwagBaseClient, IUserProfileClient
     {
-        //     if (userToken != null)
-        //     {
-        //         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
-        //     }
-        //
-        //     UserProfileResponse? response;
-        //     try
-        //     {
-        //         response = await _api.UserProfileAsync(userId);
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         Console.WriteLine(e);
-        //         return null;
-        //     }
-        //
-        //     if (response == null || response.UserProfileDto == null)
-        //     {
-        //         return null;
-        //     }
-        //
-        //     var user = new Entities.User()
-        //     {
-        //         Id = response.UserProfileDto.Id,
-        //         Username = response.UserProfileDto.Username,
-        //         Email = response.UserProfileDto.Email, 
-        //         Bio = response.UserProfileDto.Bio,
-        //         ProfilePicture =  response.UserProfileDto.ProfilePicture
-        //     };
-        //
-        //     return user;
-        // }
-        return null;
+        public async Task<Entities.User> GetUserProfile(string userId)
+        {
+            UserProfileResponse? response;
+            try
+            {
+                response = await _api.UserGETAsync(userId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+        
+            if (response == null || response.UserProfile == null)
+            {
+                return null;
+            }
+
+            var userRatings = new List<UserRating>();
+            
+            foreach (var userRating in response.UserProfile.Ratings)
+            {
+                userRatings.Add(new UserRating { NumberOfStars = userRating.NumberOfStars });
+            }
+
+            var user = new Entities.User()
+            {
+                UserRatings = userRatings
+            };
+        
+            return user;
+        }
     }
 }
+
+

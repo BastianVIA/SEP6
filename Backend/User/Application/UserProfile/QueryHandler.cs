@@ -21,7 +21,7 @@ public class UserRatingDto
 }
 
 
-public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
+public class QueryHandler : IRequestHandler<Query,UserProfileResponse>
 {
     private readonly IUserRepository _repository;
     private readonly IMediator _mediator;
@@ -36,7 +36,7 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
     
     public async Task<UserProfileResponse> Handle(Query request, CancellationToken cancellationToken)
     {
-        var transaction =  _transactionFactory.BeginReadOnlyTransaction();
+        var transaction =   _transactionFactory.BeginReadOnlyTransaction();
         
         var userRequested = await _repository.ReadUserWithFavouriteMoviesFromIdAsync(request.userId, transaction);
         var ratingDtos = new List<UserRatingDto>();
@@ -47,7 +47,8 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
         
         return new UserProfileResponse(toDto(ratingDtos));
     }
-
+    
+    
     private UserProfileDto toDto(List<UserRatingDto> userRating)
     {
         return new UserProfileDto { Ratings = userRating};

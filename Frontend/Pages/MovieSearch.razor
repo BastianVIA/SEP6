@@ -55,8 +55,11 @@
     </div>
 }
 else
+{ 
+    @if (isConnected)
 {
     <LottieAnimation Path="/Animations/loadingAimation.json" Style="@(@"height: 200px")"/>
+}
 }
 @code {
     [Parameter]
@@ -69,20 +72,16 @@ else
     private MovieSortingKey? sortingKey;
     private SortingDirection? sortingDirection;
     private int moviesPerPage = 10;
-    
+    private bool isConnected = true;
+
     [Parameter]
-    public string SearchTerm { get; set; }
+    public string SearchTerm { get; set; } = string.Empty;
     
-    // protected override async Task OnParametersSetAsync()
-    // {
-    //     movieTitle = MovieTitle;
-    //     pageNumber = 1;
-    //     await SearchForMovie();
-    // }
+
     
     protected override async Task OnParametersSetAsync()
     {
-        movieTitle = SearchTerm;
+        movieTitle = MovieTitle;
         pageNumber = 1;
         await SearchForMovie();
     }
@@ -133,6 +132,10 @@ else
         pageNumber--;
         await SearchForMovie();
     }
+    
+    protected override void OnAfterRender(bool firstRender)
+    {
+        isConnected = firstRender;
+    }
 }
-
 
