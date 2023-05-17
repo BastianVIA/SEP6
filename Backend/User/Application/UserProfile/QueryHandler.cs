@@ -1,4 +1,5 @@
 ﻿using Backend.Database.TransactionManager;
+using Backend.Movie.Application.GetInfoFromMovies;
 using Backend.Movie.Application.GetRecommendations;
 using Backend.User.Domain;
 using Backend.User.Infrastructure;
@@ -18,6 +19,8 @@ public class UserProfileDto
     
     public List<string> FavoriteMovies { get; set; }
     public List<UserRatingDto> Ratings { get; set; }
+    
+    public double AverageOfUserRatings { get; set; }
 }
 
 public class UserRatingDto
@@ -26,7 +29,7 @@ public class UserRatingDto
 }
 
 
-public class QueryHandler : IRequestHandler<Query,UserProfileResponse>
+public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
 {
     private readonly IUserRepository _repository;
     private readonly IMediator _mediator;
@@ -41,14 +44,16 @@ public class QueryHandler : IRequestHandler<Query,UserProfileResponse>
     
     public async Task<UserProfileResponse> Handle(Query request, CancellationToken cancellationToken)
     {
-        var transaction =   _transactionFactory.BeginReadOnlyTransaction();
+        var transaction =  _transactionFactory.BeginReadOnlyTransaction();
         
-        var userRequested = await _repository.ReadUserFromIdAsync(request.userId, transaction,includeRatings:true,includeFavoriteMovies:true);
+        var userRequested = await _repository.ReadUserFromIdAsync(request.userId, transaction, includeRatings: true, includeFavoriteMovies: true);
         var ratingDtos = GetRatingDtos(userRequested);
-
+        userRequested.SetRatingAvg();
+        
         return new UserProfileResponse(toDto(userRequested, ratingDtos));
     }
     
+
     private UserProfileDto toDto(Domain.User user, List<UserRatingDto> userRating)
     {
         return new UserProfileDto
@@ -57,11 +62,12 @@ public class QueryHandler : IRequestHandler<Query,UserProfileResponse>
             Email = user.Email,
             Bio = user.Bio,
             FavoriteMovies = user.FavoriteMovies,
-            Ratings = userRating
+            Ratings = userRating,
+            AverageOfUserRatings = user.AverageOfUserRatings
         };
     }
     
-    
+
     private List<UserRatingDto> GetRatingDtos(Domain.User user)
     {
         var list = new List<UserRatingDto>();

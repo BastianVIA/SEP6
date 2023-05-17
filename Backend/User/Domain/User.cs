@@ -10,6 +10,8 @@ public class User : Foundation.BaseDomain
     public string? Bio { get; set; }
     public List<string>? FavoriteMovies { get; set; }
     public List<UserRating>? Ratings { get; set; }
+    
+    public double AverageOfUserRatings { get; set; }
 
     public User()
     {
@@ -157,5 +159,23 @@ public class User : Foundation.BaseDomain
 
         throw new KeyNotFoundException(
             $"Tried to get rating from movie with id: {movieId}, from user with id: {Id}, but could not find the rating");
+    }
+    
+    public void SetRatingAvg()
+    {
+        double count = 0.0;
+        if (Ratings.Count == 0)
+        {
+            AverageOfUserRatings = count;
+            return;
+        }
+
+
+        foreach (var rating in Ratings)
+        {
+            count += rating.NumberOfStars;
+        }
+
+        AverageOfUserRatings = count / Ratings.Count;
     }
 }
