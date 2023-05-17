@@ -42,7 +42,6 @@ public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
             },
             Actors = actors,
             Directors = directors,
-            IsFavorite = response.MovieDetailsDto.IsFavorite,
             Resume = response.MovieDetailsDto.Resume
         };
 
