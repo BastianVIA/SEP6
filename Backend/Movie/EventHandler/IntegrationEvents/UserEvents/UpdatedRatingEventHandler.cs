@@ -23,7 +23,7 @@ public class UpdatedRatingEventHandler : INotificationHandler<UpdatedRatingInteg
         var transaction = _transactionFactory.GetCurrentTransaction();
         try
         {
-            var movie = await _movieRepository.ReadMovieFromId(notification.MovieId, transaction);
+            var movie = await _movieRepository.ReadMovieFromId(notification.MovieId, transaction, includeRatings:true);
             movie.UpdateRating(notification.PreviousRating, notification.NewRating);
             await _movieRepository.Update(movie, transaction);
         }

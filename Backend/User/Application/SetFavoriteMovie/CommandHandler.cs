@@ -26,7 +26,7 @@ public class CommandHandler : IRequestHandler<Command>
         await using var transaction = await _databaseTransactionFactory.BeginTransactionAsync();
         try
         {
-            var user = await _repository.ReadUserFromIdAsync(request.userId, transaction);
+            var user = await _repository.ReadUserFromIdAsync(request.userId, transaction, includeFavoriteMovies:true);
             if (user.HasAlreadyFavoritedMovie(request.movieId))
             {
                 LogManager.GetCurrentClassLogger()
