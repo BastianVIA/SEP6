@@ -6,6 +6,8 @@ namespace Frontend.Network.MovieDetail;
 
 public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
 {
+    
+    
     public async Task<Movie?> GetMovieDetails(string movieId, string? userToken)
     {
         if (userToken != null)
@@ -33,7 +35,6 @@ public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
             Id = response.MovieDetailsDto.Id,
             Title = response.MovieDetailsDto.Title,
             ReleaseYear = response.MovieDetailsDto.ReleaseYear,
-            IsFavorite = response.MovieDetailsDto.IsFavorite,
             UserRating = response.MovieDetailsDto.UserRating,
             PosterUrl = response.MovieDetailsDto.PathToPoster == null || string.IsNullOrWhiteSpace(response.MovieDetailsDto.PathToPoster.ToString()) ? new Uri(DEFAULT_POSTER_URL, UriKind.Relative) : response.MovieDetailsDto.PathToPoster,
             Rating = new Rating
@@ -43,7 +44,8 @@ public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
             },
             Actors = actors,
             Directors = directors,
-            Resume = response.MovieDetailsDto.Resume
+            Resume = response.MovieDetailsDto.Resume,
+            IsFavorite = response.MovieDetailsDto.IsFavorite
         };
 
         return movie;

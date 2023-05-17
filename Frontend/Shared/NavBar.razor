@@ -33,10 +33,32 @@
                 <BarItem>
                     <Addons>
                         <Addon AddonType="AddonType.Body">
-                            <TextEdit @bind-Text="@movieTitle" Placeholder="Movie title"/>
+                            <TextEdit @bind-Text="@searchTerm" Placeholder="Search term"/>
+                        </Addon>
+
+                        <Addon AddonType="AddonType.Body">
+                            
+                            
+                         <Dropdown>
+                             <DropdownToggle Color="Color.Primary" TextWeight="TextWeight.Bold">
+                                 @if (searchOptionName != null && !string.IsNullOrEmpty(searchOptionName))
+                                 {
+                                     @searchOptionName
+                                 }
+                                 else
+                                 {
+                                     <span>Search Options</span>
+                                 }
+                             </DropdownToggle>
+                             <DropdownMenu>
+                              <DropdownItem Clicked="@(async () =>  ToggleDropdown(true))">Search User</DropdownItem>
+                                 <DropdownItem Clicked="@(async () =>  ToggleDropdown(false))">Search Movie</DropdownItem>
+                                 </DropdownMenu>
+                         </Dropdown>
+
                         </Addon>
                         <Addon AddonType="AddonType.End">
-                            <Button Color="Color.Primary"  Clicked="SearchForMovie">
+                            <Button Color="Color.Primary" Clicked="PerformSearch">
                                 <Icon Name="IconName.Search"/>
                             </Button>
                         </Addon>
@@ -50,7 +72,7 @@
                                     @displayName
                                 </DropdownToggle>
                                 <DropdownMenu>
-                                    <DropdownItem>Edit profile</DropdownItem>
+                                    <DropdownItem Clicked="MyProfile">My profile</DropdownItem>
                                     <DropdownDivider/>
                                     <DropdownItem Clicked="Logout">Logout</DropdownItem>
                                 </DropdownMenu>
@@ -71,6 +93,9 @@
 @code {
     private string movieTitle;
     private string displayName;
+    private string searchOptionName;
+    private string searchTerm;
+    private bool searchUsers = false;
 
     private void SearchForMovie()
     {
@@ -81,8 +106,29 @@
     protected override void OnInitialized()
     {
         FirebaseModel.OnNotifyAlert += SetDisplayName;
-    }
+        searchOptionName = "Search Movie";
 
+        
+    }
+    
+    
+    private void PerformSearch()
+    {
+        if (searchTerm == null) return;
+
+        if (searchUsers)
+        {
+            searchOptionName = "Search User";
+            NavManager.NavigateTo($"userSearch/{searchTerm}");
+        }
+        else
+        {
+            searchOptionName = "Search Movie";
+            NavManager.NavigateTo($"searchResult/{searchTerm}");
+        }
+
+        StateHasChanged();
+    }
 
     private void SetDisplayName(object? sender, AlertEventArgs args)
     {
@@ -94,6 +140,27 @@
     }
 
 
+    private void ToggleSearchUsers(bool isSearchUsers)
+    {
+        searchUsers = isSearchUsers;
+    }
+    
+    private async void ToggleDropdown(bool searchUsers)
+    {
+        this.searchUsers = searchUsers;
+
+        if (searchUsers)
+        {
+            searchOptionName = "Search User";
+        }
+        else
+        {
+            searchOptionName = "Search Movie";
+        }
+
+        StateHasChanged();
+    }
+    
     public void Dispose()
     {
         FirebaseModel.OnNotifyAlert -= SetDisplayName;
@@ -103,6 +170,12 @@
     {
         FirebaseModel.Logout();
         AuthStateProvider.SignOut();
+    }
+
+
+    private void MyProfile()
+    {
+        NavManager.NavigateTo("/userprofile");
     }
 
 }

@@ -30,18 +30,22 @@ public class UserRepository : IUserRepository
         return ToDomain(user);
     }
 
-    public async Task CreateUserAsync(string userId , DbTransaction tx)
+    public async Task CreateUserAsync(string userId, string displayName, string email , DbTransaction tx)
     {
 
         await tx.DataContext.Users.AddAsync(new UserDAO
         {
             Id = userId,
-            FavoriteMovies = new List<UserMovieDAO>()
+            DisplayName = displayName,
+            Email = email,
+            FavoriteMovies = new List<UserMovieDAO>(),
+            UserRatings = new List<UserRatingDAO>()
         });
         await tx.DataContext.SaveChangesAsync();
     }
 
-
+ 
+    
     public async Task Update(Domain.User domainUser , DbTransaction tx)
     {
         tx.AddDomainEvents(domainUser.ReadAllDomainEvents());
@@ -98,6 +102,9 @@ public class UserRepository : IUserRepository
         return new Domain.User
         {
             Id = userDao.Id,
+            DisplayName = userDao.DisplayName,
+            Email = userDao.Email,
+            Bio = userDao.Bio,
             FavoriteMovies = favMovies,
             Ratings = userRatings
         };

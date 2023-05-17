@@ -138,7 +138,7 @@ else
         {
             movie.IsFavorite = !movie.IsFavorite;
             await FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.CurrentUser!.TokenValue, MovieId);
-            await LoadMovieDetails();
+             await LoadMovieDetails();
         }
         catch (Exception e)
         {

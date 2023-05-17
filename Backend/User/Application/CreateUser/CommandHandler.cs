@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Backend.User.Application.CreateUser;
 
-public record Command(string userId) : IRequest;
+public record Command(string userId, string displayName, string email) : IRequest;
 
 public class CommandHandler : IRequestHandler<Command>
 {
@@ -23,7 +23,7 @@ public class CommandHandler : IRequestHandler<Command>
        await using var transaction = await _databaseTransactionFactory.BeginTransactionAsync();
        try
        {
-           await _repository.CreateUserAsync(request.userId, transaction);
+           await _repository.CreateUserAsync(request.userId, request.displayName, request.email, transaction);
        }
        catch (Exception e)
        {
