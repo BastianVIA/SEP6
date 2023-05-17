@@ -36,7 +36,10 @@ public class UserRepository : IUserRepository
         await tx.DataContext.Users.AddAsync(new UserDAO
         {
             Id = userId,
-            FavoriteMovies = new List<UserMovieDAO>()
+            DisplayName = displayName,
+            Email = email,
+            FavoriteMovies = new List<UserMovieDAO>(),
+            UserRatings = new List<UserRatingDAO>()
         });
         await tx.DataContext.SaveChangesAsync();
     }
