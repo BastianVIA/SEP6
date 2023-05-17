@@ -26,7 +26,7 @@ public class CommandHandler : IRequestHandler<Command>
         
         try
         {
-            var user = await _repository.ReadUserWithRatingsFromIdAsync(request.userId, transaction);
+            var user = await _repository.ReadUserFromIdAsync(request.userId, transaction, includeRatings:true);
             if (user.HasAlreadyRatedMovie(request.movieId))
             {
                 if (request.rating == null)
