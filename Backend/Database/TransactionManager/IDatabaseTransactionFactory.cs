@@ -5,7 +5,7 @@ namespace Backend.Database.TransactionManager;
 
 public interface IDatabaseTransactionFactory
 {
-    DbTransaction? GetCurrentTransaction();
+    DbTransaction GetCurrentTransaction();
     Task<DbTransaction> BeginTransactionAsync();
     DbReadOnlyTransaction BeginReadOnlyTransaction();
 }

@@ -19,6 +19,13 @@ public class UserRepository : IUserRepository
 
     public async Task<Domain.User> ReadUserWithRatingsFromIdAsync(string userId, DbReadOnlyTransaction tx)
     {
+        var user = await tx.DataContext.Users.Include(u => u.UserRatings)
+            .SingleAsync(user => user.Id == userId);
+        return ToDomain(user);
+    }
+    
+    public async Task<Domain.User> ReadUserWithFavouriteMoviesFromIdAsync(string userId, DbReadOnlyTransaction tx)
+    {
         var user = await tx.DataContext.Users.Include(u => u.FavoriteMovies).SingleAsync(user => user.Id == userId);
         return ToDomain(user);
     }
@@ -37,14 +44,21 @@ public class UserRepository : IUserRepository
 
     public async Task Update(Domain.User domainUser , DbTransaction tx)
     {
-        var user = await tx.DataContext.Users.Include(u => u.FavoriteMovies).SingleAsync(user => user.Id == domainUser.Id);
+        tx.AddDomainEvents(domainUser.ReadAllDomainEvents());
+        var user = await tx.DataContext.Users.Include(u => u.FavoriteMovies)
+            .SingleAsync(user => user.Id == domainUser.Id);
         if (user.FavoriteMovies == null)
         {
             user.FavoriteMovies = new List<UserMovieDAO>();
         }
+
+        if (user.UserRatings == null)
+        {
+            user.UserRatings = new List<UserRatingDAO>();
+        }
         FromDomain(user.FavoriteMovies, domainUser.FavoriteMovies);
+        FromDomain(user.UserRatings, domainUser.Ratings);
         tx.DataContext.Users.Update(user);
-        await tx.DataContext.SaveChangesAsync();
     }
 
     private Domain.User ToDomain(UserDAO userDao)
@@ -58,10 +72,20 @@ public class UserRepository : IUserRepository
             }
         }
 
+        var userRatings = new List<UserRating>();
+        if (userDao.UserRatings != null)
+        {
+            foreach (var rating in userDao.UserRatings)
+            {
+                userRatings.Add(new UserRating(rating.MovieId, rating.NumberOfStars));
+            }
+        }
+
         return new Domain.User
         {
             Id = userDao.Id,
-            FavoriteMovies = favMovies
+            FavoriteMovies = favMovies,
+            Ratings = userRatings
         };
     }
 
@@ -77,5 +101,18 @@ public class UserRepository : IUserRepository
             }
         }
     }
-    
+
+    private void FromDomain(List<UserRatingDAO> userDaoRatings, List<UserRating> domainRatings)
+    {
+        var movieIds = domainRatings.Select(r => r.MovieId).ToList();
+        userDaoRatings.RemoveAll(daoRating => !movieIds.Contains(daoRating.MovieId));
+        foreach (var domainRating in domainRatings)
+        {
+            var ratingExists = userDaoRatings.Any(daoRating => daoRating.MovieId == domainRating.MovieId);
+            if (!ratingExists)
+            {
+                userDaoRatings.Add(new UserRatingDAO { MovieId = domainRating.MovieId, NumberOfStars = domainRating.NumberOfStars });
+            }
+        }
+    }
 }
