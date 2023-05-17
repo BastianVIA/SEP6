@@ -1,10 +1,10 @@
-﻿using Backend.Movie.Application.Search;
+﻿using Backend.Database.TransactionManager;
 using Backend.Movie.Domain;
 using Backend.Movie.Infrastructure;
 using Backend.Service;
 using MediatR;
 
-namespace Backend.Movie.Application.Details;
+namespace Backend.Movie.Application.GetDetails;
 
 public record Query(string Id, string? userId) : IRequest<MovieDetailsResponse>;
 
@@ -16,43 +16,51 @@ public class MovieDetailsDto
     public string Title { get; set; }
     public int ReleaseYear { get; set; }
     public bool IsFavorite { get; set; }
+    public int? UserRating { get; set; }
     public Uri? PathToPoster { get; set; }
 
-    public  DetailsRatingDto? Ratings { get; set; }
+    public DetailsRatingDto? Ratings { get; set; }
     public List<DetailsPersonsDto>? Actors { get; set; }
     public List<DetailsPersonsDto>? Directors { get; set; }
-    
+
     public string? Resume { get; set; }
 }
+
 public record DetailsRatingDto(float AverageRating, int NumberOfVotes);
 
 public record DetailsPersonsDto(string Id, string Name, int? BirthYear);
 
-public class QueryHandler :  IRequestHandler<Query, MovieDetailsResponse>
+public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
 {
     private IMovieRepository _repository;
     private readonly IImageService _imageService;
     private readonly IResumeService _resumeService;
     private readonly IMediator _mediator;
+    private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
 
-    public QueryHandler(IMovieRepository repository, IImageService imageService, IResumeService resumeService, IMediator mediator)
+    public QueryHandler(IMovieRepository repository, IImageService imageService, IResumeService resumeService,
+        IMediator mediator, IDatabaseTransactionFactory databaseTransactionFactory)
     {
         _repository = repository;
         _imageService = imageService;
         _resumeService = resumeService;
         _mediator = mediator;
+        _databaseTransactionFactory = databaseTransactionFactory;
     }
 
     public async Task<MovieDetailsResponse> Handle(Query request, CancellationToken cancellationToken)
     {
-        var movie =  _repository.ReadMovieFromId(request.Id);
+        var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
+        var movie = _repository.ReadMovieFromId(request.Id, transaction);
         var pathForPoster = _imageService.GetPathForPoster(request.Id);
         var resume = _resumeService.GetResume(request.Id);
         var isFavorite = false;
         if (request.userId != null)
-        { 
-            isFavorite = await _mediator.Send(new User.Application.GetIfMovieIsFavorite.Query(request.userId, request.Id));
+        {
+            isFavorite =
+                await _mediator.Send(new User.Application.GetIfMovieIsFavorite.Query(request.userId, request.Id));
         }
+
         return new MovieDetailsResponse(ToDto(await movie, await pathForPoster, await resume, isFavorite));
     }
 
@@ -73,7 +81,7 @@ public class QueryHandler :  IRequestHandler<Query, MovieDetailsResponse>
         {
             dtoMovie.Ratings = new DetailsRatingDto(movie.Rating.AverageRating, movie.Rating.Votes);
         }
-        
+
 
         return dtoMovie;
     }

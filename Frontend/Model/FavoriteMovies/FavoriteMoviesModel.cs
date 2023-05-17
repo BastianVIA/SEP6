@@ -26,4 +26,9 @@ public class FavoriteMoviesModel : NSwagBaseClient, IFavoriteMoviesModel
     {
         await _client.AddToFavoriteMovies(bearerToken, movieId);
     }
+    
+    public async Task DeleteFavoriteMovie(string bearerToken, string movieId)
+    {
+        await _client.DeleteFavoriteMovie(bearerToken, movieId);
+    }
 }

@@ -1,8 +1,12 @@
-﻿namespace Backend.User.Infrastructure;
+﻿using Backend.Database.Transaction;
+using Microsoft.EntityFrameworkCore.Storage;
+
+namespace Backend.User.Infrastructure;
 
 public interface IUserRepository
 {
-    Task<Domain.User> ReadUserFromIdAsync(string userId);
-    Task CreateUserAsync(string userId);
-    Task Update(Domain.User user);
+    Task<Domain.User> ReadUserFromIdAsync(string userId, DbReadOnlyTransaction tx);
+    Task<Domain.User> ReadUserWithFavouriteMoviesFromIdAsync(string userId, DbReadOnlyTransaction tx);
+    Task CreateUserAsync(string userId, DbTransaction tx);
+    Task Update(Domain.User user, DbTransaction tx);
 }

@@ -98,6 +98,24 @@ namespace Backend.Migrations
                     b.ToTable("UserMovieDAO");
                 });
 
+            modelBuilder.Entity("Backend.User.Infrastructure.UserRatingDAO", b =>
+                {
+                    b.Property<string>("MovieId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("NumberOfStars")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("MovieId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserRatingDAO");
+                });
+
             modelBuilder.Entity("MovieDAOPersonDAO", b =>
                 {
                     b.Property<string>("ActedMoviesId")
@@ -148,6 +166,17 @@ namespace Backend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Backend.User.Infrastructure.UserRatingDAO", b =>
+                {
+                    b.HasOne("Backend.User.Infrastructure.UserDAO", "User")
+                        .WithMany("UserRatings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MovieDAOPersonDAO", b =>
                 {
                     b.HasOne("Backend.Movie.Infrastructure.MovieDAO", null)
@@ -186,6 +215,8 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.User.Infrastructure.UserDAO", b =>
                 {
                     b.Navigation("FavoriteMovies");
+
+                    b.Navigation("UserRatings");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,7 +12,7 @@ public class DataContext : DbContext
     public DbSet<PersonDAO> Persons { get; set; }   
     public DbSet<UserDAO> Users { get; set; }
 
-    public DataContext(IConfiguration configuration)
+    public DataContext(IConfiguration configuration, DbContextOptions options) : base(options)
     {
         Configuration = configuration;
     }
@@ -47,6 +47,15 @@ public class DataContext : DbContext
             .HasOne(um => um.User)
             .WithMany(u => u.FavoriteMovies)
             .HasForeignKey(um => um.UserId);
+
+        modelBuilder.Entity<UserRatingDAO>()
+            .HasKey(dao => new { dao.MovieId, dao.UserId });
+        
+        modelBuilder.Entity<UserRatingDAO>()
+            .HasOne(ur => ur.User)
+            .WithMany(u => u.UserRatings)
+            .HasForeignKey(ur => ur.UserId);
+
     }
     
 }

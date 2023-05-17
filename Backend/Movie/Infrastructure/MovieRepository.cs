@@ -1,28 +1,20 @@
 ﻿using Backend.Database;
+using Backend.Database.Transaction;
 using Backend.Enum;
 using Backend.Movie.Domain;
-using Backend.Service;
-using Microsoft.AspNetCore.Html;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
+
 
 namespace Backend.Movie.Infrastructure;
 
 public class MovieRepository : IMovieRepository
 {
     private const int NumberOfResultsPerPage = 10;
-    private IConfiguration _configuration;
-
-    public MovieRepository(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-
+    
     public async Task<List<Domain.Movie>> SearchForMovie(string title, MovieSortingKey movieSortingKey,
-        SortingDirection sortingDirection, int requestPageNumber)
+        SortingDirection sortingDirection, int requestPageNumber, DbReadOnlyTransaction tx)
     {
-        await using var database = new DataContext(_configuration);
-        var query = database.Movies.Include(m => m.Rating)
+        var query = tx.DataContext.Movies.Include(m => m.Rating)
             .Where(m => EF.Functions.Like(m.Title, $"%{title}%"));
 
         switch (movieSortingKey)
@@ -49,74 +41,30 @@ public class MovieRepository : IMovieRepository
         return ToDomain(await foundMovies);
     }
 
-    private IOrderedQueryable<MovieDAO> SearchForMoveOrderByVotesAsync(IQueryable<MovieDAO> query,
-        SortingDirection sortingDirection)
+
+    public async Task<Domain.Movie> ReadMovieFromId(string id, DbReadOnlyTransaction tx)
     {
-        switch (sortingDirection)
-        {
-            case SortingDirection.DESC:
-                return query.OrderByDescending(movie => movie.Rating != null ? movie.Rating.Votes : 0);
-            case SortingDirection.ASC:
-                return query.OrderBy(movie => movie.Rating != null ? movie.Rating.Votes : 0);
-            default:
-                throw new KeyNotFoundException($"{sortingDirection} not a valid order direction ");
-        }
-    }
-
-    private IOrderedQueryable<MovieDAO> SearchForMoveOrderByRatingAsync(IQueryable<MovieDAO> query,
-        SortingDirection sortingDirection)
-    {
-        switch (sortingDirection)
-        {
-            case SortingDirection.DESC:
-                return query.OrderByDescending(movie => movie.Rating != null ? movie.Rating.Rating : 0);
-            case SortingDirection.ASC:
-                return query.OrderBy(movie => movie.Rating != null ? movie.Rating.Rating : 0);
-            default:
-                throw new KeyNotFoundException($"{sortingDirection} not a valid order direction ");
-        }
-    }
-
-
-    private IOrderedQueryable<MovieDAO> SearchForMoveOrderByReleaseYearAsync(IQueryable<MovieDAO> query,
-        SortingDirection sortingDirection)
-    {
-        switch (sortingDirection)
-        {
-            case SortingDirection.DESC:
-                return query.OrderByDescending(movie => movie.Year);
-            case SortingDirection.ASC:
-                return query.OrderBy(movie => movie.Year);
-            default:
-                throw new KeyNotFoundException($"{sortingDirection} not a valid order direction ");
-        }
-    }
-
-
-    public async Task<Domain.Movie> ReadMovieFromId(string id)
-    {
-        await using var database = new DataContext(_configuration);
-        var result = await database.Movies.Where(m => m.Id == id).Include(m => m.Rating).FirstOrDefaultAsync();
+        var result = await tx.DataContext.Movies.Where(m => m.Id == id).Include(m => m.Rating).FirstOrDefaultAsync();
 
         if (result == null)
         {
             throw new KeyNotFoundException($"Could not find movie with id: {id}");
         }
 
-        result.Actors = await database.Persons.Where(p => p.ActedMovies.Contains(result)).Take(NumberOfResultsPerPage)
+        result.Actors = await tx.DataContext.Persons.Where(p => p.ActedMovies.Contains(result))
+            .Take(NumberOfResultsPerPage)
             .ToListAsync();
-        result.Directors = await database.Persons.Where(p => p.DirectedMovies.Contains(result))
+        result.Directors = await tx.DataContext.Persons.Where(p => p.DirectedMovies.Contains(result))
             .Take(NumberOfResultsPerPage)
             .ToListAsync();
 
         return ToDomain(result);
     }
 
-    public async Task<List<Domain.Movie>> ReadMoviesFromList(List<string> movieIds, int requestedPageNumber)
+    public async Task<List<Domain.Movie>> ReadMoviesFromList(List<string> movieIds, int requestedPageNumber,
+        DbReadOnlyTransaction tx)
     {
-        await using var database = new DataContext(_configuration);
-
-        var foundMovies = database.Movies.Include(m => m.Rating)
+        var foundMovies = tx.DataContext.Movies.Include(m => m.Rating)
             .Where(m => movieIds.Contains(m.Id))
             .Skip(NumberOfResultsPerPage * (requestedPageNumber - 1))
             .Take(NumberOfResultsPerPage)
@@ -124,13 +72,12 @@ public class MovieRepository : IMovieRepository
         return ToDomain(await foundMovies);
     }
 
-    public async Task<List<Domain.Movie>> GetRecommendedMovies(int minVotes, float minRating)
+    public async Task<List<Domain.Movie>> GetRecommendedMovies(int minVotes, float minRating, DbReadOnlyTransaction tx)
     {
-        await using var database = new DataContext(_configuration);
         var random = new Random();
-        var movies = database.Movies
+        var movies = tx.DataContext.Movies
             .Include(m => m.Rating)
-            .Where(m => m.Rating != null && m.Rating.Votes > 100 && m.Rating.Rating > 7)
+            .Where(m => m.Rating != null && m.Rating.Votes > minVotes && m.Rating.Rating > minRating)
             .OrderBy(m => m.Rating.Votes * m.Rating.Rating)
             .Take(200)
             .ToList()
@@ -202,5 +149,48 @@ public class MovieRepository : IMovieRepository
         }
 
         return listOfPersons;
+    }
+
+    private IOrderedQueryable<MovieDAO> SearchForMoveOrderByVotesAsync(IQueryable<MovieDAO> query,
+        SortingDirection sortingDirection)
+    {
+        switch (sortingDirection)
+        {
+            case SortingDirection.DESC:
+                return query.OrderByDescending(movie => movie.Rating != null ? movie.Rating.Votes : 0);
+            case SortingDirection.ASC:
+                return query.OrderBy(movie => movie.Rating != null ? movie.Rating.Votes : 0);
+            default:
+                throw new KeyNotFoundException($"{sortingDirection} not a valid order direction ");
+        }
+    }
+
+    private IOrderedQueryable<MovieDAO> SearchForMoveOrderByRatingAsync(IQueryable<MovieDAO> query,
+        SortingDirection sortingDirection)
+    {
+        switch (sortingDirection)
+        {
+            case SortingDirection.DESC:
+                return query.OrderByDescending(movie => movie.Rating != null ? movie.Rating.Rating : 0);
+            case SortingDirection.ASC:
+                return query.OrderBy(movie => movie.Rating != null ? movie.Rating.Rating : 0);
+            default:
+                throw new KeyNotFoundException($"{sortingDirection} not a valid order direction ");
+        }
+    }
+
+
+    private IOrderedQueryable<MovieDAO> SearchForMoveOrderByReleaseYearAsync(IQueryable<MovieDAO> query,
+        SortingDirection sortingDirection)
+    {
+        switch (sortingDirection)
+        {
+            case SortingDirection.DESC:
+                return query.OrderByDescending(movie => movie.Year);
+            case SortingDirection.ASC:
+                return query.OrderBy(movie => movie.Year);
+            default:
+                throw new KeyNotFoundException($"{sortingDirection} not a valid order direction ");
+        }
     }
 }
