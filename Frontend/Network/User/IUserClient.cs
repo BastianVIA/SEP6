@@ -2,5 +2,5 @@
 
 public interface IUserClient
 {
-    public Task CreateUser(string userToken);
+    public Task CreateUser(string userToken, string displayName, string email);
 }

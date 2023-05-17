@@ -12,6 +12,11 @@ public record UserProfileResponse(UserProfileDto userProfile);
 
 public class UserProfileDto
 {
+    public string DisplayName { get; set; }
+    public string Email { get; set; }
+    public string Bio { get; set; }
+    
+    public List<string> FavoriteMovies { get; set; }
     public List<UserRatingDto> Ratings { get; set; }
 }
 
@@ -38,18 +43,33 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
     {
         var transaction =  _transactionFactory.BeginReadOnlyTransaction();
         
-        var userRequested = await _repository.ReadUserWithFavouriteMoviesFromIdAsync(request.userId, transaction);
-        var ratingDtos = new List<UserRatingDto>();
-        foreach (var rating in userRequested.Ratings)
-        {
-            ratingDtos.Add(new UserRatingDto{NumberOfStars = rating.NumberOfStars});
-        }
-        
-        return new UserProfileResponse(toDto(ratingDtos));
-    }
+        var userRequested = await _repository.ReadUserFromIdAsync(request.userId, transaction);
+        var ratingDtos = GetRatingDtos(userRequested);
 
-    private UserProfileDto toDto(List<UserRatingDto> userRating)
+        return new UserProfileResponse(toDto(userRequested, ratingDtos));
+    }
+    
+    private UserProfileDto toDto(Domain.User user, List<UserRatingDto> userRating)
     {
-        return new UserProfileDto { Ratings = userRating};
+        return new UserProfileDto
+        {
+            DisplayName = user.DisplayName,
+            Email = user.Email,
+            Bio = user.Bio,
+            FavoriteMovies = user.FavoriteMovies,
+            Ratings = userRating
+        };
+    }
+    
+
+    private List<UserRatingDto> GetRatingDtos(Domain.User user)
+    {
+        var list = new List<UserRatingDto>();
+        foreach (var rating in user.Ratings)
+        {
+            list.Add(new UserRatingDto{NumberOfStars = rating.NumberOfStars});
+        }
+
+        return list;
     }
 }
