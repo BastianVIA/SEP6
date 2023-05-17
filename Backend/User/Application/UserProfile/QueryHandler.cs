@@ -20,6 +20,7 @@ public class UserProfileDto
     public List<string> FavoriteMovies { get; set; }
     public (int, int)[] RatingsDataPoints { get; set; }
     public decimal AverageOfUserRatings { get; set; }
+    public decimal AverageOfFavoriteMovies { get; set; }
 }
 
 public class UserRatingDto
