@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-using Backend.Movie.Domain;
-using NLog;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Backend.User.Domain;
 
@@ -20,8 +18,14 @@ public class User : Foundation.BaseDomain
         FavoriteMovies = new List<string>();
         Ratings = new List<UserRating>();
     }
+
     public bool HasAlreadyFavoritedMovie(string movieId)
     {
+        if (FavoriteMovies == null)
+        {
+            return false;
+        }
+
         foreach (var favoriteMovie in FavoriteMovies)
         {
             if (favoriteMovie == movieId)
@@ -29,11 +33,48 @@ public class User : Foundation.BaseDomain
                 return true;
             }
         }
+
         return false;
+    }
+
+    public void AddRating(string movieId, int rating)
+    {
+        if (Ratings == null)
+        {
+            Ratings = new List<UserRating>();
+        }
+
+        var newRating = new UserRating(movieId, rating);
+        Ratings.Add(newRating);
+        AddDomainEvent(new CreatedRatingEvent(Id, newRating));
+    }
+
+    public void RemoveFavorite(string movieId)
+    {
+        if (FavoriteMovies == null)
+        {
+            throw new ValidationException("Tried removing from Favortie movies, but no favorite Movies exists");
+        }
+
+        for (int i = FavoriteMovies.Count - 1; i >= 0; i--)
+        {
+            var movie = FavoriteMovies[i];
+
+            if (movieId == movie)
+            {
+                FavoriteMovies.RemoveAt(i);
+                return;
+            }
+        }
     }
 
     public bool HasAlreadyRatedMovie(string movieId)
     {
+        if (FavoriteMovies == null)
+        {
+            return false;
+        }
+
         foreach (var r in Ratings)
         {
             if (r.MovieId == movieId)
@@ -45,15 +86,24 @@ public class User : Foundation.BaseDomain
         return false;
     }
 
-    public void AddRating(string movieId, int rating)
+
+    public void AddFavoriteMovie(string movieId)
     {
-        var newRating = new UserRating(movieId, rating);
-        Ratings.Add(newRating);
-        AddDomainEvent(new CreatedRatingEvent(Id, newRating));
+        if (FavoriteMovies == null)
+        {
+            FavoriteMovies = new List<string>();
+        }
+
+        FavoriteMovies.Add(movieId);
     }
-    
+
     public void RemoveRating(string movieId)
     {
+        if (Ratings == null)
+        {
+            Ratings = new List<UserRating>();
+        }
+
         for (int i = Ratings.Count - 1; i >= 0; i--)
         {
             var rating = Ratings[i];
@@ -69,8 +119,14 @@ public class User : Foundation.BaseDomain
             $"Tried to remove rating from movie with id: {movieId}, from user with id: {Id}, but could not find any");
     }
 
+
     public void UpdateRating(string requestMovieId, int rating)
     {
+        if (Ratings == null)
+        {
+            throw new ValidationException("Tried to update ratings, but no ratings found");
+        }
+
         foreach (var userRating in Ratings)
         {
             if (userRating.MovieId == requestMovieId)
@@ -81,13 +137,18 @@ public class User : Foundation.BaseDomain
                 return;
             }
         }
-        
+
         throw new KeyNotFoundException(
             $"Tried to update rating from movie with id: {requestMovieId}, from user with id: {Id}, but could not find the rating");
     }
 
     public int GetRatingForMovie(string movieId)
     {
+        if (Ratings == null)
+        {
+            throw new ValidationException("No Ratings found");
+        }
+
         foreach (var rating in Ratings)
         {
             if (rating.MovieId == movieId)
@@ -95,6 +156,7 @@ public class User : Foundation.BaseDomain
                 return rating.NumberOfStars;
             }
         }
+
         throw new KeyNotFoundException(
             $"Tried to get rating from movie with id: {movieId}, from user with id: {Id}, but could not find the rating");
     }

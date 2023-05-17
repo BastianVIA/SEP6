@@ -11,19 +11,19 @@ public class CommandHandler : IRequestHandler<Command>
 {
     private readonly IUserRepository _repository;
     private readonly IMediator _mediator;
-    private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
+    private readonly IDatabaseTransactionFactory _transactionFactory;
 
-    public CommandHandler(IUserRepository repository, IMediator mediator,
-        IDatabaseTransactionFactory databaseTransactionFactory)
+    public CommandHandler(IUserRepository repository, IMediator mediator, IDatabaseTransactionFactory transactionFactory)
     {
         _repository = repository;
         _mediator = mediator;
-        _databaseTransactionFactory = databaseTransactionFactory;
+        _transactionFactory = transactionFactory;
     }
 
     public async Task Handle(Command request, CancellationToken cancellationToken)
     {
-        await using var transaction = await _databaseTransactionFactory.BeginTransactionAsync();
+        await using var transaction = await _transactionFactory.BeginTransactionAsync();
+        
         try
         {
             var user = await _repository.ReadUserFromIdAsync(request.userId, transaction, includeRatings:true);
@@ -55,6 +55,8 @@ public class CommandHandler : IRequestHandler<Command>
             await transaction.RollbackTransactionAsync();
             throw;
         }
-      
+    
+        
+        
     }
 }

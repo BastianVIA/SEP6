@@ -26,15 +26,16 @@ public class CommandHandler : IRequestHandler<Command>
         await using var transaction = await _databaseTransactionFactory.BeginTransactionAsync();
         try
         {
-            var user = await _repository.ReadUserFromIdAsync(request.userId, transaction, includeFavoriteMovies:true);
+            
+            var user = await _repository.ReadUserFromIdAsync(request.userId, transaction,includeFavoriteMovies:true);
             if (user.HasAlreadyFavoritedMovie(request.movieId))
             {
-                LogManager.GetCurrentClassLogger()
-                    .Error(
-                        $"User with id: {request.userId}, tired to add: {request.movieId} to favorite list but it is already in the favorite list");
-                throw new InvalidDataException($"Movie with Id: {request.movieId} Already In Favorite list");
+              user.RemoveFavorite(request.movieId);
             }
-            user.FavoriteMovies.Add(request.movieId);
+            else
+            {
+                user.AddFavoriteMovie(request.movieId);
+            }
             await _repository.Update(user, transaction);
         }
         catch (Exception e)
