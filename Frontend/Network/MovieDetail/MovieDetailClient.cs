@@ -29,7 +29,7 @@ public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
             return null;
         }
 
-        var actors = response.MovieDetailsDto.Actors?.Select(actor => new Actor
+        var actors = response.MovieDetailsDto.Actors?.Select(actor => new Entities.Actor
         {
             ID = actor.Id,
             Name = actor.Name,

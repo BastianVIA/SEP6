@@ -1,6 +1,8 @@
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
 using Blazorise;
+using Frontend.Entities;
+using Frontend.Model.Actor;
 using Frontend.Model.FavoriteMovies;
 using Frontend.Model.Firebase;
 using Frontend.Model.MovieDetail;
@@ -33,6 +35,7 @@ builder.Services.AddScoped<IFirebaseModel, FirebaseModel>();
 builder.Services.AddScoped<IFavoriteMoviesModel, FavoriteMoviesModel>();
 builder.Services.AddScoped<IUserModel, UserModel>();
 builder.Services.AddScoped<IRecommendationsModel, RecommendationsModel>();
+builder.Services.AddScoped<IActorModel, ActorModel>();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
