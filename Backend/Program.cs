@@ -1,4 +1,5 @@
 using Backend.Database;
+using Backend.Database.TransactionManager;
 using Backend.Middleware;
 using Backend.Movie.Infrastructure;
 using Backend.Service;
@@ -10,6 +11,11 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using FirebaseAdmin.Auth;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using NLog;
 using LogLevel = NLog.LogLevel;
 
@@ -18,6 +24,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+builder.Services.AddScoped<GlobalExceptionFilter>();
 
 builder.Services.AddScoped<IImageService, TMDBService>();
 builder.Services.AddScoped<IResumeService, TMDBService>();
@@ -49,7 +56,13 @@ builder.Services
         };
     });
 
-builder.Services.AddScoped<DataContext>();
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("WebApiDatabase")));
+var transactionSemaphore = new SemaphoreSlim(1, 1);
+
+builder.Services.AddScoped<IDatabaseTransactionFactory>(sp => new DatabaseTransactionFactory(sp.GetRequiredService<DataContext>(), transactionSemaphore));
+
+
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -85,6 +98,25 @@ LogManager.Setup().LoadConfiguration(builder => {
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseExceptionHandler(appError =>
+{
+    appError.Run(async context =>
+    {
+        var exceptionHandler = context.Features.Get<IExceptionHandlerPathFeature>();
+        var exception = exceptionHandler?.Error;
+        var exceptionFilter = context.RequestServices.GetRequiredService<GlobalExceptionFilter>();
+
+        var actionContext = new ActionContext(context, context.GetRouteData(), new ControllerActionDescriptor());
+        var exceptionContext = new ExceptionContext(actionContext, new List<IFilterMetadata>{exceptionFilter})
+        {
+            Exception = exception
+        };
+
+        await exceptionFilter.OnExceptionAsync(exceptionContext);
+    });
+});
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -93,8 +125,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
 
 app.MapControllers();
 

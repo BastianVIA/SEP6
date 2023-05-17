@@ -1,6 +1,6 @@
 ﻿using System.Net.NetworkInformation;
 using AutoFixture;
-using Backend.Movie.Application.Details;
+using Backend.Movie.Application.GetDetails;
 using Backend.Movie.Infrastructure;
 using Backend.Service;
 using MediatR;

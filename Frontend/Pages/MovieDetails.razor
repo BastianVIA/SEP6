@@ -15,19 +15,19 @@
     <div class="movie-container">
         <Row>
             <Column ColumnSize="ColumnSize.Is12">
-                <h2>@Movie.Title</h2>
+                <h2>@movie.Title</h2>
             </Column>
         </Row>
         <Row>
             <Column ColumnSize="ColumnSize.Is4">
-                <img src="@Movie.PosterUrl" alt="poster" class="movie-poster"/>
+                <img src="@movie.PosterUrl" alt="poster" class="movie-poster"/>
             </Column>
             <Column ColumnSize="ColumnSize.Is6">
                 <h4>Actors</h4>
                 <ul>
-                    @if (Movie.Actors != null)
+                    @if (movie.Actors != null)
                     {
-                        foreach (var actor in Movie.Actors)
+                        foreach (var actor in movie.Actors)
                         {
                             <li>@actor.Name, @actor.BirthYear</li>
                         }
@@ -43,15 +43,15 @@
                     <Authorized>
                         <div>
                             <h4>Favorite</h4>
-                            @if (IsOnFavoriteMovies())
+                            @if (IsOnFavorites())
                             {
-                                <Button Color="@Color.Primary" Clicked="@StarClicked">
-                                    <Icon Name="@IconName.Star"/>
+                                <Button Color="@Color.Secondary" Clicked="@StarClicked">
+                                    <Icon TextColor="@TextColor.Warning" Name="@IconName.Star"/>
                                 </Button>
                             }
                             else
                             {
-                                <Button Color="@Color.Primary" Clicked="@StarClicked">
+                                <Button Color="@Color.Secondary" Clicked="@StarClicked">
                                     <Icon TextColor="@TextColor.Black50" Name="@IconName.Star"/>
                                 </Button>
                             }
@@ -64,9 +64,9 @@
             <Column ColumnSize="ColumnSize.Is4">
                 <h4>Directors</h4>
                 <ul>
-                    @if (Movie.Directors != null)
+                    @if (movie.Directors != null)
                     {
-                        foreach (var director in Movie.Directors)
+                        foreach (var director in movie.Directors)
                         {
                             <li>@director.Name, @director.BirthYear</li>
                         }
@@ -79,17 +79,17 @@
             </Column>
             <Column ColumnSize="ColumnSize.Is4">
                 <h4>Rating</h4>
-                <p>@(Movie?.Rating?.AverageRating.ToString() ?? "N/A") based on @(Movie?.Rating?.RatingCount.ToString() ?? "N/A") votes</p>
+                <p>@(movie?.Rating?.AverageRating.ToString() ?? "N/A") based on @(movie?.Rating?.RatingCount.ToString() ?? "N/A") votes</p>
             </Column>
             <Column ColumnSize="ColumnSize.Is4">
                 <h4>Release Year</h4>
-                <p>@Movie.ReleaseYear</p>
+                <p>@movie.ReleaseYear</p>
             </Column>
         </Row>
         <Row>
             <Column ColumnSize="ColumnSize.Is12">
                 <h4>Resume</h4>
-                <p>@Movie.Resume</p>
+                <p>@movie.Resume</p>
             </Column>
         </Row>
         <Row>
@@ -108,9 +108,11 @@ else
 }
 
 @code {
+
     [Parameter]
     public string MovieId { get; set; }
-    private Movie Movie;
+
+    private Movie movie;
     private bool movieLoaded = false;
     public int UserRating;
     protected override async Task OnInitializedAsync()
@@ -125,20 +127,30 @@ else
 
     private async Task LoadMovieDetails()
     {
-        Movie = await MovieDetailModel.GetMovieDetails(MovieId, FirebaseModel.CurrentUser?.TokenValue);
-        UserRating = Movie?.UserRating ?? 0;
+        movie = await MovieDetailModel.GetMovieDetails(MovieId, FirebaseModel.CurrentUser?.TokenValue);
+        UserRating = movie?.UserRating ?? 0;
         movieLoaded = true;
     }
 
     private async Task StarClicked()
     {
-        await FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.CurrentUser!.TokenValue, MovieId);
-        StateHasChanged();
+        try
+        {
+            movie.IsFavorite = !movie.IsFavorite;
+            await FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.CurrentUser!.TokenValue, MovieId);
+            await LoadMovieDetails();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    private bool IsOnFavoriteMovies()
+    private bool IsOnFavorites()
     {
-        return (Movie != null && Movie.IsFavorite != null && Movie.IsFavorite.Value);
+        return (movie.IsFavorite != null && movie.IsFavorite.Value);
     }
+}
 
 }

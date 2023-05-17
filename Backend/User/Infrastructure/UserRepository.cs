@@ -1,51 +1,50 @@
-﻿using System.Data.Common;
 using Backend.Database;
+using Backend.Database.Transaction;
 using Backend.User.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Options;
 using NLog;
 
 namespace Backend.User.Infrastructure;
 
 public class UserRepository : IUserRepository
 {
-    private IConfiguration _configuration;
-
-    public UserRepository(IConfiguration configuration)
+    
+    public async Task<Domain.User> ReadUserFromIdAsync(string userId , DbReadOnlyTransaction tx)
     {
-        _configuration = configuration;
-    }
-
-    public async Task<Domain.User> ReadUserFromIdAsync(string userId)
-    {
-        await using var _database = new DataContext(_configuration);
-        var user = await _database.Users.Include(u => u.FavoriteMovies).SingleAsync(user => user.Id == userId);
+        var user = await tx.DataContext.Users.Include(u => u.FavoriteMovies).SingleAsync(user => user.Id == userId);
         return ToDomain(user);
     }
 
-    public async Task<Domain.User> ReadUserWithRatingsFromIdAsync(string userId)
+    public async Task<Domain.User> ReadUserWithRatingsFromIdAsync(string userId, DbReadOnlyTransaction tx)
     {
-        await using var _database = new DataContext(_configuration);
-        var user = await _database.Users.Include(u => u.FavoriteMovies).SingleAsync(user => user.Id == userId);
+        var user = await tx.DataContext.Users.Include(u => u.UserRatings)
+            .SingleAsync(user => user.Id == userId);
+        return ToDomain(user);
+    }
+    
+    public async Task<Domain.User> ReadUserWithFavouriteMoviesFromIdAsync(string userId, DbReadOnlyTransaction tx)
+    {
+        var user = await tx.DataContext.Users.Include(u => u.FavoriteMovies).SingleAsync(user => user.Id == userId);
         return ToDomain(user);
     }
 
-    public async Task CreateUserAsync(string userId)
+    public async Task CreateUserAsync(string userId , DbTransaction tx)
     {
-        await using var _database = new DataContext(_configuration);
 
-        await _database.Users.AddAsync(new UserDAO
+        await tx.DataContext.Users.AddAsync(new UserDAO
         {
             Id = userId,
             FavoriteMovies = new List<UserMovieDAO>()
         });
-        await _database.SaveChangesAsync();
+        await tx.DataContext.SaveChangesAsync();
     }
 
 
-    public async Task Update(Domain.User domainUser)
+    public async Task Update(Domain.User domainUser , DbTransaction tx)
     {
-        await using var _database = new DataContext(_configuration);
-        var user = await _database.Users.Include(u => u.FavoriteMovies).SingleAsync(user => user.Id == domainUser.Id);
+        var user = await tx.DataContext.Users.Include(u => u.FavoriteMovies).SingleAsync(user => user.Id == domainUser.Id);
         if (user.FavoriteMovies == null)
         {
             user.FavoriteMovies = new List<UserMovieDAO>();
@@ -57,8 +56,8 @@ public class UserRepository : IUserRepository
         }
         FromDomain(user.FavoriteMovies, domainUser.FavoriteMovies);
         FromDomain(user.UserRatings, domainUser.Ratings);
-        _database.Users.Update(user);
-        await _database.SaveChangesAsync();
+        tx.DataContext.Users.Update(user);
+        await tx.DataContext.SaveChangesAsync();
     }
 
     private Domain.User ToDomain(UserDAO userDao)
@@ -88,7 +87,7 @@ public class UserRepository : IUserRepository
             Ratings = userRatings
         };
     }
-    
+
     private void FromDomain(List<UserMovieDAO> userDaoMovies, List<string> movieIds)
     {
         userDaoMovies.RemoveAll(daoMovie => !movieIds.Contains(daoMovie.Id));

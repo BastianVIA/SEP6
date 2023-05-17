@@ -9,7 +9,6 @@ public class MovieDetailModel :NSwagBaseClient, IMovieDetailModel
 
 {
     private IMovieDetailClient _client;
-
     public MovieDetailModel(IMovieDetailClient client)
     {
         _client = client;

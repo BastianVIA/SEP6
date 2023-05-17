@@ -1,4 +1,5 @@
-﻿using Backend.Movie.Application.GetInfoFromMovies;
+﻿using Backend.Database.TransactionManager;
+using Backend.Movie.Application.GetInfoFromMovies;
 using Backend.User.Infrastructure;
 using MediatR;
 
@@ -23,16 +24,19 @@ public class QueryHandler : IRequestHandler<Query, FavoriteMovesResponse>
 {
     private readonly IUserRepository _repository;
     private readonly IMediator _mediator;
+    private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
 
-    public QueryHandler(IUserRepository repository, IMediator mediator)
+    public QueryHandler(IUserRepository repository, IMediator mediator, IDatabaseTransactionFactory databaseTransactionFactory)
     {
         _repository = repository;
         _mediator = mediator;
+        _databaseTransactionFactory = databaseTransactionFactory;
     }
 
     public async Task<FavoriteMovesResponse> Handle(Query request, CancellationToken cancellationToken)
     {
-        var userRequested = await _repository.ReadUserFromIdAsync(request.userId);
+        var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
+        var userRequested = await _repository.ReadUserFromIdAsync(request.userId,transaction);
         var moviesInfoResponse =await _mediator.Send(new Movie.Application.GetInfoFromMovies.Query(userRequested.FavoriteMovies));
         var movieDtos = new List<FavoriteMovieDto>();
         foreach (var movieInfo in  moviesInfoResponse.MovieInfoDtos)
