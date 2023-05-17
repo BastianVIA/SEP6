@@ -18,6 +18,8 @@ public class BaseDomain
 
     public List<INotification> ReadAllDomainEvents()
     {
-        return domainEvents;
+        var copiedEvents = domainEvents.ToList();
+        domainEvents.Clear();
+        return copiedEvents;
     }
 }

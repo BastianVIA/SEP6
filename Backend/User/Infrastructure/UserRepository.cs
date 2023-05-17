@@ -44,7 +44,9 @@ public class UserRepository : IUserRepository
 
     public async Task Update(Domain.User domainUser , DbTransaction tx)
     {
-        var user = await tx.DataContext.Users.Include(u => u.FavoriteMovies).SingleAsync(user => user.Id == domainUser.Id);
+        tx.AddDomainEvents(domainUser.ReadAllDomainEvents());
+        var user = await tx.DataContext.Users.Include(u => u.FavoriteMovies)
+            .SingleAsync(user => user.Id == domainUser.Id);
         if (user.FavoriteMovies == null)
         {
             user.FavoriteMovies = new List<UserMovieDAO>();
@@ -57,7 +59,6 @@ public class UserRepository : IUserRepository
         FromDomain(user.FavoriteMovies, domainUser.FavoriteMovies);
         FromDomain(user.UserRatings, domainUser.Ratings);
         tx.DataContext.Users.Update(user);
-        await tx.DataContext.SaveChangesAsync();
     }
 
     private Domain.User ToDomain(UserDAO userDao)
