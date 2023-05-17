@@ -20,14 +20,7 @@ public class GlobalExceptionFilter : IAsyncExceptionFilter
     public async Task OnExceptionAsync(ExceptionContext context)
     {
         LogManager.GetCurrentClassLogger().Error($"An Exception occurred of type: {context.Exception.GetType()}, with message: {context.Exception.Message}");
-
-        var transaction = _transactionFactory.GetCurrentTransaction();
-        if (transaction != null)
-        {
-            await transaction.RollbackTransactionAsync();
-        }
-     
-
+        
         context.ExceptionHandled = true;
         context.Result = exceptionParser(context.Exception);
         await context.Result.ExecuteResultAsync(context);
