@@ -1,4 +1,5 @@
-﻿using Backend.Movie.Infrastructure;
+﻿using Backend.Database.TransactionManager;
+using Backend.Movie.Infrastructure;
 using Backend.Service;
 using MediatR;
 
@@ -23,16 +24,19 @@ public class QueryHandler : IRequestHandler<Query, MoviesInfoResponse>
 {
     private readonly IMovieRepository _repository;
     private readonly IImageService _imageService;
+    private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
 
-    public QueryHandler(IMovieRepository repository, IImageService imageService)
+    public QueryHandler(IMovieRepository repository, IImageService imageService, IDatabaseTransactionFactory databaseTransactionFactory)
     {
         _repository = repository;
         _imageService = imageService;
+        _databaseTransactionFactory = databaseTransactionFactory;
     }
     
     public async Task<MoviesInfoResponse> Handle(Query request, CancellationToken cancellationToken)
     {
-        var listOfMovies = _repository.ReadMoviesFromList(request.movieIds, request.requestedPageNumber);
+        var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
+        var listOfMovies = _repository.ReadMoviesFromList(request.movieIds, request.requestedPageNumber, transaction);
         var listOfMoviesAsDto = new List<MovieInfoDto>();
         foreach (var movie in await listOfMovies)
         {

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Backend.Database.TransactionManager;
 using Backend.User.Infrastructure;
 using MediatR;
 using NLog;
@@ -11,39 +12,36 @@ public class CommandHandler : IRequestHandler<Command>
 {
     private readonly IUserRepository _repository;
     private readonly IMediator _mediator;
+    private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
 
-    public CommandHandler(IUserRepository userRepository, IMediator mediator)
+    public CommandHandler(IUserRepository userRepository, IMediator mediator, IDatabaseTransactionFactory databaseTransactionFactory)
     {
         _repository = userRepository;
         _mediator = mediator;
+        _databaseTransactionFactory = databaseTransactionFactory;
     }
 
     public async Task Handle(Command request, CancellationToken cancellationToken)
     {
-        Domain.User user;
+        await using var transaction = await _databaseTransactionFactory.BeginTransactionAsync();
         try
         {
-            user = await _repository.ReadUserFromIdAsync(request.userId);
-        }
-        catch (InvalidOperationException e)
-        {
-            var createUserCommand = new CreateUser.Command(request.userId);
-            await _mediator.Send(createUserCommand);
-            user = await _repository.ReadUserFromIdAsync(request.userId);
-        }
-
-        if (user.HasAlreadyFavoritedMovie(request.movieId))
-        {
-            user.FavoriteMovies.Remove(request.movieId);
-            LogManager.GetCurrentClassLogger()
-                .Info($"Movie with id: {request.movieId} removed from favorites of user with id: {request.userId}");
-        }
-        else
-        {
+            var user = await _repository.ReadUserFromIdAsync(request.userId, transaction);
+            if (user.HasAlreadyFavoritedMovie(request.movieId))
+            {
+                LogManager.GetCurrentClassLogger()
+                    .Error(
+                        $"User with id: {request.userId}, tired to add: {request.movieId} to favorite list but it is already in the favorite list");
+                throw new InvalidDataException($"Movie with Id: {request.movieId} Already In Favorite list");
+            }
             user.FavoriteMovies.Add(request.movieId);
-            LogManager.GetCurrentClassLogger()
-                .Info($"User with id: {request.userId} added movie with id: {request.movieId} to favorite list");
+            await _repository.Update(user, transaction);
         }
-        await _repository.Update(user);
+        catch (Exception e)
+        {
+            await transaction.RollbackTransactionAsync();
+            throw;
+        }
+       
     }
 }

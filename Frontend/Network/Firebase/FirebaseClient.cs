@@ -40,6 +40,7 @@ public class FirebaseClient : IFirebaseClient
     {
         var userCredential = await client.SignInWithEmailAndPasswordAsync(email, password);
         var tokenValue = await userCredential.User.GetIdTokenAsync();
+        Console.WriteLine($"TOKEN: {tokenValue}");
         return CreateFirebaseUser(userCredential, tokenValue);
     }
 

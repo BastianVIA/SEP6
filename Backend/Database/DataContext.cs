@@ -12,7 +12,7 @@ public class DataContext : DbContext
     public DbSet<PersonDAO> Persons { get; set; }   
     public DbSet<UserDAO> Users { get; set; }
 
-    public DataContext(IConfiguration configuration)
+    public DataContext(IConfiguration configuration, DbContextOptions options) : base(options)
     {
         Configuration = configuration;
     }
