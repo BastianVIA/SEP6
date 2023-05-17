@@ -1,5 +1,5 @@
-﻿using System.Data.Common;
-using Backend.Database;
+﻿using Backend.Database;
+using Backend.Database.Transaction;
 using Backend.User.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -17,15 +17,14 @@ public class UserRepository : IUserRepository
         return ToDomain(user);
     }
 
-    public async Task<Domain.User> ReadUserWithRatingsFromIdAsync(string userId)
+    public async Task<Domain.User> ReadUserWithRatingsFromIdAsync(string userId, DbReadOnlyTransaction tx)
     {
-        await using var _database = new DataContext(_configuration);
-        var user = await _database.Users.Include(u => u.UserRatings)
+        var user = await tx.DataContext.Users.Include(u => u.UserRatings)
             .SingleAsync(user => user.Id == userId);
         return ToDomain(user);
     }
-
-    public async Task<Domain.User> ReadUserWithRatingsFromIdAsync(string userId, DbReadOnlyTransaction tx)
+    
+    public async Task<Domain.User> ReadUserWithFavouriteMoviesFromIdAsync(string userId, DbReadOnlyTransaction tx)
     {
         var user = await tx.DataContext.Users.Include(u => u.FavoriteMovies).SingleAsync(user => user.Id == userId);
         return ToDomain(user);

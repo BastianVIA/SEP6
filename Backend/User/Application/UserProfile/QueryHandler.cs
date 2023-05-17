@@ -1,4 +1,5 @@
-﻿using Backend.Movie.Application.GetRecommendations;
+﻿using Backend.Database.TransactionManager;
+using Backend.Movie.Application.GetRecommendations;
 using Backend.User.Domain;
 using Backend.User.Infrastructure;
 using MediatR;
@@ -24,16 +25,20 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
 {
     private readonly IUserRepository _repository;
     private readonly IMediator _mediator;
+    private readonly IDatabaseTransactionFactory _transactionFactory;
 
-    public QueryHandler(IUserRepository repository, IMediator mediator)
+    public QueryHandler(IUserRepository repository, IMediator mediator, IDatabaseTransactionFactory transactionFactory)
     {
         _repository = repository;
         _mediator = mediator;
+        _transactionFactory = transactionFactory;
     }
     
     public async Task<UserProfileResponse> Handle(Query request, CancellationToken cancellationToken)
     {
-        var userRequested = await _repository.ReadUserWithRatingsFromIdAsync(request.userId);
+        var transaction =  _transactionFactory.BeginReadOnlyTransaction();
+        
+        var userRequested = await _repository.ReadUserWithFavouriteMoviesFromIdAsync(request.userId, transaction);
         var ratingDtos = new List<UserRatingDto>();
         foreach (var rating in userRequested.Ratings)
         {
