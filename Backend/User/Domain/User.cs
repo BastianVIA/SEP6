@@ -11,7 +11,7 @@ public class User : Foundation.BaseDomain
     public List<string>? FavoriteMovies { get; set; }
     public List<UserRating>? Ratings { get; set; }
     
-    public double AverageOfUserRatings { get; set; }
+    public decimal AverageOfUserRatings { get; set; }
 
     public User()
     {
@@ -162,7 +162,7 @@ public class User : Foundation.BaseDomain
     
     public void SetRatingAvg()
     {
-        double count = 0.0;
+        var count = 0.0m;
         if (Ratings.Count == 0)
         {
             AverageOfUserRatings = count;
@@ -175,6 +175,7 @@ public class User : Foundation.BaseDomain
             count += rating.NumberOfStars;
         }
 
-        AverageOfUserRatings = count / Ratings.Count;
+        var rounded = (decimal) MathF.Round((float)count / Ratings.Count, 1);
+        AverageOfUserRatings = rounded;
     }
 }
