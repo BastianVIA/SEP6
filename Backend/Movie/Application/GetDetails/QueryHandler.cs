@@ -51,11 +51,11 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
     public async Task<MovieDetailsResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var movie = _repository.ReadMovieFromId(request.Id, transaction);
+        var movie = _repository.ReadMovieFromId(request.Id, transaction,includeRatings:true,includeActors:true,includeDirectors:true);
         var pathForPoster = _imageService.GetPathForPoster(request.Id);
         var resume = _resumeService.GetResume(request.Id);
         var isFavorite = false;
-        int? userRating = null; 
+        int? userRating = null;
         if (request.userId != null)
         {
             var result =
@@ -67,7 +67,8 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
         return new MovieDetailsResponse(ToDto(await movie, await pathForPoster, await resume, isFavorite, userRating));
     }
 
-    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? resume, bool isFavorite, int? userRating)
+    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? resume, bool isFavorite,
+        int? userRating)
     {
         var dtoMovie = new MovieDetailsDto
         {

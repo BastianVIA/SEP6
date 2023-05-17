@@ -21,7 +21,7 @@ public class QueryHandler : IRequestHandler<Query, GetUserInfoForMovieResponse>
     public async Task<GetUserInfoForMovieResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _transactionFactory.BeginReadOnlyTransaction();
-        var user = await _repository.ReadUserWithRatingsFromIdAsync(request.UserId, transaction);
+        var user = await _repository.ReadUserFromIdAsync(request.UserId, transaction, includeRatings:true, includeFavoriteMovies:true);
         int? numberOfStars = null;
         if (user.HasAlreadyRatedMovie(request.MovieId))
         {

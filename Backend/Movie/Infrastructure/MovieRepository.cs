@@ -1,10 +1,7 @@
-﻿using System.Collections.ObjectModel;
-using Backend.Database;
-using Backend.Database.Transaction;
+﻿using Backend.Database.Transaction;
 using Backend.Enum;
 using Backend.Movie.Domain;
 using Microsoft.EntityFrameworkCore;
-using TMDbLib.Objects.Collections;
 
 
 namespace Backend.Movie.Infrastructure;
@@ -44,21 +41,32 @@ public class MovieRepository : IMovieRepository
     }
 
 
-    public async Task<Domain.Movie> ReadMovieFromId(string id, DbReadOnlyTransaction tx)
+    public async Task<Domain.Movie> ReadMovieFromId(string id, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeActors = false, bool includeDirectors = false)
     {
-        var result = await tx.DataContext.Movies.Where(m => m.Id == id).Include(m => m.Rating).FirstOrDefaultAsync();
+        var query = tx.DataContext.Movies.Where(m => m.Id == id);
+        if (includeRatings)
+        {
+            query = query.Include(m => m.Rating);
+        }
 
+        var result = await query.FirstOrDefaultAsync();
         if (result == null)
         {
             throw new KeyNotFoundException($"Could not find movie with id: {id}");
         }
 
-        result.Actors = await tx.DataContext.Persons.Where(p => p.ActedMovies.Contains(result))
-            .Take(NumberOfResultsPerPage)
-            .ToListAsync();
-        result.Directors = await tx.DataContext.Persons.Where(p => p.DirectedMovies.Contains(result))
-            .Take(NumberOfResultsPerPage)
-            .ToListAsync();
+        if (includeActors)
+        {
+            result.Actors = await tx.DataContext.Persons.Where(p => p.ActedMovies.Contains(result))
+                .Take(NumberOfResultsPerPage)
+                .ToListAsync();
+        }
+        if (includeDirectors)
+        {
+            result.Directors = await tx.DataContext.Persons.Where(p => p.DirectedMovies.Contains(result))
+                .Take(NumberOfResultsPerPage)
+                .ToListAsync();
+        }
 
         return ToDomain(result);
     }
