@@ -101,7 +101,14 @@ public class User : Foundation.BaseDomain
     
     public void SetRatingAvg()
     {
-        double count = 0;
+        double count = 0.0;
+        if (Ratings.Count == 0)
+        {
+            AverageOfUserRatings = count;
+            return;
+        }
+
+
         foreach (var rating in Ratings)
         {
             count += rating.NumberOfStars;

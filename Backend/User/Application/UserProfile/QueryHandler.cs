@@ -46,7 +46,7 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
     {
         var transaction =  _transactionFactory.BeginReadOnlyTransaction();
         
-        var userRequested = await _repository.ReadUserFromIdAsync(request.userId, transaction);
+        var userRequested = await _repository.ReadUserFromIdAsync(request.userId, transaction, includeRatings: true, includeFavoriteMovies: true);
         var ratingDtos = GetRatingDtos(userRequested);
         userRequested.SetRatingAvg();
         
