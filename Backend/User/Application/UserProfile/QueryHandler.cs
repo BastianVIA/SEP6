@@ -1,4 +1,5 @@
 ﻿using Backend.Database.TransactionManager;
+using Backend.Movie.Application.GetInfoFromMovies;
 using Backend.Movie.Application.GetRecommendations;
 using Backend.User.Domain;
 using Backend.User.Infrastructure;
@@ -14,10 +15,12 @@ public class UserProfileDto
 {
     public string DisplayName { get; set; }
     public string Email { get; set; }
-    public string Bio { get; set; }
+    public string? Bio { get; set; }
     
     public List<string> FavoriteMovies { get; set; }
     public List<UserRatingDto> Ratings { get; set; }
+    
+    public double AverageOfUserRatings { get; set; }
 }
 
 public class UserRatingDto
@@ -45,10 +48,12 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
         
         var userRequested = await _repository.ReadUserFromIdAsync(request.userId, transaction);
         var ratingDtos = GetRatingDtos(userRequested);
-
+        userRequested.SetRatingAvg();
+        
         return new UserProfileResponse(toDto(userRequested, ratingDtos));
     }
     
+
     private UserProfileDto toDto(Domain.User user, List<UserRatingDto> userRating)
     {
         return new UserProfileDto
@@ -57,7 +62,8 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
             Email = user.Email,
             Bio = user.Bio,
             FavoriteMovies = user.FavoriteMovies,
-            Ratings = userRating
+            Ratings = userRating,
+            AverageOfUserRatings = user.AverageOfUserRatings
         };
     }
     
