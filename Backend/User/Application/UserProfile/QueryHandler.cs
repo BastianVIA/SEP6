@@ -14,7 +14,7 @@ public class UserProfileDto
 {
     public string DisplayName { get; set; }
     public string Email { get; set; }
-    public string Bio { get; set; }
+    public string? Bio { get; set; }
     
     public List<string> FavoriteMovies { get; set; }
     public List<UserRatingDto> Ratings { get; set; }
@@ -43,7 +43,7 @@ public class QueryHandler : IRequestHandler<Query,UserProfileResponse>
     {
         var transaction =   _transactionFactory.BeginReadOnlyTransaction();
         
-        var userRequested = await _repository.ReadUserFromIdAsync(request.userId, transaction);
+        var userRequested = await _repository.ReadUserFromIdAsync(request.userId, transaction,includeRatings:true,includeFavoriteMovies:true);
         var ratingDtos = GetRatingDtos(userRequested);
 
         return new UserProfileResponse(toDto(userRequested, ratingDtos));

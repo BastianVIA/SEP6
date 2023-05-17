@@ -23,14 +23,14 @@ namespace Frontend.Network.UserProfiles
                 Console.WriteLine(e);
                 return null;
             }
-        
+
             if (response == null || response.UserProfile == null)
             {
                 return null;
             }
 
             var userRatings = new List<UserRating>();
-            
+
             foreach (var userRating in response.UserProfile.Ratings)
             {
                 userRatings.Add(new UserRating { NumberOfStars = userRating.NumberOfStars });
@@ -38,12 +38,13 @@ namespace Frontend.Network.UserProfiles
 
             var user = new Entities.User()
             {
-                UserRatings = userRatings
+                UserRatings = userRatings,
+                Username = response.UserProfile.DisplayName,
+                Email = response.UserProfile.Email,
+                Bio = response.UserProfile.Bio
             };
-        
+
             return user;
         }
     }
 }
-
-
