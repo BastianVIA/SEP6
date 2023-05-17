@@ -5,6 +5,9 @@ namespace Backend.User.Domain;
 public class User : Foundation.BaseDomain
 {
     public string Id { get; set; }
+    public string DisplayName { get; set; }
+    public string Email { get; set; }
+    public string? Bio { get; set; }
     public List<string> FavoriteMovies { get; set; }
     public List<UserRating> Ratings { get; set; }
 

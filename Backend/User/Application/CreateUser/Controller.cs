@@ -24,7 +24,7 @@ public class Controller : ControllerBase
     [Tags("UserApi")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Authorize]
-    public IActionResult Post()
+    public IActionResult Post([FromBody] CreateUserRequest request)
     {
         try
         {
@@ -33,7 +33,7 @@ public class Controller : ControllerBase
             {
                 return BadRequest("No token provided to create the user");
             }
-            var command = new Command(userid);
+            var command = new Command(userid, request.DisplayName, request.Email);
             var result = _mediator.Send(command);
             return Ok(result);
         }
@@ -42,5 +42,11 @@ public class Controller : ControllerBase
             return StatusCode(500, $"Internal server error {e.Message}");
         }
 
+    }
+
+    public class CreateUserRequest
+    {
+        public string DisplayName { get; set; }
+        public string Email { get; set; }
     }
 }
