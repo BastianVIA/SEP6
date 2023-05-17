@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using Nuke.Common;
 using Nuke.Common.CI;
@@ -19,7 +21,6 @@ using static Nuke.Common.Tools.Git.GitTasks;
 [DotNetVerbosityMapping]
 class Build : NukeBuild
 {
- 
     public static int Main() => Execute<Build>(x => x.Deploy);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
@@ -30,6 +31,8 @@ class Build : NukeBuild
     [GitVersion] readonly GitVersion GitVersion;
 
     AbsolutePath OutputDirectory => RootDirectory / "output";
+    AbsolutePath PublishDirectory => OutputDirectory / "Publish";
+    AbsolutePath ZipFilePath => PublishDirectory / "app.zip";
 
     Target Clean => _ => _.Before(Compile)
         .Executes(() =>
@@ -54,34 +57,94 @@ class Build : NukeBuild
         .Executes(() =>
         {
             DotNetBuild(s => s.SetProjectFile(Solution)
-                              .SetConfiguration(Configuration)
-                              .EnableNoRestore());
+                .SetConfiguration(Configuration)
+                .EnableNoRestore());
         });
 
-    Target Publish => _ => _
+    Target PublishBackend => _ => _
         .DependsOn(Compile)
         .Executes(() =>
         {
-            var publishDirectory = OutputDirectory / "Publish";
-
-            DotNetPublish(s => s.SetProject(Solution)
-                                .SetConfiguration(Configuration)
-                                .SetOutput(publishDirectory)
-                                .EnableNoBuild());
+            AbsolutePath backendPublishDirectory = OutputDirectory / "Publish" / "Backend";
+            DotNetPublish(s => s.SetProject(Solution.GetProject("Backend"))
+                .SetConfiguration(Configuration)
+                .SetOutput(backendPublishDirectory)
+                .EnableNoBuild());
         });
 
-    Target Deploy => _ => _
-        .DependsOn(Publish)
+    Target ZipBackend => _ => _
+        .DependsOn(PublishBackend)
         .Executes(() =>
         {
-            var publishDirectory = OutputDirectory / "Publish";   
+            AbsolutePath backendZipFilePath = OutputDirectory / "Publish" / "Backend.zip";
+            CompressionLevel compressionLevel = IsLocalBuild ? CompressionLevel.Fastest : CompressionLevel.Optimal;
+        
+            if (File.Exists(backendZipFilePath))
+            {
+                File.Delete(backendZipFilePath);
+            }
+        
+            ZipFile.CreateFromDirectory(PublishDirectory / "Backend", backendZipFilePath, compressionLevel,
+                includeBaseDirectory: false);
+        });
 
-            var zipFilePath = publishDirectory / "app.zip";
+    Target DeployBackend => _ => _
+        .DependsOn(ZipBackend)
+        .Executes(() =>
+        {
+            var backendPublishDirectory = OutputDirectory / "Publish" / "Backend";
 
-            ProcessTasks.StartProcess("az", $"webapp deployment source config-zip --src \"{zipFilePath}\" --name {AzureAppServiceName} --resource-group {AzureResourceGroupName} --subscription {AzureSubscriptionId}", workingDirectory: publishDirectory);
+            var zipFilePath = backendPublishDirectory / "backend.zip";
+
+            ProcessTasks.StartProcess("az",
+                $"webapp deployment source config-zip --src \"{zipFilePath}\" --name {AzureAppServiceBackendName} --resource-group {AzureResourceGroupName} --subscription {AzureSubscriptionId}",
+                workingDirectory: backendPublishDirectory);
+        });
+
+    
+    
+    Target PublishFrontend => _ => _
+        .DependsOn(Compile)
+        .Executes(() =>
+        {
+            AbsolutePath frontendPublishDirectory = OutputDirectory / "Publish" / "Frontend";
+            DotNetPublish(s => s.SetProject(Solution.GetProject("Frontend"))
+                .SetConfiguration(Configuration)
+                .SetOutput(frontendPublishDirectory)
+                .EnableNoBuild());
         });
     
+    Target ZipFrontend => _ => _
+        .DependsOn(PublishFrontend)
+        .Executes(() =>
+        {
+            AbsolutePath frontendZipFilePath = OutputDirectory / "Publish" / "Frontend.zip";
+            CompressionLevel compressionLevel = IsLocalBuild ? CompressionLevel.Fastest : CompressionLevel.Optimal;
+            ZipFile.CreateFromDirectory(PublishDirectory / "Frontend", frontendZipFilePath, compressionLevel,
+                includeBaseDirectory: false);
+        });
+    
+    
+    Target DeployFrontend => _ => _
+        .DependsOn(ZipFrontend)
+        .Executes(() =>
+        {
+            var frontendPublishDirectory = OutputDirectory / "Publish" / "Frontend";
+    
+            var zipFilePath = frontendPublishDirectory / "frontend.zip";
+    
+            ProcessTasks.StartProcess("az",
+                $"webapp deployment source config-zip --src \"{zipFilePath}\" --name {AzureAppServiceFrontendName} --resource-group {AzureResourceGroupName} --subscription {AzureSubscriptionId}",
+                workingDirectory: frontendPublishDirectory);
+        });
+    
+
+    Target Deploy => _ => _
+        .DependsOn(DeployBackend);
+
+
     string AzureSubscriptionId => Environment.GetEnvironmentVariable("AZURE_SUBSCRIPTION_ID");
     string AzureResourceGroupName => Environment.GetEnvironmentVariable("AZURE_RESOURCE_GROUP_NAME");
-    string AzureAppServiceName => Environment.GetEnvironmentVariable("AZURE_APP_SERVICE_NAME");
+    string AzureAppServiceBackendName => Environment.GetEnvironmentVariable("AZURE_APP_SERVICE_BACKEND_NAME");
+    string AzureAppServiceFrontendName => Environment.GetEnvironmentVariable("AZURE_APP_SERVICE_FRONTEND_NAME");
 }
