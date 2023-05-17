@@ -131,13 +131,20 @@ public class UserRepository : IUserRepository
     {
         var movieIds = domainRatings.Select(r => r.MovieId).ToList();
         userDaoRatings.RemoveAll(daoRating => !movieIds.Contains(daoRating.MovieId));
+
         foreach (var domainRating in domainRatings)
         {
-            var ratingExists = userDaoRatings.Any(daoRating => daoRating.MovieId == domainRating.MovieId);
-            if (!ratingExists)
+            var existingRating = userDaoRatings.FirstOrDefault(daoRating => daoRating.MovieId == domainRating.MovieId);
+
+            if (existingRating == null)
             {
                 userDaoRatings.Add(new UserRatingDAO { MovieId = domainRating.MovieId, NumberOfStars = domainRating.NumberOfStars });
             }
+            else
+            {
+                existingRating.NumberOfStars = domainRating.NumberOfStars;
+            }
         }
     }
+
 }
