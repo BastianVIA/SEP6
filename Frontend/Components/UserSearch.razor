@@ -23,7 +23,6 @@
                 <TableRow>
                     <TableHeaderCell>Profile Picture</TableHeaderCell>
                     <TableHeaderCell>Username</TableHeaderCell>
-                    <TableHeaderCell>Email</TableHeaderCell>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -32,11 +31,22 @@
                     <TableRow @onclick="@(() => OnUserClick(user.Id))">
                         <TableRowCell><img src="@user.ProfilePicture" height="200"/></TableRowCell>
                         <TableRowCell>@user.Username</TableRowCell>
-                        <TableRowCell>@user.Email</TableRowCell>
                     </TableRow> 
                 }
             </TableBody>
         </Table>
+        
+        <div class="page-navigation">
+            <button class="btn btn-secondary" @onclick="@GoToPreviousPage">
+                <Icon Name="@IconName.AngleLeft"/>
+            </button>
+            <div class="page-number">
+                <p>Page @pageNumber</p>
+            </div>
+            <button class="btn btn-secondary" @onclick="@GoToNextPage">
+                <Icon Name="@IconName.AngleRight"/>
+            </button>
+        </div>
     </div>
 }
 else
@@ -46,20 +56,15 @@ else
 
 @code {
     [Parameter]
-    public string SearchTerm { get; set; }
+    public string Username { get; set; }
     private IList<User> userList = new List<User>();
-    [Parameter]
-    public string username { get; set; }
     public bool isDataFetched = false;
     private int pageNumber { get; set; }
-    private string? sortingAlphabet;
-    private SortingDirection? sortingDirection;
     private int usersPerPage = 10;
 
-    
     protected override async Task OnParametersSetAsync()
     {
-        username = SearchTerm;
+        pageNumber = 1;
         await SearchForUser();
     }
 
@@ -67,7 +72,7 @@ else
     {
         isDataFetched = false;
         userList.Clear();
-        userList = await UserSearchModel.SearchForUserAsync(username,sortingAlphabet,sortingDirection,pageNumber);
+        userList = await UserSearchModel.SearchForUserAsync(Username, pageNumber);
         isDataFetched = true;
     }
 
@@ -75,4 +80,25 @@ else
     {
         NavManager.NavigateTo($"userProfile/{userId}");
     }
+
+    private async void GoToPreviousPage()
+    {
+        if (pageNumber <= 1)
+        {
+            return;
+        }
+        pageNumber--;
+        await SearchForUser();
+    }
+
+    private async void GoToNextPage()
+    {
+        if (userList.Count < usersPerPage)
+        {
+            return;
+        }
+        pageNumber++;
+        await SearchForUser();
+    }
+
 }

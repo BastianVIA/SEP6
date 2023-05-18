@@ -33,7 +33,7 @@
                 <BarItem>
                     <Addons>
                         <Addon AddonType="AddonType.Body">
-                            <TextEdit @bind-Text="@searchTerm" Placeholder="Search term"/>
+                            <TextEdit @bind-Text="@searchTerm" Placeholder="Search"/>
                         </Addon>
                         <Addon AddonType="AddonType.End">
                             <Button Color="Color.Primary" Clicked="PerformSearch">
@@ -69,16 +69,9 @@
 </div>
 
 @code {
-    private string movieTitle;
     private string displayName;
     private string searchTerm;
     private bool searchUsers = false;
-
-    private void SearchForMovie()
-    {
-        if (movieTitle == null) return;
-        NavManager.NavigateTo($"searchResult/{movieTitle}");
-    }
 
     protected override void OnInitialized()
     {
@@ -88,7 +81,7 @@
 
     private void PerformSearch()
     {
-        if (searchTerm == "") return;
+        if (searchTerm == null) return;
         NavManager.NavigateTo($"SearchResult/{searchTerm}");
     }
 

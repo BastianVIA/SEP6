@@ -16,7 +16,7 @@
 
         @if (personList.Count == 0)
         {
-            <p size="20px">No such movie exists.</p>
+            <p size="20px">No such person exists.</p>
         }
         <Table Hoverable Striped>
             <TableHeader>
@@ -62,7 +62,7 @@ else
     private int pageNumber { get; set; }
     
     private bool isDataFetched = false;
-    private int peoplePerPage = 10;
+    private int peoplePerPage = 20;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -76,7 +76,6 @@ else
         personList.Clear();
         personList = await PersonSearchModel.SearchForPersonAsync(PersonName, pageNumber);
         isDataFetched = true;
-        StateHasChanged();
     }
 
     private async Task GoToNextPage()
