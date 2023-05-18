@@ -16,6 +16,20 @@ public class Controller : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Retrieves the social feed for a user.
+    /// </summary>
+    /// <param name="pageNumber">Specifies the page number for paginated results. Default value is 1.</param>
+    /// <response code="200">The social feed data for the user.</response>
+    /// <remarks>
+    /// The data optionally includes an "ActivityDataDto", and the fields filled out in this dto depend on the topic:
+    /// - FavoriteMovie: No ActivityDataDto provided.
+    /// - CreatedRating: ActivityDataDto provided with "MovieId" and "NewRating" fields.
+    /// - UpdatedRating: ActivityDataDto provided with "MovieId", "NewRating", and "OldRating" fields.
+    /// - RemovedRating: ActivityDataDto provided with "MovieId" and "OldRating" fields.
+    /// - NewUser: No ActivityDataDto provided.
+    /// - UnFavoriteMovie: No ActivityDataDto provided.
+    /// </remarks>
     [HttpGet]
     [Route("userFeed")]
     [Tags("SocialFeed")]
@@ -28,7 +42,7 @@ public class Controller : ControllerBase
         {
             return BadRequest("No user token provided");
         }
-        
+
         var query = new Query(userid, pageNumber);
         var result = _mediator.Send(query);
 
