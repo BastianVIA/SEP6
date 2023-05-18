@@ -4,39 +4,27 @@
 @using Frontend.Model.Actor
 @inject IActorModel ActorModel
 @inject NavigationManager NavManager
-<h3>Actor</h3>
 
 <div class="actor-container">
-    <Row>
+    <Row RowColumns="RowColumns.Are3">
         <Column ColumnSize="ColumnSize.Is3">
             <Div Display="Display.Flex" Flex="Flex.JustifyContent.Center">
                 <img src="@_actor.ImageUrl"/>
             </Div>
-    
         </Column>
-        <Column ColumnSize="ColumnSize.Is9">
-            <Row>
-                <Row><h2>@_actor.Name</h2></Row>
-                <Row><h4>Biography</h4></Row>
-                <Row><h6>@_actor.Bio</h6></Row>
-            </Row>
-            <Divider/>
-            <Row>
-                <Column>
-                    <Row><h6>Birthyear</h6></Row>
-                    <Row>@_actor.BirthYear</Row>
-                </Column>
-                <Column>
-                    
-                </Column>
-                <Column>
-                    
-                </Column>
-            </Row>
+        <Column ColumnSize="ColumnSize.Is6">
+            <Row><Heading Size="HeadingSize.Is2">@_actor.Name</Heading></Row>
+            <Row><Heading Size="HeadingSize.Is5">Biography</Heading></Row>
+            <Row><Paragraph>@_actor.Bio</Paragraph></Row>
+        </Column>
+        <Column ColumnSize="ColumnSize.Is3">
+            <Row><Heading Size="HeadingSize.Is5">Birthyear</Heading></Row>
+            <Row><Text>@_actor.BirthYear</Text></Row>
         </Column>
     </Row>
+    <Row Margin="Margin.Is2.FromTop"><Heading Size="HeadingSize.Is5">Acted in movies</Heading></Row>
     <Row>
-        <Table Hoverable Striped>
+         <Table Hoverable Striped>
             <TableHeader>
                 <TableRow>
                     <TableHeaderCell>Poster</TableHeaderCell>
@@ -46,14 +34,14 @@
                 </TableRow>
             </TableHeader>
             <TableBody>
-                @foreach(Movie movie in _actor.ActedInList)
+                @foreach (Movie movie in _actor.ActedInList)
                 {
                     <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
                         <TableRowCell></TableRowCell>
                         <TableRowCell>@movie.Title</TableRowCell>
                         <TableRowCell>@movie.ReleaseYear</TableRowCell>
                         <TableRowCell></TableRowCell>
-                    </TableRow> 
+                    </TableRow>
                 }
             </TableBody>
         </Table>
@@ -64,18 +52,13 @@
 
 
 @code {
-
     [Parameter] public string ActorId { get; set; }
-    
-
     private Actor _actor;
-
     protected override async Task OnInitializedAsync()
     {
        _actor=  await ActorModel.GetActorDetails(ActorId);
     }
     
-
     private void OnMovieClick(string movieId)
     {
         NavManager.NavigateTo($"movieDetails/{movieId}");

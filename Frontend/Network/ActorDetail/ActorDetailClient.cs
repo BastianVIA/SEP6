@@ -15,13 +15,15 @@ public class ActorDetailClient : IActorDetailClient
         var movies = new List<Movie>();
         movies.Add(new Movie()
         {
-            Title = "Henrik Brunsvir",
-            ReleaseYear = 2023
+            Id = "tt0109830",
+            Title = "Forest Gump",
+            ReleaseYear = 1994
         });
         movies.Add(new Movie()
         {
-            Title = "2 Kanoner På 1 Scooter",
-            ReleaseYear = 1988
+            Id = "tt0120815",
+            Title = "Saving Ryan fyren",
+            ReleaseYear = 1998
         });
         return new Entities.Actor()
         {
