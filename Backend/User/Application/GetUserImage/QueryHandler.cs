@@ -1,7 +1,7 @@
 ﻿using Backend.Service;
 using MediatR;
 
-namespace Backend.User.Application.UserImage;
+namespace Backend.User.Application.GetUserImage;
 
 public record Query(string userId) : IRequest<UserImageResponse>;
 

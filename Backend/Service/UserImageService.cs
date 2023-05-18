@@ -31,4 +31,20 @@ public class UserImageService : IUserImageService
 
         return data;
     }
+
+    public async Task UploadImage(string userId, byte[] data)
+    {
+        string filePath = Path.Combine(_imageFolder, $"{userId}.jpg");
+
+        try
+        {
+            await File.WriteAllBytesAsync(filePath, data);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+        
+    }
 }
