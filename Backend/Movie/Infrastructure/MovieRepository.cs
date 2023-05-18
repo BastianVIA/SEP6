@@ -1,5 +1,4 @@
-﻿using Backend.Database;
-using Backend.Database.Transaction;
+﻿using Backend.Database.Transaction;
 using Backend.Enum;
 using Backend.Movie.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +9,7 @@ namespace Backend.Movie.Infrastructure;
 public class MovieRepository : IMovieRepository
 {
     private const int NumberOfResultsPerPage = 10;
-    
+
     public async Task<List<Domain.Movie>> SearchForMovie(string title, MovieSortingKey movieSortingKey,
         SortingDirection sortingDirection, int requestPageNumber, DbReadOnlyTransaction tx)
     {
@@ -42,21 +41,32 @@ public class MovieRepository : IMovieRepository
     }
 
 
-    public async Task<Domain.Movie> ReadMovieFromId(string id, DbReadOnlyTransaction tx)
+    public async Task<Domain.Movie> ReadMovieFromId(string id, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeActors = false, bool includeDirectors = false)
     {
-        var result = await tx.DataContext.Movies.Where(m => m.Id == id).Include(m => m.Rating).FirstOrDefaultAsync();
+        var query = tx.DataContext.Movies.Where(m => m.Id == id);
+        if (includeRatings)
+        {
+            query = query.Include(m => m.Rating);
+        }
 
+        var result = await query.FirstOrDefaultAsync();
         if (result == null)
         {
             throw new KeyNotFoundException($"Could not find movie with id: {id}");
         }
 
-        result.Actors = await tx.DataContext.Persons.Where(p => p.ActedMovies.Contains(result))
-            .Take(NumberOfResultsPerPage)
-            .ToListAsync();
-        result.Directors = await tx.DataContext.Persons.Where(p => p.DirectedMovies.Contains(result))
-            .Take(NumberOfResultsPerPage)
-            .ToListAsync();
+        if (includeActors)
+        {
+            result.Actors = await tx.DataContext.Persons.Where(p => p.ActedMovies.Contains(result))
+                .Take(NumberOfResultsPerPage)
+                .ToListAsync();
+        }
+        if (includeDirectors)
+        {
+            result.Directors = await tx.DataContext.Persons.Where(p => p.DirectedMovies.Contains(result))
+                .Take(NumberOfResultsPerPage)
+                .ToListAsync();
+        }
 
         return ToDomain(result);
     }
@@ -85,6 +95,43 @@ public class MovieRepository : IMovieRepository
             .Take(NumberOfResultsPerPage)
             .ToList();
         return ToDomain(movies);
+    }
+
+    public async Task Update(Domain.Movie movie, DbTransaction tx)
+    {
+        tx.AddDomainEvents(movie.ReadAllDomainEvents());
+        var movieDao = await tx.DataContext.Movies
+            .Include(m => m.Rating)
+            .SingleAsync(m => m.Id == movie.Id);
+
+
+        excludeActorsAndDirectorsFromupdate(tx, movieDao);
+
+        movieDao.Title = movie.Title;
+        movieDao.Year = movie.ReleaseYear;
+
+        if (movie.Rating != null)
+        {
+            movieDao.Rating = FromDomain(movie.Rating, movie.Id);
+        }
+
+        tx.DataContext.Movies.Update(movieDao);
+    }
+
+    private static void excludeActorsAndDirectorsFromupdate(DbTransaction tx, MovieDAO movieDao)
+    {
+        if (movieDao.Actors == null)
+        {
+            movieDao.Actors = new List<PersonDAO>();
+        }
+
+        if (movieDao.Directors == null)
+        {
+            movieDao.Directors = new List<PersonDAO>();
+        }
+
+        tx.DataContext.Entry(movieDao).Collection(m => m.Actors).IsModified = false;
+        tx.DataContext.Entry(movieDao).Collection(m => m.Directors).IsModified = false;
     }
 
     private List<Domain.Movie> ToDomain(List<MovieDAO> movieDaos)
@@ -132,6 +179,16 @@ public class MovieRepository : IMovieRepository
             Id = personDao.Id,
             Name = personDao.Name,
             BirthYear = personDao.BirthYear
+        };
+    }
+
+    private RatingDAO FromDomain(Domain.Rating rating, string movieId)
+    {
+        return new RatingDAO
+        {
+            MovieId = movieId,
+            Rating = rating.AverageRating,
+            Votes = rating.Votes
         };
     }
 
