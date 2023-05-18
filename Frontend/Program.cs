@@ -1,6 +1,8 @@
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
 using Blazorise;
+using Frontend.Entities;
+using Frontend.Model.Actor;
 using Frontend.Model.FavoriteMovies;
 using Frontend.Model.Firebase;
 using Frontend.Model.MovieDetail;
@@ -39,6 +41,7 @@ builder.Services.AddScoped<IUserModel, UserModel>();
 builder.Services.AddScoped<IUserProfileClient, UserProfileClient>();
 builder.Services.AddScoped<IUserProfilesModel, UserProfilesModel>();
 builder.Services.AddScoped<IRecommendationsModel, RecommendationsModel>();
+builder.Services.AddScoped<IActorModel, ActorModel>();
 
 builder.Services.AddScoped<IUserSearchClient, UserSearchClient>();
 builder.Services.AddScoped<IUserSearchModel, UserSearchModel>();
