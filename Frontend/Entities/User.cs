@@ -1,4 +1,6 @@
-﻿namespace Frontend.Entities;
+﻿using Frontend.Service;
+
+namespace Frontend.Entities;
 
 public class User
 {
@@ -14,6 +16,8 @@ public class User
     public List<Movie> FavoriteMovies { get; set; }
     
     public float AverageOfUserRatings { get; set; }
+    
+    public ICollection<Int32Int32ValueTuple> RatingDataPoints { get; set; }
     
     
 }
