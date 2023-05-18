@@ -36,32 +36,30 @@
                 <BarItem>
                     <Addons>
                         <Addon AddonType="AddonType.Body">
-                            <TextEdit @bind-Text="@searchTerm" Placeholder="Search term"/>
+                            <TextEdit @bind-Text="@searchTerm" Placeholder="Search term" @onkeydown="HandleKeyDown" />
                         </Addon>
-
-                        <Addon AddonType="AddonType.Body">
-                            
-                            
-                         <Dropdown>
-                             <DropdownToggle Color="Color.Primary" TextWeight="TextWeight.Bold">
-                                 @if (searchOptionName != null && !string.IsNullOrEmpty(searchOptionName))
-                                 {
-                                     @searchOptionName
-                                 }
-                                 else
-                                 {
-                                     <span>Search Options</span>
-                                 }
-                             </DropdownToggle>
-                             <DropdownMenu>
-                              <DropdownItem Clicked="@(async () =>  ToggleDropdown(true))">Search User</DropdownItem>
-                                 <DropdownItem Clicked="@(async () =>  ToggleDropdown(false))">Search Movie</DropdownItem>
-                                 </DropdownMenu>
-                         </Dropdown>
-
+                
+                        <Addon AddonType="AddonType.Body">                
+                            <Dropdown>
+                                <DropdownToggle Color="Color.Primary" TextWeight="TextWeight.Bold">
+                                    @if (searchOptionName != null && !string.IsNullOrEmpty(searchOptionName))
+                                    {
+                                        @searchOptionName
+                                    }
+                                    else
+                                    {
+                                        <span>Search Options</span>
+                                    }
+                                </DropdownToggle>
+                                <DropdownMenu>
+                                    <DropdownItem Clicked="@(async () =>  await ToggleDropdown(true))">Search User</DropdownItem>
+                                    <DropdownItem Clicked="@(async () =>  await ToggleDropdown(false))">Search Movie</DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
                         </Addon>
+                        
                         <Addon AddonType="AddonType.End">
-                            <Button Color="Color.Primary" Clicked="PerformSearch">
+                            <Button Color="Color.Primary" @onclick="PerformSearch">
                                 <Icon Name="IconName.Search"/>
                             </Button>
                         </Addon>
@@ -114,8 +112,14 @@
         
     }
     
-    
-    private void PerformSearch()
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await PerformSearch();
+        }
+    }
+    private async Task PerformSearch()
     {
         if (searchTerm == null) return;
 
@@ -130,8 +134,9 @@
             NavManager.NavigateTo($"searchResult/{searchTerm}");
         }
 
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
+    
 
     private void SetDisplayName(object? sender, AlertEventArgs args)
     {
@@ -148,7 +153,7 @@
         searchUsers = isSearchUsers;
     }
     
-    private async void ToggleDropdown(bool searchUsers)
+    private async Task ToggleDropdown(bool searchUsers)
     {
         this.searchUsers = searchUsers;
 
@@ -161,7 +166,7 @@
             searchOptionName = "Search Movie";
         }
 
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
     
     public void Dispose()
