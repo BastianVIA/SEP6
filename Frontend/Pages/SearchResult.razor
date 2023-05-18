@@ -1,0 +1,48 @@
+﻿@page "/SearchResult/{SearchText}"
+@using Frontend.Components
+@using Blazorise
+
+<Row>
+    <Column ColumnSize="ColumnSize.Is2">
+        <Div Margin="Margin.Is2.FromStart.Is2.FromBottom" >
+            <h4>Filter</h4>
+            <RadioGroup Orientation="Orientation.Vertical" TValue="string" Name="searchType" CheckedValue="@checkedValue" Buttons CheckedValueChanged="@OnChange">
+                <Radio Value="@("movies")">Movies</Radio>
+                <Radio Value="@("users")">Users</Radio>
+                <Radio Value="@("persons")">Persons</Radio>
+            </RadioGroup>
+        </Div>
+    </Column>
+    
+    <Column ColumnSize="ColumnSize.Is8">
+        @switch (checkedValue)
+        {
+            case "movies":
+                <MovieSearch MovieTitle="@SearchText"/>
+                break;
+            case "users":
+                @* <UserSearch SearchTerm="@SearchText"/> *@
+                break;
+            case "persons":
+                <PersonSearch PersonName="@SearchText"/>
+                break;
+            default:
+                <p>Nothing found</p>
+                break;
+        }
+        
+    </Column>
+</Row>
+
+@code {
+
+    [Parameter]
+    public string SearchText { get; set; }
+    private string checkedValue = "movies";
+    
+    private void OnChange(string value)
+    {
+        checkedValue = value;
+    }
+
+}

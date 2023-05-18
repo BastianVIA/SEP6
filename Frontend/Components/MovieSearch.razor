@@ -1,4 +1,4 @@
-﻿@page "/SearchResult/{movieTitle}"
+﻿
 @using Frontend.Entities
 @using Frontend.Service
 @inject IMovieSearchModel MovieSearchModel
@@ -58,7 +58,7 @@ else
 { 
     @if (isConnected)
 {
-    <LottieAnimation Path="/Animations/loadingAimation.json" Style="@(@"height: 200px")"/>
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
 }
 }
 @code {
