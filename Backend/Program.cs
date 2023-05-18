@@ -80,6 +80,7 @@ builder.Services.AddSwaggerGen(options =>
     options.UseInlineDefinitionsForEnums();
     options.SupportNonNullableReferenceTypes();
     options.UseAllOfToExtendReferenceSchemas();
+    options.IncludeXmlComments("bin/Debug/Backend.xml");
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
