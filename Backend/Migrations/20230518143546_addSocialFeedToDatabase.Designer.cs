@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230518135502_addedOldRatingToDb")]
-    partial class addedOldRatingToDb
+    [Migration("20230518143546_addSocialFeedToDatabase")]
+    partial class addSocialFeedToDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
