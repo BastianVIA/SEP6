@@ -37,7 +37,7 @@
                 @foreach (Movie movie in _actor.ActedInList)
                 {
                     <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
-                        <TableRowCell></TableRowCell>
+                        <TableRowCell><img src="@movie.PosterUrl" height="100px"/></TableRowCell>
                         <TableRowCell>@movie.Title</TableRowCell>
                         <TableRowCell>@movie.ReleaseYear</TableRowCell>
                         <TableRowCell>@movie.Rating?.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/></TableRowCell>

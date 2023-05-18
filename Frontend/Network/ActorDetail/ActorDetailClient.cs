@@ -15,12 +15,14 @@ public class ActorDetailClient : IActorDetailClient
         var movies = new List<Movie>();
         movies.Add(new Movie()
         {
+            PosterUrl = new Uri("https://image.tmdb.org/t/p/original/c54HpQmuwXjHq2C9wmoACjxoom3.jpg"),
             Id = "tt0109830",
             Title = "Forest Gump",
             ReleaseYear = 1994
         });
         movies.Add(new Movie()
         {
+            PosterUrl = new Uri("https://image.tmdb.org/t/p/original/c54HpQmuwXjHq2C9wmoACjxoom3.jpg"),
             Id = "tt0120815",
             Title = "Saving Ryan fyren",
             ReleaseYear = 1998
