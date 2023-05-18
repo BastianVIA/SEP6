@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.User.Application.UserImage;
+namespace Backend.User.Application.GetUserImage;
 
 
 public class Controller : ControllerBase
@@ -34,8 +34,8 @@ public class Controller : ControllerBase
             Console.WriteLine(e);
             return NotFound();
         }
-        
-       
     }
+    
+    
 
 }
