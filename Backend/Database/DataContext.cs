@@ -50,6 +50,15 @@ public class DataContext : DbContext
             .WithMany(u => u.FavoriteMovies)
             .HasForeignKey(um => um.UserId);
 
+        modelBuilder.Entity<UserRatingDAO>()
+            .HasKey(dao => new { dao.MovieId, dao.UserId });
+        
+        modelBuilder.Entity<UserRatingDAO>()
+            .HasOne(ur => ur.User)
+            .WithMany(u => u.UserRatings)
+            .HasForeignKey(ur => ur.UserId);
+
+
         modelBuilder.Entity<PeopleMovieDAO>()
             .HasKey(dao => dao.MovieId);
 

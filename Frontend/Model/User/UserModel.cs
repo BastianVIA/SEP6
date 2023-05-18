@@ -14,8 +14,8 @@ public class UserModel : NSwagBaseClient, IUserModel
         _client = client;
     }
 
-    public async Task CreateUser(string userToken)
+    public async Task CreateUser(string userToken,string displayName, string email)
     {
-        await _client.CreateUser(userToken);
+        await _client.CreateUser(userToken, displayName, email);
     }
 }

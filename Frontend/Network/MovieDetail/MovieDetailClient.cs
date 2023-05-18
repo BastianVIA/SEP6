@@ -6,28 +6,15 @@ namespace Frontend.Network.MovieDetail;
 
 public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
 {
-    public async Task<Movie> GetMovieDetails(string movieId, string? userToken)
+    
+    
+    public async Task<Movie?> GetMovieDetails(string movieId, string? userToken)
     {
         if (userToken != null)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
         }
-
-        MovieDetailsResponse? response;
-        try
-        {
-            response = await _api.MovieAsync(movieId);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return null;
-        }
-
-        if (response == null || response.MovieDetailsDto == null)
-        {
-            return null;
-        }
+        var response = await _api.MovieAsync(movieId);
 
         var actors = response.MovieDetailsDto.Actors?.Select(actor => new Actor
         {
@@ -48,6 +35,7 @@ public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
             Id = response.MovieDetailsDto.Id,
             Title = response.MovieDetailsDto.Title,
             ReleaseYear = response.MovieDetailsDto.ReleaseYear,
+            UserRating = response.MovieDetailsDto.UserRating,
             PosterUrl = response.MovieDetailsDto.PathToPoster == null || string.IsNullOrWhiteSpace(response.MovieDetailsDto.PathToPoster.ToString()) ? new Uri(DEFAULT_POSTER_URL, UriKind.Relative) : response.MovieDetailsDto.PathToPoster,
             Rating = new Rating
             {
@@ -56,10 +44,17 @@ public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
             },
             Actors = actors,
             Directors = directors,
-            IsFavorite = response.MovieDetailsDto.IsFavorite,
-            Resume = response.MovieDetailsDto.Resume
+            Resume = response.MovieDetailsDto.Resume,
+            IsFavorite = response.MovieDetailsDto.IsFavorite
         };
 
         return movie;
+    }
+
+    public async Task SetMovieRating(string? userToken, string movieId, int? rating = null)
+    {
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+        await _api.RateMovieAsync(new SetRatingRequest { MovieId = movieId, Rating = rating });
+        
     }
 }

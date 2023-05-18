@@ -7,6 +7,7 @@ public class Movie
     public string Id { get; set; }
     public int ReleaseYear { get; set; }
     public bool? IsFavorite { get; set;}
+    public int? UserRating { get; set; }
     public Uri? PosterUrl { get; set; }
     public List<Actor>? Actors { get; set; }
     public List<Director>? Directors { get; set; }

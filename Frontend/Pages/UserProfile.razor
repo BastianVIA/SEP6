@@ -1,0 +1,73 @@
+﻿@page "/userprofile"
+@using Frontend.Model.MovieDetail
+@using Frontend.Model.FavoriteMovies
+@using Frontend.Model.UserProfiles
+@using Frontend.Entities
+@using Frontend.Model.Firebase
+@inject IUserProfilesModel UserProfilesModel
+@inject IFavoriteMoviesModel FavoriteMoviesModel
+@inject NavigationManager NavManager
+@inject IMovieDetailModel MovieDetailModel
+@inject IFirebaseModel FirebaseModel
+
+<h3>User Profile</h3>
+
+@if (user == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div>
+        <h4>@user.Username</h4>
+        <p>@user.Email</p>
+        <p>@user.Bio</p>
+
+        <h5>Favorite Movies</h5>
+        @if (favoriteMovies != null && favoriteMovies.Any())
+        {
+            <ul>
+                @foreach (var movie in favoriteMovies)
+                {
+                    <li>@movie.Title</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>No favorite movies yet.</p>
+        }
+    </div>
+    
+    <div>
+        <p>User's Average Rating on Movies: @user.AverageOfUserRatings</p>
+    </div>
+    
+    @* <div> @user.Bio</div> *@
+    <div> @user.Email</div>
+
+    <div> @user.Username</div>
+
+  //  <div> @user.ProfilePicture</div>
+
+    
+}
+
+@code {
+    private User user;
+    private IList<Movie> favoriteMovies;
+    private double averageRating;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserProfilesModel.GetUserProfile(FirebaseModel.CurrentUser.UID);
+        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID);
+        
+        if (favoriteMovies != null && favoriteMovies.Any())
+        {
+            averageRating = favoriteMovies.Average(movie => movie.Rating?.AverageRating ?? 0);
+        }
+
+        StateHasChanged();
+    }
+}

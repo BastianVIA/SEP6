@@ -8,8 +8,11 @@ public interface IMovieRepository
 {
     Task<List<Domain.Movie>> SearchForMovie(string title, MovieSortingKey movieSortingKey,
         SortingDirection sortingDirection, int requestPageNumber, DbReadOnlyTransaction tx);
-    Task<Domain.Movie> ReadMovieFromId(string id, DbReadOnlyTransaction tx);
+
+    Task<Domain.Movie> ReadMovieFromId(string id, DbReadOnlyTransaction tx, bool includeRatings = false,
+        bool includeActors = false, bool includeDirectors = false);
     Task<List<Domain.Movie>> ReadMoviesFromList(List<string> movieIds, int requestedPageNumber, DbReadOnlyTransaction tx);
     Task<List<Domain.Movie>> GetRecommendedMovies(int minVotes, float minRating, DbReadOnlyTransaction tx);
+    Task Update(Domain.Movie movie, DbTransaction tx);
 
 }

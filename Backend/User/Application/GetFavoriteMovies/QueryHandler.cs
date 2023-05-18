@@ -36,7 +36,7 @@ public class QueryHandler : IRequestHandler<Query, FavoriteMovesResponse>
     public async Task<FavoriteMovesResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var userRequested = await _repository.ReadUserFromIdAsync(request.userId,transaction);
+        var userRequested = await _repository.ReadUserFromIdAsync(request.userId,transaction, includeFavoriteMovies:true);
         var moviesInfoResponse =await _mediator.Send(new Movie.Application.GetInfoFromMovies.Query(userRequested.FavoriteMovies));
         var movieDtos = new List<FavoriteMovieDto>();
         foreach (var movieInfo in  moviesInfoResponse.MovieInfoDtos)
