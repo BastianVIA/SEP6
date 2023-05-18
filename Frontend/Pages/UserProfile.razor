@@ -1,78 +1,4 @@
-﻿@* @page "/userprofile" *@
-@* @using Frontend.Model.MovieDetail *@
-@* @using Frontend.Model.FavoriteMovies *@
-@* @using Frontend.Model.UserProfiles *@
-@* @using Frontend.Entities *@
-@* @using Frontend.Model.Firebase *@
-@* @inject IUserProfilesModel UserProfilesModel *@
-@* @inject IFavoriteMoviesModel FavoriteMoviesModel *@
-@* @inject NavigationManager NavManager *@
-@* @inject IMovieDetailModel MovieDetailModel *@
-@* @inject IFirebaseModel FirebaseModel *@
-@* *@
-@* <h3>User Profile</h3> *@
-@* *@
-@* @if (user == null) *@
-@* { *@
-@*     <p><em>Loading...</em></p> *@
-@* } *@
-@* else *@
-@* { *@
-@*     <div> *@
-@*         <h4>@user.Username</h4> *@
-@*         <p>@user.Email</p> *@
-@*         <p>@user.Bio</p> *@
-@* *@
-@*         <h5>Favorite Movies</h5> *@
-@*         @if (favoriteMovies != null && favoriteMovies.Any()) *@
-@*         { *@
-@*             <ul> *@
-@*                 @foreach (var movie in favoriteMovies) *@
-@*                 { *@
-@*                     <li>@movie.Title</li> *@
-@*                 } *@
-@*             </ul> *@
-@*         } *@
-@*         else *@
-@*         { *@
-@*             <p>No favorite movies yet.</p> *@
-@*         } *@
-@*     </div> *@
-@*      *@
-@*     <div> *@
-@*         <p>User's Average Rating on Movies: @user.AverageOfUserRatings</p> *@
-@*     </div> *@
-@*      *@
-@*     $1$ <div> @user.Bio</div> #1# *@
-@*     <div> @user.Email</div> *@
-@* *@
-@*     <div> @user.Username</div> *@
-@* *@
-@*   //  <div> @user.ProfilePicture</div> *@
-@* *@
-@*      *@
-@* } *@
-@* *@
-@* @code { *@
-@*     private User user; *@
-@*     private IList<Movie> favoriteMovies; *@
-@*     private double averageRating; *@
-@* *@
-@*     protected override async Task OnInitializedAsync() *@
-@*     { *@
-@*         user = await UserProfilesModel.GetUserProfile(FirebaseModel.CurrentUser.UID); *@
-@*         favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID); *@
-@*          *@
-@*         if (favoriteMovies != null && favoriteMovies.Any()) *@
-@*         { *@
-@*             averageRating = favoriteMovies.Average(movie => movie.Rating?.AverageRating ?? 0); *@
-@*         } *@
-@* *@
-@*         StateHasChanged(); *@
-@*     } *@
-@* } *@
-
-@page "/userprofile"
+﻿@page "/userprofile"
 @using Frontend.Model.MovieDetail
 @using Frontend.Model.FavoriteMovies
 @using Frontend.Model.UserProfiles
@@ -83,6 +9,7 @@
 @inject NavigationManager NavManager
 @inject IMovieDetailModel MovieDetailModel
 @inject IFirebaseModel FirebaseModel
+@using Blazorise.Charts
 
 <div class="user-profile">
     @if (user == null)
@@ -108,30 +35,69 @@
         <h5>Favorite Movies</h5>
         @if (favoriteMovies != null && favoriteMovies.Any())
         {
-            <ul>
+            <div class="user-profile__favorites">
                 @foreach (var movie in favoriteMovies)
                 {
-                    <li>@movie.Title</li>
+                    <div class="user-profile__favorites__item">
+                           <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
+                           <TableRowCell>
+                               <img src="@movie.PosterUrl" height="30px"/>
+                           </TableRowCell>
+                           </TableRow>
+                        <p>@movie.Title</p>
+                    </div>
                 }
-            </ul>
+            </div>
         }
         else
         {
             <p>No favorite movies yet.</p>
         }
 
-        <div>
-            <p>User's Average Rating on Movies: @user.AverageOfUserRatings</p>
+        <p>User's Average Rating on Movies: @averageRating</p>
 
-            <p>User's Average Rating on Movies: @averageRating</p>
-        </div>
+        <h5>Total Movies Reviewed: @totalMoviesReviewed</h5>
+
+        @* @if (ratingsCount != null && ratingsCount.Any()) *@
+        {
+
+
+        }
+        // else
+        // {
+        //     <p>No ratings available.</p>
+        // }
     }
+
+     <div style="width: 90%; height: 33%;">
+                    <BarChart @ref="barChart" TItem="int">
+                        <ChartOptions Responsive="true" Title="Movie Ratings"/>
+                        <BarChartDataset TItem="int" Data="new ChartData<int> { Data = ratingsCount }" BackgroundColor="backgroundColors"/>
+                        <ChartLabels Labels="@ratingLabels"/>
+                    </BarChart>
+                </div>
+
 </div>
 
+
+
+
 @code {
+    BarChart<int> barChart;
+    private List<string> ratingLabels = new List<string>() { "1 star", "2 stars", "3 stars", "4 stars", "5 stars", "6 stars", "7 stars", "8 stars", "9 stars", "10 stars" };
     private User user;
     private IList<Movie> favoriteMovies;
     private double averageRating;
+    private int totalMoviesReviewed;
+    //  private List<int> ratingsCount;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await HandleRedraw();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -140,11 +106,12 @@
 
         if (favoriteMovies != null && favoriteMovies.Any())
         {
+            totalMoviesReviewed = favoriteMovies.Count();
             averageRating = favoriteMovies.Average(movie => movie.Rating?.AverageRating ?? 0);
+            ratingsCount = Enumerable.Range(1, 10).Select(rating => favoriteMovies.Count(movie => movie.Rating?.AverageRating == rating)).ToList();
         }
-
-        StateHasChanged();
     }
+
 
     private async Task UpdateProfilePicture(ChangeEventArgs e)
     {
@@ -152,9 +119,62 @@
 
         if (file != null)
         {
-    // Implement logic to upload the image and update the user profile picture.
-    // This is dependent on your backend service.
+
+            //TODO logic to upload
         }
     }
 
+
+    async Task HandleRedraw()
+    {
+        await barChart.Clear();
+
+        await barChart.AddLabelsDatasetsAndUpdate(Labels, GetBarChartDataset());
+    }
+
+    private BarChartDataset
+        <int> GetBarChartDataset()
+    {
+        return new BarChartDataset
+            <int>
+        {
+            Label = "Movie Ratings",
+            Data = ratingsCount,
+            BackgroundColor = backgroundColors,
+            BorderColor = borderColors,
+            BorderWidth = 1
+        };
+    }
+
+    List
+        <int> ratingsCount = new List
+            <int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+    List
+        <string> backgroundColors = new List
+            <string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
+
+    List
+        <string> borderColors = new List
+            <string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
+
+    List
+        <string> Labels = new List
+            <string> { "One Star", "Two Stars", "Three Stars", "Four Stars", "Five Stars", "Sex Stars", "Seven Stars", "Eight Stars", "Nine Stars", "Ten Stars" };
+
+    Task OnClicked(ChartMouseEventArgs e)
+    {
+        var model = e.Model as BarChartModel;
+
+        Console.WriteLine($"Handling event for {nameof(BarChartModel)}: x:{model.X} y:{model.Y}");
+        return Task.CompletedTask;
+    }
+
+
+    private void OnMovieClick(string movieId)
+    {
+        NavManager.NavigateTo($"movieDetails/{movieId}");
+    }
+
 }
+
