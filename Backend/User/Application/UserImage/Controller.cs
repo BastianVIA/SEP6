@@ -24,10 +24,18 @@ public class Controller : ControllerBase
     public async Task<IActionResult> GetUserImage([Required]string userId)
     {
         var query = new Query(userId);
+        try
+        {
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
+        catch (FileNotFoundException e)
+        {
+            Console.WriteLine(e);
+            return NotFound();
+        }
         
-        var result = await _mediator.Send(query);
-        
-        return Ok(result);
+       
     }
 
 }
