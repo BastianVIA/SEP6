@@ -31,17 +31,13 @@ namespace Frontend.Network.UserProfiles
 
             var userRatings = new List<UserRating>();
 
-            foreach (var userRating in response.UserProfile.Ratings)
-            {
-                userRatings.Add(new UserRating { NumberOfStars = userRating.NumberOfStars });
-            }
-
             var user = new Entities.User()
             {
                 UserRatings = userRatings,
                 Username = response.UserProfile.DisplayName,
                 Email = response.UserProfile.Email,
-                Bio = response.UserProfile.Bio
+                Bio = response.UserProfile.Bio,
+                AverageOfUserRatings = (decimal)response.UserProfile.AverageOfUserRatings
             };
 
             return user;

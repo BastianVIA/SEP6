@@ -18,9 +18,9 @@ public class UserProfileDto
     public string? Bio { get; set; }
     
     public List<string> FavoriteMovies { get; set; }
-    public List<UserRatingDto> Ratings { get; set; }
-    
-    public double AverageOfUserRatings { get; set; }
+    public (int, int)[] RatingsDataPoints { get; set; }
+    public decimal AverageOfUserRatings { get; set; }
+    public decimal AverageOfFavoriteMovies { get; set; }
 }
 
 public class UserRatingDto
@@ -47,14 +47,13 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
         var transaction =  _transactionFactory.BeginReadOnlyTransaction();
         
         var userRequested = await _repository.ReadUserFromIdAsync(request.userId, transaction, includeRatings: true, includeFavoriteMovies: true);
-        var ratingDtos = GetRatingDtos(userRequested);
         userRequested.SetRatingAvg();
-        
-        return new UserProfileResponse(toDto(userRequested, ratingDtos));
+        var ratingDataPoints = GetRatingDataPoints(userRequested);
+        return new UserProfileResponse(toDto(userRequested, ratingDataPoints));
     }
     
 
-    private UserProfileDto toDto(Domain.User user, List<UserRatingDto> userRating)
+    private UserProfileDto toDto(Domain.User user, (int,int)[] ratingDataPoints)
     {
         return new UserProfileDto
         {
@@ -62,11 +61,23 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
             Email = user.Email,
             Bio = user.Bio,
             FavoriteMovies = user.FavoriteMovies,
-            Ratings = userRating,
+            RatingsDataPoints = ratingDataPoints,
             AverageOfUserRatings = user.AverageOfUserRatings
         };
     }
-    
+
+    private (int,int)[] GetRatingDataPoints(Domain.User user)
+    {
+        var dataPoints = new[] {(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0)};
+        foreach (var rating in user.Ratings)
+        {
+            var tupleIndex = Array.FindIndex(dataPoints, tuple => tuple.Item1 == rating.NumberOfStars);
+            dataPoints[tupleIndex].Item2++;
+        }
+
+        return dataPoints;
+    }
+
 
     private List<UserRatingDto> GetRatingDtos(Domain.User user)
     {
