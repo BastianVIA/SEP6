@@ -1,4 +1,5 @@
 ﻿using Backend.Database.TransactionManager;
+using Backend.SocialFeed.Domain;
 using Backend.SocialFeed.Infrastructure;
 using Backend.User.IntegrationEvents;
 using MediatR;
@@ -23,7 +24,8 @@ public class UserCreatedEventHandler : INotificationHandler<UserCreatedIntegrati
         var transaction = _transactionFactory.GetCurrentTransaction();
         try
         {
-            _socialUserRepository.CreateSocialUser(notification.UserId, transaction);
+            var newUser = new SocialUser(notification.UserId);
+            _socialUserRepository.CreateSocialUserAsync(newUser, transaction);
         }
         catch (Exception e)
         {

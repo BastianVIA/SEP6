@@ -27,15 +27,18 @@ public class SocialUserRepository : ISocialUserRepository
         return ToDomain(user);
     }
 
-
-    public void CreateSocialUser(string userId, DbTransaction tx)
+    public void CreateSocialUserAsync(SocialUser user, DbTransaction tx)
     {
+        tx.AddDomainEvents(user.ReadAllDomainEvents());
         tx.DataContext.SocialUsers.Add(new SocialUserDAO
         {
-            Id = userId
+            Id = user.Id
         });
+        
     }
- 
+
+
+
     public async Task UpdateSocialUser(SocialUser socialUser, DbTransaction tx)
     {
         tx.AddDomainEvents(socialUser.ReadAllDomainEvents());

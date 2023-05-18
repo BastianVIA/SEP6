@@ -20,7 +20,8 @@ public class PostRepository : IPostRepository
                 Id = Guid.NewGuid().ToString(),
                 PostId = post.Id.ToString(),
                 MovieId = post.ActivityData.MovieId,
-                NewRating = post.ActivityData.NewRating
+                NewRating = post.ActivityData.NewRating,
+                OldRating = post.ActivityData.OldRating
             };
         }
 
@@ -47,8 +48,12 @@ public class PostRepository : IPostRepository
         return ToDomain(posts);
     }
 
-    private List<Domain.Post> ToDomain(List<PostDAO> daos)
+    private List<Domain.Post> ToDomain(List<PostDAO>? daos)
     {
+        if (daos == null || !daos.Any())
+        {
+            return new List<Post>();
+        }
         var domainList = new List<Domain.Post>();
         foreach (var postDao in daos)
         {
@@ -71,8 +76,12 @@ public class PostRepository : IPostRepository
         };
     }
     
-    private Domain.ActivityData ToDomain(ActivityDAO dao)
+    private Domain.ActivityData? ToDomain(ActivityDAO? dao)
     {
+        if (dao == null)
+        {
+            return null;
+        }
         var activity = new ActivityData();
         if (dao.MovieId != null)
         {
@@ -82,6 +91,11 @@ public class PostRepository : IPostRepository
         if (dao.NewRating != null)
         {
             activity.NewRating = dao.NewRating;
+        }
+
+        if (dao.OldRating != null)
+        {
+            activity.OldRating = dao.OldRating;
         }
 
         return activity;

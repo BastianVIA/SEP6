@@ -21,6 +21,17 @@ public class FavoritedMovie : INotification
         MovieId = movieId;
     }
 }
+
+public class UnFavoritedMovie : INotification
+{
+    public string UserId { get; }
+    public string MovieId { get; }
+    public UnFavoritedMovie(string userId, string movieId)
+    {
+        UserId = userId;
+        MovieId = movieId;
+    }
+}
 public class CreatedRatingEvent : INotification
 {
     public string UserId { get;  }

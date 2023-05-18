@@ -14,7 +14,7 @@ public class FeedPostDto
     public Guid Id;
     public string UserId;
     public Activity Topic;
-    public ActivityDataDto ActivityDataDto;
+    public ActivityDataDto? ActivityDataDto;
     public DateTime TimeOfActivity { get; set; }
 }
 
@@ -22,6 +22,7 @@ public class ActivityDataDto
 {
     public string? MovieId { get; set; }
     public int? NewRating { get; set; }
+    public int? OldRating { get; set; }
 }
 public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
 {
@@ -71,12 +72,17 @@ public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
         };
     }
 
-    private ActivityDataDto toDto(ActivityData activityData)
+    private ActivityDataDto? toDto(ActivityData? activityData)
     {
+        if (activityData == null)
+        {
+            return null;
+        }
         return new ActivityDataDto
         {
             MovieId = activityData.MovieId,
-            NewRating = activityData.NewRating
+            NewRating = activityData.NewRating,
+            OldRating = activityData.OldRating,
         };
     }
 }

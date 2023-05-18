@@ -36,7 +36,13 @@ public class DbTransaction : DbReadOnlyTransaction, IAsyncDisposable
 
         try
         {
-            await pulishDomainEvents();
+            while (_domainEvents.Count > 0)
+            {
+                // Having the loop like this could cause problems if we have circular events so added debug to find it in case something goes wrong
+                LogManager.GetCurrentClassLogger().Debug("Events published"); 
+                await pulishDomainEvents(); 
+
+            }
             await DataContext.SaveChangesAsync();
             await Transaction.CommitAsync();
             LogManager.GetCurrentClassLogger().Info("Commited transaction");

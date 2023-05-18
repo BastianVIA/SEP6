@@ -7,7 +7,12 @@ public class SocialUser : BaseDomain
     public string Id { get; set; }
     public List<string>? Following { get; set;}
 
-
+    public SocialUser(){}
+    public SocialUser(string id)
+    {
+        Id = id;
+        AddDomainEvent(new SocialUserCreatedEvent(Id));
+    }
     public bool AlreadyFollows(string userToCheckIfFollows)
     {
         if (Following == null)

@@ -68,6 +68,7 @@ public class User : Foundation.BaseDomain
             if (movieId == movie)
             {
                 FavoriteMovies.RemoveAt(i);
+                AddDomainEvent(new UnFavoritedMovie(Id, movieId));
                 return;
             }
         }

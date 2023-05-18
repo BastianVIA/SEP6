@@ -5,7 +5,12 @@ namespace Backend.SocialFeed.Domain;
 public enum Activity
 {
     FavoriteMovie,
-    RateMovie
+    CreatedRating,
+    UpdatedRating,
+    RemovedRating,
+    NewUser,
+    UnFavoriteMovie,
+    
 }
 
 public class Post : BaseDomain

@@ -30,7 +30,11 @@ public class Controller : ControllerBase
     {
         try
         {
-            string userid = (string)HttpContext.Items[HttpContextKeys.UserId];
+            var userid = (string?)HttpContext.Items[HttpContextKeys.UserId];
+            if (userid == null)
+            {
+                return BadRequest("No user token provided");
+            }
             var command = new Command(userid, movieId);
             await _mediator.Send(command);
         }
