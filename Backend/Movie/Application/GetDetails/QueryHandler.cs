@@ -51,20 +51,24 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
     public async Task<MovieDetailsResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var movie = _repository.ReadMovieFromId(request.Id, transaction);
+        var movie = _repository.ReadMovieFromId(request.Id, transaction,includeRatings:true,includeActors:true,includeDirectors:true);
         var pathForPoster = _imageService.GetPathForPoster(request.Id);
         var resume = _resumeService.GetResume(request.Id);
         var isFavorite = false;
+        int? userRating = null;
         if (request.userId != null)
         {
-            isFavorite =
-                await _mediator.Send(new User.Application.GetIfMovieIsFavorite.Query(request.userId, request.Id));
+            var result =
+                await _mediator.Send(new User.Application.GetUserInfoForMovie.Query(request.userId, request.Id));
+            isFavorite = result.IsFavorite;
+            userRating = result.NumberOfStars;
         }
 
-        return new MovieDetailsResponse(ToDto(await movie, await pathForPoster, await resume, isFavorite));
+        return new MovieDetailsResponse(ToDto(await movie, await pathForPoster, await resume, isFavorite, userRating));
     }
 
-    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? resume, bool isFavorite)
+    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? resume, bool isFavorite,
+        int? userRating)
     {
         var dtoMovie = new MovieDetailsDto
         {
@@ -75,7 +79,8 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
             Actors = ToPersonDto(movie.Actors),
             Directors = ToPersonDto(movie.Directors),
             Resume = resume,
-            IsFavorite = isFavorite
+            IsFavorite = isFavorite,
+            UserRating = userRating
         };
         if (movie.Rating != null)
         {

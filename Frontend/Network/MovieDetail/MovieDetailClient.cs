@@ -6,6 +6,8 @@ namespace Frontend.Network.MovieDetail;
 
 public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
 {
+    
+    
     public async Task<Movie?> GetMovieDetails(string movieId, string? userToken)
     {
         if (userToken != null)
@@ -42,8 +44,8 @@ public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
             },
             Actors = actors,
             Directors = directors,
-            IsFavorite = response.MovieDetailsDto.IsFavorite,
-            Resume = response.MovieDetailsDto.Resume
+            Resume = response.MovieDetailsDto.Resume,
+            IsFavorite = response.MovieDetailsDto.IsFavorite
         };
 
         return movie;
