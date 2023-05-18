@@ -44,10 +44,12 @@ public class GlobalExceptionFilter : IAsyncExceptionFilter
         else if (exception is UnauthorizedAccessException)
         {
             response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            response.Value = exception.Message;
         }
         else if (exception is ValidationException)
         {
             response.StatusCode = (int)HttpStatusCode.BadRequest;
+            response.Value = exception.Message;
         }
         else if (exception is NullReferenceException)
         {

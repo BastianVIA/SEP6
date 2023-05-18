@@ -1,5 +1,6 @@
 ﻿using Backend.Movie.Infrastructure;
 using Backend.People.Infrastructure;
+using Backend.SocialFeed.Infrastructure;
 using Backend.User.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,10 @@ public class DataContext : DbContext
     public DbSet<PersonDAO> Persons { get; set; }   
     public DbSet<UserDAO> Users { get; set; }
     public DbSet<PeopleDAO> People { get; set; }
+    
+    public DbSet<PostDAO> Posts { get; set; }
+    
+    public DbSet<SocialUserDAO> SocialUsers { get; set; }
 
     public DataContext(IConfiguration configuration, DbContextOptions options) : base(options)
     {
@@ -71,6 +76,31 @@ public class DataContext : DbContext
             .HasMany(pm => pm.Directors)
             .WithMany(p => p.DirectedMovies)
             .UsingEntity(t => t.ToTable("DirectedMovies"));
+        modelBuilder.Entity<PostDAO>()
+            .HasKey(p => p.Id);
+        
+        modelBuilder.Entity<PostDAO>()
+            .HasOne(p => p.ActivityData)
+            .WithOne(a => a.PostThisBelongsTo)
+            .HasForeignKey<ActivityDAO>(a => a.PostId);
+        
+
+        modelBuilder.Entity<SocialUserDAO>()
+            .HasKey(s => s.Id);
+
+        modelBuilder.Entity<SocialUserDAO>()
+            .HasMany(s => s.Following)
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+                "SocialUserFollowers",
+                x => x.HasOne<SocialUserDAO>().WithMany().HasForeignKey("FollowingId"),
+                x => x.HasOne<SocialUserDAO>().WithMany().HasForeignKey("FollowerId"),
+                x =>
+                {
+                    x.HasKey("FollowingId", "FollowerId");
+                    x.HasIndex("FollowerId");
+                });
+
     }
     
 }
