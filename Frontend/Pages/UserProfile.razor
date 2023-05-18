@@ -58,22 +58,13 @@
 
         <h5>Total Movies Reviewed: @totalMoviesReviewed</h5>
 
-        @* @if (ratingsCount != null && ratingsCount.Any()) *@
-        {
-
-
-        }
-        // else
-        // {
-        //     <p>No ratings available.</p>
-        // }
     }
 
      <div style="width: 90%; height: 33%;">
                     <BarChart @ref="barChart" TItem="int">
                         <ChartOptions Responsive="true" Title="Movie Ratings"/>
                         <BarChartDataset TItem="int" Data="new ChartData<int> { Data = ratingsCount }" BackgroundColor="backgroundColors"/>
-                        <ChartLabels Labels="@ratingLabels"/>
+                        <ChartLabels Labels="@Labels"/>
                     </BarChart>
                 </div>
 
@@ -84,12 +75,10 @@
 
 @code {
     BarChart<int> barChart;
-    private List<string> ratingLabels = new List<string>() { "1 star", "2 stars", "3 stars", "4 stars", "5 stars", "6 stars", "7 stars", "8 stars", "9 stars", "10 stars" };
     private User user;
     private IList<Movie> favoriteMovies;
     private double averageRating;
     private int totalMoviesReviewed;
-    //  private List<int> ratingsCount;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -104,12 +93,24 @@
         user = await UserProfilesModel.GetUserProfile(FirebaseModel.CurrentUser.UID);
         favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID);
 
-        if (favoriteMovies != null && favoriteMovies.Any())
+        // if (favoriteMovies != null && favoriteMovies.Any())
+        // {
+        //     totalMoviesReviewed = favoriteMovies.Count();
+        //     averageRating = favoriteMovies.Average(movie => movie.Rating?.AverageRating ?? 0);
+        //     ratingsCount = Enumerable.Range(1, 10).Select(rating => favoriteMovies.Count(movie => movie.Rating?.AverageRating == rating)).ToList();
+        // }
+        
+        ratingsCount.Clear();
+
+
+        if (user.RatingDataPoints != null && user.RatingDataPoints.Any())
         {
-            totalMoviesReviewed = favoriteMovies.Count();
-            averageRating = favoriteMovies.Average(movie => movie.Rating?.AverageRating ?? 0);
-            ratingsCount = Enumerable.Range(1, 10).Select(rating => favoriteMovies.Count(movie => movie.Rating?.AverageRating == rating)).ToList();
+            totalMoviesReviewed = user.RatingDataPoints.Sum(r => r.Item2);
+            averageRating = user.RatingDataPoints.Sum(r => r.Item1 * r.Item2) / (double)totalMoviesReviewed;
+            
+            ratingsCount.AddRange(user.RatingDataPoints.OrderBy(r=> r.Item1).Select(r=>r.Item2));
         }
+        await InvokeAsync(StateHasChanged);
     }
 
 
