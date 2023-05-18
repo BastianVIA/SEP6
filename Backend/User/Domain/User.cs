@@ -15,8 +15,13 @@ public class User : Foundation.BaseDomain
 
     public User()
     {
-        FavoriteMovies = new List<string>();
-        Ratings = new List<UserRating>();
+    }
+    public User(string id, string displayName, string email)
+    {
+        Id = id;
+        DisplayName = displayName;
+        Email = email;
+        AddDomainEvent(new UserCreated(Id));
     }
 
     public bool HasAlreadyFavoritedMovie(string movieId)
@@ -94,6 +99,7 @@ public class User : Foundation.BaseDomain
         }
 
         FavoriteMovies.Add(movieId);
+        AddDomainEvent(new FavoritedMovie(Id, movieId));
     }
 
     public void RemoveRating(string movieId)

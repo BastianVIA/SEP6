@@ -3,6 +3,7 @@ using Backend.Database.TransactionManager;
 using Backend.Middleware;
 using Backend.Movie.Infrastructure;
 using Backend.Service;
+using Backend.SocialFeed.Infrastructure;
 using Backend.User.Infrastructure;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -68,6 +69,8 @@ builder.Services.AddScoped<IDatabaseTransactionFactory>(sp =>
 
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<ISocialUserRepository, SocialUserRepository>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 

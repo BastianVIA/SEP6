@@ -2,7 +2,24 @@
 
 namespace Backend.User.IntegrationEvents;
 
+public class UserCreatedIntegrationEvent : INotification
+{
+    public string UserId { get; }
+    public UserCreatedIntegrationEvent(string userId)
+    {
+        UserId = userId;
+    }
+}
 
+public class FavoritedMovieIntegrationEvent : INotification
+{
+    public string UserId { get; }
+    public string MovieId { get; }
+    public FavoritedMovieIntegrationEvent(string userId, string movieId)
+    {
+        UserId = userId;
+        MovieId = movieId;
+    }}
 public class CreatedRatingIntegrationEvent : INotification
 {
     public string UserId { get; }

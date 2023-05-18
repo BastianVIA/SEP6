@@ -3,6 +3,7 @@ using System;
 using Backend.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230518085850_addingSocialFeedToDb")]
+    partial class addingSocialFeedToDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -210,21 +213,6 @@ namespace Backend.Migrations
                     b.ToTable("Directors", (string)null);
                 });
 
-            modelBuilder.Entity("SocialUserFollowers", b =>
-                {
-                    b.Property<string>("FollowingId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FollowerId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("FollowingId", "FollowerId");
-
-                    b.HasIndex("FollowerId");
-
-                    b.ToTable("SocialUserFollowers");
-                });
-
             modelBuilder.Entity("Backend.Movie.Infrastructure.RatingDAO", b =>
                 {
                     b.HasOne("Backend.Movie.Infrastructure.MovieDAO", null)
@@ -297,21 +285,6 @@ namespace Backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SocialUserFollowers", b =>
-                {
-                    b.HasOne("Backend.SocialFeed.Infrastructure.SocialUserDAO", null)
-                        .WithMany()
-                        .HasForeignKey("FollowerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Backend.SocialFeed.Infrastructure.SocialUserDAO", null)
-                        .WithMany()
-                        .HasForeignKey("FollowingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Backend.Movie.Infrastructure.MovieDAO", b =>
                 {
                     b.Navigation("Rating");
@@ -319,7 +292,8 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.SocialFeed.Infrastructure.PostDAO", b =>
                 {
-                    b.Navigation("ActivityData");
+                    b.Navigation("ActivityData")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Backend.User.Infrastructure.UserDAO", b =>

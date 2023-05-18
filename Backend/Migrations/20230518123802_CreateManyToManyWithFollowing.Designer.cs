@@ -3,6 +3,7 @@ using System;
 using Backend.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230518123802_CreateManyToManyWithFollowing")]
+    partial class CreateManyToManyWithFollowing
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -319,7 +322,8 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.SocialFeed.Infrastructure.PostDAO", b =>
                 {
-                    b.Navigation("ActivityData");
+                    b.Navigation("ActivityData")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Backend.User.Infrastructure.UserDAO", b =>

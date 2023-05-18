@@ -23,7 +23,8 @@ public class CommandHandler : IRequestHandler<Command>
        await using var transaction = await _databaseTransactionFactory.BeginTransactionAsync();
        try
        {
-           await _repository.CreateUserAsync(request.userId, request.displayName, request.email, transaction);
+           var newUser = new Domain.User(request.userId, request.displayName, request.email);
+           await _repository.CreateUserAsync(newUser, transaction);
        }
        catch (Exception e)
        {
