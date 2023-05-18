@@ -92,6 +92,14 @@
                 <p>@movie.Resume</p>
             </Column>
         </Row>
+        <Row>
+            <AuthorizeView>
+                <Authorized>
+                    <Rating Color="Color.Primary" @onclick="@OnRatingChange" @bind-SelectedValue="UserRating" MaxValue="10"/>
+                </Authorized>
+            </AuthorizeView>
+        </Row>
+        
     </div>
 }
 else
@@ -106,15 +114,21 @@ else
 
     private Movie movie;
     private bool movieLoaded = false;
-
+    public int UserRating;
     protected override async Task OnInitializedAsync()
     {
         await LoadMovieDetails();
     }
 
+    private void OnRatingChange()
+    {
+        MovieDetailModel.SetMovieRating(FirebaseModel.CurrentUser!.TokenValue, MovieId, UserRating == 0 ? null : UserRating);
+    }
+
     private async Task LoadMovieDetails()
     {
         movie = await MovieDetailModel.GetMovieDetails(MovieId, FirebaseModel.CurrentUser?.TokenValue);
+        UserRating = movie?.UserRating ?? 0;
         movieLoaded = true;
     }
 
@@ -123,8 +137,8 @@ else
         try
         {
             movie.IsFavorite = !movie.IsFavorite;
-            await FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, MovieId);
-            await LoadMovieDetails();
+            await FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.CurrentUser!.TokenValue, MovieId);
+             await LoadMovieDetails();
         }
         catch (Exception e)
         {
@@ -137,5 +151,6 @@ else
     {
         return (movie.IsFavorite != null && movie.IsFavorite.Value);
     }
+}
 
 }

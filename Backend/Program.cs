@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using FirebaseAdmin.Auth;
+using MediatR;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -60,7 +61,9 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("WebApiDatabase")));
 var transactionSemaphore = new SemaphoreSlim(1, 1);
 
-builder.Services.AddScoped<IDatabaseTransactionFactory>(sp => new DatabaseTransactionFactory(sp.GetRequiredService<DataContext>(), transactionSemaphore));
+builder.Services.AddScoped<IDatabaseTransactionFactory>(sp =>
+    new DatabaseTransactionFactory(sp.GetRequiredService<DataContext>(), transactionSemaphore,
+        sp.GetRequiredService<IMediator>()));
 
 
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
@@ -90,7 +93,8 @@ builder.Services.AddSwaggerGenNewtonsoftSupport();
 var app = builder.Build();
 app.UseMiddleware<FirebaseTokenMiddleware>();
 
-LogManager.Setup().LoadConfiguration(builder => {
+LogManager.Setup().LoadConfiguration(builder =>
+{
     builder.ForLogger().FilterMinLevel(LogLevel.Info).WriteToConsole();
     builder.ForLogger().FilterMinLevel(LogLevel.Debug).WriteToFile(fileName: "log.txt");
 });
@@ -107,7 +111,7 @@ app.UseExceptionHandler(appError =>
         var exceptionFilter = context.RequestServices.GetRequiredService<GlobalExceptionFilter>();
 
         var actionContext = new ActionContext(context, context.GetRouteData(), new ControllerActionDescriptor());
-        var exceptionContext = new ExceptionContext(actionContext, new List<IFilterMetadata>{exceptionFilter})
+        var exceptionContext = new ExceptionContext(actionContext, new List<IFilterMetadata> { exceptionFilter })
         {
             Exception = exception
         };

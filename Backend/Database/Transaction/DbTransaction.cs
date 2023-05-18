@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore.Storage;
 using NLog;
 
 namespace Backend.Database.Transaction;
@@ -7,20 +8,27 @@ public class DbTransaction : DbReadOnlyTransaction, IAsyncDisposable
 {
     public IDbContextTransaction Transaction { get; set; }
     public bool Disposed;
+    private readonly IMediator _mediator;
+    private List<INotification> _domainEvents;
     private SemaphoreSlim _transactionSemaphore;
-    private bool commited;
-    
-    public DbTransaction(SemaphoreSlim transactionSemaphore, IDbContextTransaction transaction, DataContext dataContext) : base(dataContext)
+    private bool _hasBeenRolledBack;
+
+    public DbTransaction(SemaphoreSlim transactionSemaphore, IDbContextTransaction transaction, DataContext dataContext,
+        IMediator mediator) : base(dataContext)
     {
         _transactionSemaphore = transactionSemaphore;
         Transaction = transaction;
+        _mediator = mediator;
+        _domainEvents = new List<INotification>();
     }
+
     async Task CommitTransactionAsync()
     {
         if (Disposed)
         {
             return;
         }
+
         if (Transaction == null)
         {
             throw new ArgumentNullException(nameof(Transaction));
@@ -28,10 +36,10 @@ public class DbTransaction : DbReadOnlyTransaction, IAsyncDisposable
 
         try
         {
+            await pulishDomainEvents();
             await DataContext.SaveChangesAsync();
             await Transaction.CommitAsync();
-            commited = true;
-
+            LogManager.GetCurrentClassLogger().Info("Commited transaction");
         }
         catch
         {
@@ -42,24 +50,45 @@ public class DbTransaction : DbReadOnlyTransaction, IAsyncDisposable
 
     public async Task RollbackTransactionAsync()
     {
-        if (commited)
+        if (Disposed || _hasBeenRolledBack)
         {
             return;
         }
         await Transaction.RollbackAsync();
-        
+        LogManager.GetCurrentClassLogger().Info("Rolled back transaction");
+        _hasBeenRolledBack = true;
+    }
 
+    public void AddDomainEvents(List<INotification> domainEvents)
+    {
+        _domainEvents.AddRange(domainEvents);
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (!commited)
+        if (Disposed)
+        {
+            return;
+        }
+
+        if (!_hasBeenRolledBack)
         {
             await CommitTransactionAsync();
-
         }
+
         await Transaction.DisposeAsync();
+        Disposed = true;
         _transactionSemaphore.Release();
+    }
+
+    private async Task pulishDomainEvents()
+    {
+        var copiedEvents = _domainEvents.ToList();
+        _domainEvents.Clear();
+        foreach (var domainEvent in copiedEvents)
+        {
+            await _mediator.Publish(domainEvent);
+        }
         
     }
 }
