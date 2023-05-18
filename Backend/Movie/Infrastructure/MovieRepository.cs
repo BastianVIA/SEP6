@@ -125,27 +125,27 @@ public class MovieRepository : IMovieRepository
         };
     }
 
-    private Domain.Person ToDomain(PersonDAO personDao)
-    {
-        return new Person
-        {
-            Id = personDao.Id,
-            Name = personDao.Name,
-            BirthYear = personDao.BirthYear
-        };
-    }
+    // private Domain.Person ToDomain(PersonDAO personDao)
+    // {
+    //     return new Person
+    //     {
+    //         Id = personDao.Id,
+    //         Name = personDao.Name,
+    //         BirthYear = personDao.BirthYear
+    //     };
+    // }
 
-    private List<Domain.Person>? ToDomain(ICollection<PersonDAO>? personDaos)
+    private List<string>? ToDomain(ICollection<PersonDAO>? personDaos)
     {
         if (personDaos == null || personDaos.Count == 0)
         {
             return null;
         }
 
-        var listOfPersons = new List<Domain.Person>();
+        var listOfPersons = new List<string>();
         foreach (var personDao in personDaos)
         {
-            listOfPersons.Add(ToDomain(personDao));
+            listOfPersons.Add(personDao.Id);
         }
 
         return listOfPersons;

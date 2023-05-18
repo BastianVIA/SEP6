@@ -1,6 +1,7 @@
 ﻿using Backend.Database.TransactionManager;
 using Backend.Movie.Domain;
 using Backend.Movie.Infrastructure;
+using Backend.People.Application.GetPeopleFromId;
 using Backend.Service;
 using MediatR;
 
@@ -50,7 +51,7 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
     public async Task<MovieDetailsResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var movie = _repository.ReadMovieFromId(request.Id, transaction);
+        var movie = await _repository.ReadMovieFromId(request.Id, transaction);
         var pathForPoster = _imageService.GetPathForPoster(request.Id);
         var resume = _resumeService.GetResume(request.Id);
         var isFavorite = false;
@@ -60,10 +61,13 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
                 await _mediator.Send(new User.Application.GetIfMovieIsFavorite.Query(request.userId, request.Id));
         }
 
-        return new MovieDetailsResponse(ToDto(await movie, await pathForPoster, await resume, isFavorite));
+        var actors = await _mediator.Send(new People.Application.GetPeopleFromId.Query(movie.Actors));
+        var directors = await _mediator.Send(new People.Application.GetPeopleFromId.Query(movie.Directors));
+
+        return new MovieDetailsResponse(ToDto(movie, await pathForPoster, await resume, isFavorite, actors, directors));
     }
 
-    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? resume, bool isFavorite)
+    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? resume, bool isFavorite, PersonResponse actors, PersonResponse directors)
     {
         var dtoMovie = new MovieDetailsDto
         {
@@ -71,8 +75,8 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
             Title = movie.Title,
             ReleaseYear = movie.ReleaseYear,
             PathToPoster = pathToPoser,
-            Actors = ToPersonDto(movie.Actors),
-            Directors = ToPersonDto(movie.Directors),
+            Actors = ToPersonDto(actors),
+            Directors = ToPersonDto(directors),
             Resume = resume,
             IsFavorite = isFavorite
         };
@@ -85,17 +89,17 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
         return dtoMovie;
     }
 
-    private List<DetailsPersonsDto>? ToPersonDto(List<Person>? persons)
+    private List<DetailsPersonsDto>? ToPersonDto(PersonResponse persons)
     {
-        if (persons == null || persons.Count == 0)
+        if (persons.PersonDtos == null || persons.PersonDtos.Count == 0)
         {
             return null;
         }
 
         var listToReturn = new List<DetailsPersonsDto>();
-        foreach (var person in persons)
+        foreach (var person in persons.PersonDtos)
         {
-            listToReturn.Add(new DetailsPersonsDto(person.Id, person.Name, person.BirthYear));
+            listToReturn.Add(new DetailsPersonsDto(person.ID, person.Name, person.BirthYear));
         }
 
         return listToReturn;

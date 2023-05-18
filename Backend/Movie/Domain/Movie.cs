@@ -6,7 +6,7 @@ public class Movie
     public string Title { get; set; }
     public int ReleaseYear { get; set; }
     public Rating? Rating { get; set; }
-    public List<Person>? Actors { get; set; }
-    public List<Person>? Directors { get; set; }
+    public List<string>? Actors { get; set; }
+    public List<string>? Directors { get; set; }
     
 }

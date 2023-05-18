@@ -2,6 +2,7 @@ using Backend.Database;
 using Backend.Database.TransactionManager;
 using Backend.Middleware;
 using Backend.Movie.Infrastructure;
+using Backend.People.Infrastructure;
 using Backend.Service;
 using Backend.User.Infrastructure;
 using FirebaseAdmin;
@@ -65,6 +66,7 @@ builder.Services.AddScoped<IDatabaseTransactionFactory>(sp => new DatabaseTransa
 
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPeopleRepository, PeopleRepository>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
