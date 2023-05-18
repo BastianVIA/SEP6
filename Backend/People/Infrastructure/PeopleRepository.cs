@@ -6,7 +6,7 @@ namespace Backend.People.Infrastructure;
 
 public class PeopleRepository : IPeopleRepository
 {
-    private const int NumberOfResultsPerPage = 10;
+    private const int NumberOfResultsPerPage = 20;
     
     public async Task<List<Person>> SearchForPerson(string name, int requestPageNumber, DbReadOnlyTransaction tx)
     {

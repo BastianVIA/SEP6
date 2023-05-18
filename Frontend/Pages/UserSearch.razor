@@ -1,10 +1,11 @@
-﻿@page "/userSearch"
+﻿
 @using Frontend.Entities
 @using Frontend.Service
 @inject IUserSearchModel UserSearchModel
 @inject NavigationManager NavManager
 @using Blazorise
 @using Frontend.Model.UserSearch
+@using Blazorise.LottieAnimation
 
 <PageTitle>Search User</PageTitle>
 
@@ -40,7 +41,7 @@
 }
 else
 {
-    <LottieAnimation Path="/Animations/loadingAimation.json" Style="@(@"height: 200px")"/>
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
 }
 
 @code {
