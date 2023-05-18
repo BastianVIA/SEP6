@@ -30,18 +30,15 @@ public class UserRepository : IUserRepository
         return ToDomain(user);
     }
 
-    public async Task CreateUserAsync(string userId, string displayName, string email , DbTransaction tx)
+    public async Task CreateUserAsync(Domain.User user, DbTransaction tx)
     {
-
+        tx.AddDomainEvents(user.ReadAllDomainEvents());
         await tx.DataContext.Users.AddAsync(new UserDAO
         {
-            Id = userId,
-            DisplayName = displayName,
-            Email = email,
-            FavoriteMovies = new List<UserMovieDAO>(),
-            UserRatings = new List<UserRatingDAO>()
+            Id = user.Id,
+            DisplayName = user.DisplayName,
+            Email = user.Email
         });
-        await tx.DataContext.SaveChangesAsync();
     }
 
  
