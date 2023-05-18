@@ -37,7 +37,7 @@ namespace Frontend.Network.UserProfiles
                 Username = response.UserProfile.DisplayName,
                 Email = response.UserProfile.Email,
                 Bio = response.UserProfile.Bio,
-                AverageOfUserRatings = (decimal)response.UserProfile.AverageOfUserRatings
+                AverageOfUserRatings = response.UserProfile.AverageOfUserRatings
             };
 
             return user;

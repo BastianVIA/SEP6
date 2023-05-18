@@ -13,7 +13,7 @@ public class User
     public string ProfilePicture { get; set;}
     public List<Movie> FavoriteMovies { get; set; }
     
-    public decimal AverageOfUserRatings { get; set; }
+    public float AverageOfUserRatings { get; set; }
     
     
 }

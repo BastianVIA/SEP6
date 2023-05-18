@@ -1124,10 +1124,10 @@ namespace Frontend.Service
         public System.Collections.Generic.ICollection<Int32Int32ValueTuple> RatingsDataPoints { get; set; }
 
         [Newtonsoft.Json.JsonProperty("averageOfUserRatings", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double AverageOfUserRatings { get; set; }
+        public float AverageOfUserRatings { get; set; }
 
         [Newtonsoft.Json.JsonProperty("averageOfFavoriteMovies", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double AverageOfFavoriteMovies { get; set; }
+        public float AverageOfFavoriteMovies { get; set; }
 
     }
 

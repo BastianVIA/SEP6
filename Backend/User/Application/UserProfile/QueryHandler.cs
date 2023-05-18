@@ -19,8 +19,8 @@ public class UserProfileDto
     
     public List<string> FavoriteMovies { get; set; }
     public (int, int)[] RatingsDataPoints { get; set; }
-    public decimal AverageOfUserRatings { get; set; }
-    public decimal AverageOfFavoriteMovies { get; set; }
+    public float AverageOfUserRatings { get; set; }
+    public float AverageOfFavoriteMovies { get; set; }
 }
 
 public class UserRatingDto
@@ -48,12 +48,14 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
         
         var userRequested = await _repository.ReadUserFromIdAsync(request.userId, transaction, includeRatings: true, includeFavoriteMovies: true);
         userRequested.SetRatingAvg();
+        var moviesInfoResponse =await _mediator.Send(new Movie.Application.GetInfoFromMovies.Query(userRequested.FavoriteMovies));
+        var favoriteAvg = GetFavoritesAverage(moviesInfoResponse);
         var ratingDataPoints = GetRatingDataPoints(userRequested);
-        return new UserProfileResponse(toDto(userRequested, ratingDataPoints));
+        return new UserProfileResponse(toDto(userRequested, ratingDataPoints, favoriteAvg));
     }
     
 
-    private UserProfileDto toDto(Domain.User user, (int,int)[] ratingDataPoints)
+    private UserProfileDto toDto(Domain.User user, (int,int)[] ratingDataPoints, float favoriteAvg)
     {
         return new UserProfileDto
         {
@@ -62,8 +64,20 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
             Bio = user.Bio,
             FavoriteMovies = user.FavoriteMovies,
             RatingsDataPoints = ratingDataPoints,
-            AverageOfUserRatings = user.AverageOfUserRatings
+            AverageOfUserRatings = user.AverageOfUserRatings,
+            AverageOfFavoriteMovies = favoriteAvg
         };
+    }
+
+    private float GetFavoritesAverage(MoviesInfoResponse movieInfo)
+    {
+        var count = 0.0f;
+        foreach (var movie in movieInfo.MovieInfoDtos)
+        {
+            count += movie.Rating.AverageRating;
+        }
+
+        return count / movieInfo.MovieInfoDtos.Count;
     }
 
     private (int,int)[] GetRatingDataPoints(Domain.User user)
