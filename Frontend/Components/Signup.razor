@@ -112,6 +112,7 @@
 
         if (await FirebaseModel.CreateUser(user.DisplayName, user.Email, user.Password))
         {
+            Console.WriteLine(FirebaseModel.CurrentUser.TokenValue);
             await UserModel.CreateUser(FirebaseModel.CurrentUser.TokenValue, user.DisplayName, user.Email);
             AuthStateProvider.SignIn();
             await SignupSuccess.InvokeAsync(true);

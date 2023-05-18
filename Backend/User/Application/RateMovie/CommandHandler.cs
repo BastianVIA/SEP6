@@ -10,13 +10,11 @@ public record Command(string userId, string movieId, int? rating) : IRequest;
 public class CommandHandler : IRequestHandler<Command>
 {
     private readonly IUserRepository _repository;
-    private readonly IMediator _mediator;
     private readonly IDatabaseTransactionFactory _transactionFactory;
 
-    public CommandHandler(IUserRepository repository, IMediator mediator, IDatabaseTransactionFactory transactionFactory)
+    public CommandHandler(IUserRepository repository, IDatabaseTransactionFactory transactionFactory)
     {
         _repository = repository;
-        _mediator = mediator;
         _transactionFactory = transactionFactory;
     }
 
