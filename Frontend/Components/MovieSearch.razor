@@ -18,27 +18,7 @@
         {
             <p size="20px">No such movie exists.</p>
         }
-        <Table Hoverable Striped>
-            <TableHeader>
-                <TableRow>
-                    <TableHeaderCell>Poster</TableHeaderCell>
-                    <TableHeaderCell>Title</TableHeaderCell>
-                    <TableHeaderCell>Release Year <Button Color="Color.Secondary" Clicked="SortByReleaseYear"><Icon Name="@IconName.AngleDown"/></Button></TableHeaderCell>
-                    <TableHeaderCell>Rating <Button Color="Color.Secondary" Clicked="SortByRating"><Icon Name="@IconName.AngleDown"/></Button></TableHeaderCell>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                @foreach(Movie movie in movieList)
-                {
-                    <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
-                        <TableRowCell><img src="@movie.PosterUrl" height="200"/></TableRowCell>
-                        <TableRowCell>@movie.Title</TableRowCell>
-                        <TableRowCell>@movie.ReleaseYear</TableRowCell>
-                        <TableRowCell>@movie.Rating?.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/></TableRowCell>
-                    </TableRow> 
-                }
-            </TableBody>
-        </Table>
+        <MovieTable MovieList="@movieList" PosterSize="200" Sortable="true" OnSortByRating="@SortByRating" OnSortByReleaseYear="@SortByReleaseYear"/>
 
         <div class="page-navigation">
             <button class="btn btn-secondary" @onclick="@GoToPreviousPage">
@@ -64,7 +44,7 @@ else
 @code {
     [Parameter]
     public string MovieTitle { get; set; }
-    private IList<Movie> movieList = new List<Movie>();
+    private List<Movie> movieList = new();
     private string movieTitle { get; set; }
     private int pageNumber { get; set; }
     
@@ -76,7 +56,9 @@ else
 
     [Parameter]
     public string SearchTerm { get; set; } = string.Empty;
-    
+    private SortingDirection? ratingSortingDirection = SortingDirection.ASC;
+    private SortingDirection? releaseYearSortingDirection = SortingDirection.ASC;
+
 
     
     protected override async Task OnParametersSetAsync()
@@ -90,6 +72,14 @@ else
     {
         isDataFetched = false;
         movieList.Clear();
+        if (sortingKey == MovieSortingKey.Rating)
+        {
+            sortingDirection = ratingSortingDirection;
+        }
+        else if (sortingKey == MovieSortingKey.ReleaseYear)
+        {
+            sortingDirection = releaseYearSortingDirection;
+        }
         movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle, sortingKey, sortingDirection, pageNumber);
         isDataFetched = true;
     }
@@ -102,6 +92,7 @@ else
     private async Task SortByRating()
     {
         sortingKey = MovieSortingKey.Rating;
+        ratingSortingDirection = ratingSortingDirection == SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
         pageNumber = 1;
         await SearchForMovie();
     }
@@ -109,6 +100,7 @@ else
     private async Task SortByReleaseYear()
     {
         sortingKey = MovieSortingKey.ReleaseYear;
+        releaseYearSortingDirection = releaseYearSortingDirection == SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
         pageNumber = 1;
         await SearchForMovie();
     }

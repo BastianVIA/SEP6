@@ -10,6 +10,7 @@ using Frontend.Model.MovieSearch;
 using Frontend.Model.PersonSearch;
 using Frontend.Model.Recommendations;
 using Frontend.Model.SocialFeed;
+using Frontend.Model.Top100;
 using Frontend.Model.User;
 using Frontend.Model.UserProfiles;
 using Frontend.Model.UserSearch;
@@ -50,6 +51,7 @@ builder.Services.AddScoped<IRecommendationsModel, RecommendationsModel>();
 builder.Services.AddScoped<IActorModel, ActorModel>();
 builder.Services.AddScoped<ISocialFeedClient, SocialFeedClient>();
 builder.Services.AddScoped<ISocialFeedModel, SocialFeedModel>();
+builder.Services.AddScoped<ITop100Model, Top100Model>();
 
 builder.Services.AddScoped<IUserSearchClient, UserSearchClient>();
 builder.Services.AddScoped<IUserSearchModel, UserSearchModel>();
