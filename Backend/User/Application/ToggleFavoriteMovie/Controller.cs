@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Backend.Middleware;
+using Backend.User.Application.SetFavoriteMovie;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NLog;
 
-namespace Backend.User.Application.SetFavoriteMovie;
+namespace Backend.User.Application.ToggleFavoriteMovie;
 
 [ApiController]
 [Route("user")]

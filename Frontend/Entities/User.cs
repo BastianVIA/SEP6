@@ -10,7 +10,7 @@ public class User
     
     public List<UserRating> UserRatings { get; set; }
     
-    public string ProfilePicture { get; set;}
+    public string? ProfilePicture { get; set;}
     public List<Movie> FavoriteMovies { get; set; }
     
     public float AverageOfUserRatings { get; set; }
