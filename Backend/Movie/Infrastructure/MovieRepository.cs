@@ -190,16 +190,6 @@ public class MovieRepository : IMovieRepository
         };
     }
 
-    // private Domain.Person ToDomain(PersonDAO personDao)
-    // {
-    //     return new Person
-    //     {
-    //         Id = personDao.Id,
-    //         Name = personDao.Name,
-    //         BirthYear = personDao.BirthYear
-    //     };
-    // }
-
     private RatingDAO FromDomain(Domain.Rating rating, string movieId)
     {
         return new RatingDAO
