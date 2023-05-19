@@ -1,7 +1,7 @@
 ﻿namespace Frontend.Entities;
 
 [Serializable]
-public class Actor
+public class Person
 {
     public string ID { get; set; }
     
@@ -12,4 +12,5 @@ public class Actor
     public int? BirthYear { get; set; }
 
     public List<Movie> ActedInList { get; set; }
+    public List<Movie> DirectedList { get; set; }
 }
