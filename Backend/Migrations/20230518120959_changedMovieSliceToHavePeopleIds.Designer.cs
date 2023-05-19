@@ -3,6 +3,7 @@ using System;
 using Backend.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230518120959_changedMovieSliceToHavePeopleIds")]
+    partial class changedMovieSliceToHavePeopleIds
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -95,76 +98,9 @@ namespace Backend.Migrations
                     b.ToTable("PeopleMovieDAO");
                 });
 
-            modelBuilder.Entity("Backend.SocialFeed.Infrastructure.ActivityDAO", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("MovieId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("NewRating")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("OldRating")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("PostId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PostId")
-                        .IsUnique();
-
-                    b.ToTable("ActivityDAO");
-                });
-
-            modelBuilder.Entity("Backend.SocialFeed.Infrastructure.PostDAO", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("TimeOfActivity")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Topic")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Posts");
-                });
-
-            modelBuilder.Entity("Backend.SocialFeed.Infrastructure.SocialUserDAO", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SocialUsers");
-                });
-
             modelBuilder.Entity("Backend.User.Infrastructure.UserDAO", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Bio")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -185,24 +121,6 @@ namespace Backend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserMovieDAO");
-                });
-
-            modelBuilder.Entity("Backend.User.Infrastructure.UserRatingDAO", b =>
-                {
-                    b.Property<string>("MovieId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("NumberOfStars")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("MovieId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserRatingDAO");
                 });
 
             modelBuilder.Entity("MovieDAOPersonDAO", b =>
@@ -265,21 +183,6 @@ namespace Backend.Migrations
                     b.ToTable("DirectedMovies", (string)null);
                 });
 
-            modelBuilder.Entity("SocialUserFollowers", b =>
-                {
-                    b.Property<string>("FollowingId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FollowerId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("FollowingId", "FollowerId");
-
-                    b.HasIndex("FollowerId");
-
-                    b.ToTable("SocialUserFollowers");
-                });
-
             modelBuilder.Entity("Backend.Movie.Infrastructure.RatingDAO", b =>
                 {
                     b.HasOne("Backend.Movie.Infrastructure.MovieDAO", null)
@@ -289,32 +192,10 @@ namespace Backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Backend.SocialFeed.Infrastructure.ActivityDAO", b =>
-                {
-                    b.HasOne("Backend.SocialFeed.Infrastructure.PostDAO", "PostThisBelongsTo")
-                        .WithOne("ActivityData")
-                        .HasForeignKey("Backend.SocialFeed.Infrastructure.ActivityDAO", "PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PostThisBelongsTo");
-                });
-
             modelBuilder.Entity("Backend.User.Infrastructure.UserMovieDAO", b =>
                 {
                     b.HasOne("Backend.User.Infrastructure.UserDAO", "User")
                         .WithMany("FavoriteMovies")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Backend.User.Infrastructure.UserRatingDAO", b =>
-                {
-                    b.HasOne("Backend.User.Infrastructure.UserDAO", "User")
-                        .WithMany("UserRatings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -382,36 +263,14 @@ namespace Backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SocialUserFollowers", b =>
-                {
-                    b.HasOne("Backend.SocialFeed.Infrastructure.SocialUserDAO", null)
-                        .WithMany()
-                        .HasForeignKey("FollowerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Backend.SocialFeed.Infrastructure.SocialUserDAO", null)
-                        .WithMany()
-                        .HasForeignKey("FollowingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Backend.Movie.Infrastructure.MovieDAO", b =>
                 {
                     b.Navigation("Rating");
                 });
 
-            modelBuilder.Entity("Backend.SocialFeed.Infrastructure.PostDAO", b =>
-                {
-                    b.Navigation("ActivityData");
-                });
-
             modelBuilder.Entity("Backend.User.Infrastructure.UserDAO", b =>
                 {
                     b.Navigation("FavoriteMovies");
-
-                    b.Navigation("UserRatings");
                 });
 #pragma warning restore 612, 618
         }

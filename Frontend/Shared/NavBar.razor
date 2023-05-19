@@ -36,29 +36,7 @@
                 <BarItem>
                     <Addons>
                         <Addon AddonType="AddonType.Body">
-                            <TextEdit @bind-Text="@searchTerm" Placeholder="Search term"/>
-                        </Addon>
-
-                        <Addon AddonType="AddonType.Body">
-                            
-                            
-                         <Dropdown>
-                             <DropdownToggle Color="Color.Primary" TextWeight="TextWeight.Bold">
-                                 @if (searchOptionName != null && !string.IsNullOrEmpty(searchOptionName))
-                                 {
-                                     @searchOptionName
-                                 }
-                                 else
-                                 {
-                                     <span>Search Options</span>
-                                 }
-                             </DropdownToggle>
-                             <DropdownMenu>
-                              <DropdownItem Clicked="@(async () =>  ToggleDropdown(true))">Search User</DropdownItem>
-                                 <DropdownItem Clicked="@(async () =>  ToggleDropdown(false))">Search Movie</DropdownItem>
-                                 </DropdownMenu>
-                         </Dropdown>
-
+                            <TextEdit @bind-Text="@searchTerm" Placeholder="Search"/>
                         </Addon>
                         <Addon AddonType="AddonType.End">
                             <Button Color="Color.Primary" Clicked="PerformSearch">
@@ -94,43 +72,20 @@
 </div>
 
 @code {
-    private string movieTitle;
     private string displayName;
-    private string searchOptionName;
     private string searchTerm;
     private bool searchUsers = false;
-
-    private void SearchForMovie()
-    {
-        if (movieTitle == null) return;
-        NavManager.NavigateTo($"searchResult/{movieTitle}");
-    }
 
     protected override void OnInitialized()
     {
         FirebaseModel.OnNotifyAlert += SetDisplayName;
-        searchOptionName = "Search Movie";
-
-        
     }
-    
-    
+
+
     private void PerformSearch()
     {
         if (searchTerm == null) return;
-
-        if (searchUsers)
-        {
-            searchOptionName = "Search User";
-            NavManager.NavigateTo($"userSearch/{searchTerm}");
-        }
-        else
-        {
-            searchOptionName = "Search Movie";
-            NavManager.NavigateTo($"searchResult/{searchTerm}");
-        }
-
-        StateHasChanged();
+        NavManager.NavigateTo($"SearchResult/{searchTerm}");
     }
 
     private void SetDisplayName(object? sender, AlertEventArgs args)
@@ -142,28 +97,6 @@
         StateHasChanged();
     }
 
-
-    private void ToggleSearchUsers(bool isSearchUsers)
-    {
-        searchUsers = isSearchUsers;
-    }
-    
-    private async void ToggleDropdown(bool searchUsers)
-    {
-        this.searchUsers = searchUsers;
-
-        if (searchUsers)
-        {
-            searchOptionName = "Search User";
-        }
-        else
-        {
-            searchOptionName = "Search Movie";
-        }
-
-        StateHasChanged();
-    }
-    
     public void Dispose()
     {
         FirebaseModel.OnNotifyAlert -= SetDisplayName;

@@ -1,4 +1,5 @@
 ﻿using Backend.Movie.Infrastructure;
+using Backend.People.Infrastructure;
 using Backend.SocialFeed.Infrastructure;
 using Backend.User.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ public class DataContext : DbContext
     public DbSet<RatingDAO> Ratings { get; set; }   
     public DbSet<PersonDAO> Persons { get; set; }   
     public DbSet<UserDAO> Users { get; set; }
+    public DbSet<PeopleDAO> People { get; set; }
     
     public DbSet<PostDAO> Posts { get; set; }
     
@@ -61,6 +63,19 @@ public class DataContext : DbContext
             .WithMany(u => u.UserRatings)
             .HasForeignKey(ur => ur.UserId);
 
+
+        modelBuilder.Entity<PeopleMovieDAO>()
+            .HasKey(dao => dao.MovieId);
+
+        modelBuilder.Entity<PeopleMovieDAO>()
+            .HasMany(pm => pm.Actors)
+            .WithMany(p => p.ActedMovies)
+            .UsingEntity(t => t.ToTable("ActedMovies"));
+        
+        modelBuilder.Entity<PeopleMovieDAO>()
+            .HasMany(pm => pm.Directors)
+            .WithMany(p => p.DirectedMovies)
+            .UsingEntity(t => t.ToTable("DirectedMovies"));
         modelBuilder.Entity<PostDAO>()
             .HasKey(p => p.Id);
         

@@ -12,10 +12,8 @@ public class UserSearchModel:IUserSearchModel
         _client = client;
     }
     
-
-    public async Task<IList<Entities.User>> SearchForUserAsync(string username, string sortingAlphabet, SortingDirection? sortingDirection = null,
-        int? pageNumber = null)
+    public async Task<IList<Entities.User>> SearchForUserAsync(string username, int? pageNumber = null)
     {
-        return await _client.SearchForUserAsync(username, sortingAlphabet, sortingDirection, pageNumber);
+        return await _client.SearchForUserAsync(username, pageNumber);
     }
 }

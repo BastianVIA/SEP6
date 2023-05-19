@@ -5,9 +5,7 @@ namespace Frontend.Network.UserSearch;
 
 public class UserSearchClient:IUserSearchClient
 {
-    public async Task<List<Entities.User>> SearchForUserAsync(string username, string sortingAlphabet,
-        SortingDirection? sortingDirection = null,
-        int? pageNumber = null)
+    public async Task<List<Entities.User>> SearchForUserAsync(string username, int? pageNumber = null)
     {
         // var response = await _api.SearchAsync(username,sortingAlphabet, sortingDirection, pageNumber);
         // List<Entities.User> users = new List<Entities.User>();

@@ -1,0 +1,42 @@
+﻿/*.page-content{*/
+/*    width: 100%;*/
+/*    margin: 0 auto;*/
+/*}*/
+
+/*@media (max-width: 641px) {*/
+/*    .page-content{*/
+/*        width: 100%;*/
+/*    }*/
+/*}*/
+
+/*@media (min-width: 2000px) {*/
+/*    .page-content{*/
+/*        width: 50%;*/
+/*    }*/
+/*}*/
+
+.page-navigation {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    padding-left: 0px;
+}
+
+.page-navigation .btn {
+    height: 29px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.page-navigation .page-number{
+    height: 29px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.page-number p{
+    text-align: center;
+}
+
