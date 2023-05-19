@@ -18,7 +18,7 @@
         {
             <p size="20px">No such movie exists.</p>
         }
-        <MovieTable MovieList="@movieList" PosterSize="200" Sortable="true" OnSortByRating="@SortByRating" OnSortByReleaseYear="@SortByReleaseYear"/>
+        <MovieTable MovieList="@movieList" PosterSize="200" Sortable="true" OnSortByRating="@SortByRating" OnSortByReleaseYear="@SortByReleaseYear" OnMovieClicked="@OnMovieClick"/>
 
         <div class="page-navigation">
             <button class="btn btn-secondary" @onclick="@GoToPreviousPage">
