@@ -22,25 +22,28 @@ public record MovieTop100RatingDto(float AverageRating, int Votes);
 
 public class QueryHandler : IRequestHandler<Query, MovieTop100Response>
 {
-    private const int MinVotesBeforeTop100 = 500000;
-
     private readonly IMovieRepository _repository;
     private readonly IImageService _imageService;
     private readonly IDatabaseTransactionFactory _transactionFactory;
 
-    public QueryHandler(IMovieRepository repository, IImageService imageService,
+    private int MinVotesForQuery;
+
+    public QueryHandler(IConfiguration configuration, IMovieRepository repository, IImageService imageService,
         IDatabaseTransactionFactory transactionFactory)
     {
         _repository = repository;
         _imageService = imageService;
         _transactionFactory = transactionFactory;
+        MinVotesForQuery = configuration.GetSection("QueryConstants").GetValue<int>("MinVotes");
     }
 
 
     public async Task<MovieTop100Response> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _transactionFactory.BeginReadOnlyTransaction();
-        var movies = await _repository.GetTop100Movies(MinVotesBeforeTop100, transaction);
+        var movies = await _repository.GetTop100Movies(
+            MinVotesForQuery, 
+            transaction);
 
         var dtoMovies = new List<MovieTop100Dto>();
         foreach (var domainMovie in movies)
