@@ -21,19 +21,21 @@
             <TableHeader>
                 <TableRow>
                     <TableHeaderCell>Profile Picture</TableHeaderCell>
-                    <TableHeaderCell>Username</TableHeaderCell>
-                    <TableHeaderCell>Number Rated Movies</TableHeaderCell>
                     <TableHeaderCell>
-                        Number of Movies Voted
-                        <Button Color="Color.Secondary" Clicked="SortByNumberOfVotedMovies">
-                            <Icon Name="@IconName.AngleDown"/>
-                        </Button>
+                        <div>
+                            Username
+                            <Button Color="Color.Secondary" Clicked="SortByDisplayName">
+                                <Icon Name="@IconName.AngleDown"/>
+                            </Button>
+                        </div>
                     </TableHeaderCell>
                     <TableHeaderCell>
-                        Username
-                        <Button Color="Color.Secondary" Clicked="SortByDisplayName">
-                            <Icon Name="@IconName.AngleDown"/>
-                        </Button>
+                        <div>
+                            Number Rated Movies
+                            <Button Color="Color.Secondary" Clicked="SortByNumberOfVotedMovies">
+                                <Icon Name="@IconName.AngleDown"/>
+                            </Button>
+                        </div>
                     </TableHeaderCell>
                 </TableRow>
             </TableHeader>
