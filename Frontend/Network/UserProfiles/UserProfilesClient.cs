@@ -39,11 +39,32 @@ namespace Frontend.Network.UserProfiles
                 Bio = response.UserProfile.Bio,
                 AverageOfUserRatings = response.UserProfile.AverageOfUserRatings,
                 RatingDataPoints = response.UserProfile.RatingsDataPoints
-                
             };
-            
+
             return user;
-            
+        }
+
+        public async Task UpdateUserProfile(Entities.User user)
+        {
+            //     var request = new UserProfileUpdateRequest
+            //     {
+            //         UserId = user.Id,
+            //         DisplayName = user.Username,
+            //         Email = user.Email,
+            //         Bio = user.Bio,
+
+            //     };
+            //
+            //     try
+            //     {
+            //         await _api.UserPUTAsync(request);
+            //     }
+            //     catch (Exception e)
+            //     {
+            //         Console.WriteLine(e);
+            //         throw;
+            //     }
+            //
         }
     }
 }

@@ -20,4 +20,8 @@ public class User
     public ICollection<Int32Int32ValueTuple> RatingDataPoints { get; set; }
     
     
+    public DateTime? LastLogin { get; set; }
+
+    
+    
 }

@@ -32,4 +32,7 @@
  .movie-container ul li:last-child {
      border-bottom: none;
  }
- 
+
+* {
+    cursor: pointer;
+}

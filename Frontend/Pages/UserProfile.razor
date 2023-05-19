@@ -1,4 +1,312 @@
-﻿@page "/userprofile"
+﻿@* @page "/userprofile" *@
+@* @using Frontend.Model.MovieDetail *@
+@* @using Frontend.Model.FavoriteMovies *@
+@* @using Frontend.Model.UserProfiles *@
+@* @using Frontend.Entities *@
+@* @using Frontend.Model.Firebase *@
+@* @inject IUserProfilesModel UserProfilesModel *@
+@* @inject IFavoriteMoviesModel FavoriteMoviesModel *@
+@* @inject NavigationManager NavManager *@
+@* @inject IMovieDetailModel MovieDetailModel *@
+@* @inject IFirebaseModel FirebaseModel *@
+@* @using Blazorise.Charts *@
+@* *@
+@* <div class="user-profile"> *@
+@*     @if (user == null) *@
+@*     { *@
+@*         <p> *@
+@*             <em>Loading...</em> *@
+@*         </p> *@
+@*     } *@
+@*     else *@
+@*     { *@
+@*         <div class="user-profile__header"> *@
+@*             <div class="user-profile__image"> *@
+@*                 <img src="@user.ProfilePicture" alt="Profile Picture"/> *@
+@*                 <input type="file" @onchange="UpdateProfilePicture"/> *@
+@*             </div> *@
+@*             <div class="user-profile__info"> *@
+@*                 <h4>@user.Username</h4> *@
+@*                 <p>@user.Email</p> *@
+@*                 <p>@user.Bio</p> *@
+@*             </div> *@
+@*         </div> *@
+@*          *@
+@*         @if (user.LastLogin.HasValue) *@
+@*         { *@
+@*             <p>Last login: @user.LastLogin.Value.ToString("g")</p> *@
+@*         } *@
+@* *@
+@*         <h5>Favorite Movies</h5> *@
+@*         @if (favoriteMovies != null && favoriteMovies.Any()) *@
+@*         { *@
+@*             <div class="user-profile__favorites"> *@
+@*                 @foreach (var movie in favoriteMovies) *@
+@*                 { *@
+@*                     <div class="user-profile__favorites__item"> *@
+@*                         <TableRow @onclick="@(() => OnMovieClick(movie.Id))"> *@
+@*                             <TableRowCell> *@
+@*                                 <img src="@movie.PosterUrl" height="30px"/> *@
+@*                             </TableRowCell> *@
+@*                         </TableRow> *@
+@*                         <p>@movie.Title</p> *@
+@*                     </div> *@
+@*                 } *@
+@*             </div> *@
+@*         } *@
+@*         else *@
+@*         { *@
+@*             <p>No favorite movies yet.</p> *@
+@*         } *@
+@*     } *@
+@*     <h5>Total Movies Reviewed: @totalMoviesReviewed</h5> *@
+@* *@
+@*     <div class="row"> *@
+@*         <div class="col-md-6"> *@
+@*             <p>User's Average Rating on Movies: @averageRating</p> *@
+@*             <div style="position: relative; width: 200px; height: 250px;"> *@
+@*                 <PieChart @ref="pieChart" TItem="double"> *@
+@*                     <ChartOptions Responsive="true" Title="User's Average Rating On Movies"> *@
+@*                         <ChartTitle Display="true" Text="User's Average Rating On Movies"/> *@
+@*                     </ChartOptions> *@
+@*                     <PieChartDataset TItem="double" Data="@pieChartData" BackgroundColor="@backgroundColors"/> *@
+@*                     <ChartLabels Labels="@chartLabels"/> *@
+@*                 </PieChart> *@
+@*                 <div style="position: absolute; top:25%; left: 50%; transform: translate(-50%, -50%); color: #000;"> *@
+@*                     @averageRating.ToString("0.0")  *@
+@*                 </div> *@
+@*             </div> *@
+@*         </div> *@
+@*      *@
+@*         <div class="col-md-6"> *@
+@*             <p>Favorited Movies Average: @averageRatingFavMovies.ToString("0.00")</p> *@
+@*             <div style="position: relative; width: 200px; height: 250px;"> *@
+@*                 <PieChart @ref="favMoviesPieChart" TItem="double"> *@
+@*                     <ChartOptions Responsive="true" Title="User's Average Rating On Favorited Movies"> *@
+@*                         <ChartTitle Display="true" Text="User's Average Rating On Favorited Movies"/> *@
+@*                     </ChartOptions> *@
+@*                     <PieChartDataset TItem="double" Data="@favMoviesPieChartData" BackgroundColor="@backgroundColors"/> *@
+@*                     <ChartLabels Labels="@chartLabels"/> *@
+@*                 </PieChart> *@
+@*                 <div style="position: absolute; top: 25%; left: 50%; transform: translate(-50%, -50%); color: #000;"> *@
+@*                     @averageRatingFavMovies.ToString("0.0") *@
+@*                 </div> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+@* *@
+@* *@
+@*     $1$ <p>User's Average Rating on Movies: @averageRating</p> #1# *@
+@*     $1$ <p>Favorited Movies average: @favoritedMoviesAverage</p> #1# *@
+@*     $1$ #1# *@
+@*     $1$ <div style="position: relative; width: 20%; height: 20%;"> #1# *@
+@*     $1$     <PieChart @ref="pieChart" TItem="double"> #1# *@
+@*     $1$         <ChartOptions Responsive="true" Title="User's Average Rating On Movies"> #1# *@
+@*     $1$             <ChartTitle Display="true" Text="User's Average Rating On Movies"/> #1# *@
+@*     $1$         </ChartOptions> #1# *@
+@*     $1$         <PieChartDataset TItem="double" Data="@pieChartData" BackgroundColor="@backgroundColors"/> #1# *@
+@*     $1$         <ChartLabels Labels="@chartLabels"/> #1# *@
+@*     $1$     </PieChart> #1# *@
+@*     $1$     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #000;"> #1# *@
+@*     $1$         @averageRating.ToString("0.0") <!-- Display the average rating --> #1# *@
+@*     $1$     </div> #1# *@
+@*     $1$ </div> #1# *@
+@*     $1$ #1# *@
+@*     $1$ <div style="position: relative; width: 20%; height: 20%;"> #1# *@
+@*     $1$     <PieChart @ref="favMoviesPieChart" TItem="double"> #1# *@
+@*     $1$         <ChartOptions Responsive="true" Title="User's Average Rating On Favorited Movies"> #1# *@
+@*     $1$             <ChartTitle Display="true" Text="User's Average Rating On Favorited Movies"/> #1# *@
+@*     $1$         </ChartOptions> #1# *@
+@*     $1$         <PieChartDataset TItem="double" Data="@favMoviesPieChartData" BackgroundColor="@backgroundColors"/> #1# *@
+@*     $1$         <ChartLabels Labels="@chartLabels"/> #1# *@
+@*     $1$     </PieChart> #1# *@
+@*     $1$     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #000;"> #1# *@
+@*     $1$         @averageRatingFavMovies.ToString("0.0") <!-- Display the average rating --> #1# *@
+@*     $1$     </div> #1# *@
+@*     $1$ </div> #1# *@
+@* *@
+@*     <h5>Users Assessment summary on Movies</h5> *@
+@* *@
+@*     <div style="width: 90%; height: 33%;"> *@
+@*         <BarChart @ref="barChart" TItem="double"> *@
+@*             <ChartOptions Responsive="true" Title="Movie Ratings"/> *@
+@*             <BarChartDataset TItem="double" Data="@ratingsCount" BackgroundColor="backgroundColors"/> *@
+@*             <ChartLabels Labels="@Labels"/> *@
+@*         </BarChart> *@
+@*     </div> *@
+@* *@
+@* *@
+@* </div> *@
+@* *@
+@* *@
+@* @code { *@
+@*     BarChart<double> barChart; *@
+@*     PieChart<double> pieChart; *@
+@*     List<double> pieChartData = new List<double> { 10.0, 20.0, 30.0, 40.0, 50.0 }; *@
+@* *@
+@* *@
+@*     List<string> chartLabels = new List<string>(); *@
+@* *@
+@*     private User user; *@
+@*     private IList<Movie> favoriteMovies; *@
+@*     private double averageRating; *@
+@*     private int totalMoviesReviewed; *@
+@*     private double averageRatingFavMovies; *@
+@*     PieChart<double> favMoviesPieChart; *@
+@*     List<double> favMoviesPieChartData = new List<double> { 10.0, 20.0, 30.0, 40.0, 50.0 }; *@
+@* *@
+@* *@
+@*     protected override async Task OnAfterRenderAsync(bool firstRender) *@
+@*     { *@
+@*         if (firstRender) *@
+@*         { *@
+@*             await HandleRedraw(); *@
+@*         } *@
+@*     } *@
+@* *@
+@*     protected override async Task OnInitializedAsync() *@
+@*     { *@
+@*         user = await UserProfilesModel.GetUserProfile(FirebaseModel.CurrentUser.UID); *@
+@*         favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID); *@
+@*         ratingsCount = new List<double>(); *@
+@* *@
+@*         if (favoriteMovies != null && favoriteMovies.Any()) *@
+@*         { *@
+@*             averageRatingFavMovies = favoriteMovies.Average(movie => movie.Rating?.AverageRating ?? 0); *@
+@*         } *@
+@* *@
+@*         if (user.RatingDataPoints != null && user.RatingDataPoints.Any()) *@
+@*         { *@
+@*             totalMoviesReviewed = user.RatingDataPoints.Sum(r => r.Item2); *@
+@*             averageRating = user.RatingDataPoints.Sum(r => r.Item1 * r.Item2) / (double)totalMoviesReviewed; *@
+@* *@
+@*             double averageRatingFavMoviesPercentage = averageRatingFavMovies * 10.0; // as averageRating is out of 10 *@
+@*             double restOfFavMoviesPie = 100.0 - averageRatingFavMoviesPercentage; *@
+@* *@
+@*             favMoviesPieChartData = new List<double> { averageRatingFavMoviesPercentage, restOfFavMoviesPie }; *@
+@* *@
+@*              *@
+@*             chartLabels.Add($"User's Average Rating On Movies: {averageRating * 10}%"); *@
+@*             chartLabels.Add(""); *@
+@*             double averageRatingPercentage = averageRating * 10.0; // as averageRating is out of 10 *@
+@*             double restOfPie = 100.0 - averageRatingPercentage; *@
+@* *@
+@*             pieChartData = new List<double> { averageRatingPercentage, restOfPie }; *@
+@* *@
+@*             ratingsCount.AddRange(user.RatingDataPoints.OrderBy(r => r.Item1).Select(r => (double)r.Item2)); *@
+@* *@
+@*             await HandleRedraw(); *@
+@*         } *@
+@* *@
+@*         await InvokeAsync(StateHasChanged); *@
+@*     } *@
+@* *@
+@* *@
+@*     private async Task UpdateProfilePicture(ChangeEventArgs e) *@
+@*     { *@
+@*         var file = e.Value as IBrowserFile; *@
+@* *@
+@*         if (file != null) *@
+@*         { *@
+@*     //TODO logic to upload *@
+@*         } *@
+@*     } *@
+@* *@
+@*     public async Task Login(User user) *@
+@*     { *@
+@* *@
+@*         // user.LastLogin = DateTime.UtcNow; *@
+@*         // await SaveUser(user);  *@
+@*         //TODO show last login of user ( should be stored in database)  *@
+@*     } *@
+@* *@
+@*     async Task HandleRedraw() *@
+@*     { *@
+@*         await barChart.Clear(); *@
+@* *@
+@*         await barChart.AddLabelsDatasetsAndUpdate(Labels, GetBarChartDataset(), GetAverageLineDataset()); *@
+@* *@
+@*         await pieChart.Clear(); *@
+@*         var pieChartDataset = new PieChartDataset<double> *@
+@*         { *@
+@*             Data = new List<double> { averageRating, 10 - averageRating }, *@
+@*             BackgroundColor = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), "rgba(0, 0, 0, 0)" }, // make the second segment transparent *@
+@*             BorderColor = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), "rgba(0, 0, 0, 0)" }, *@
+@*             BorderWidth = 1 *@
+@*         }; *@
+@*         await pieChart.AddDataSet(pieChartDataset); *@
+@*         await pieChart.Update(); *@
+@*          *@
+@*         await favMoviesPieChart.Clear(); *@
+@*         var favMoviesPieChartDataset = new PieChartDataset<double> *@
+@*         { *@
+@*             Data = new List<double> { averageRatingFavMovies, 10 - averageRatingFavMovies }, *@
+@*             BackgroundColor = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), "rgba(0, 0, 0, 0)" }, // make the second segment transparent *@
+@*             BorderColor = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), "rgba(0, 0, 0, 0)" }, *@
+@*             BorderWidth = 1 *@
+@*         }; *@
+@*         await favMoviesPieChart.AddDataSet(favMoviesPieChartDataset); *@
+@*         await favMoviesPieChart.Update(); *@
+@*     } *@
+@* *@
+@*     private BarChartDataset<double> GetAverageLineDataset() *@
+@*     { *@
+@*         return new BarChartDataset<double> *@
+@*         { *@
+@*             Label = "Average Rating", *@
+@*             Data = Enumerable.Repeat(averageRating, Labels.Count).ToList(), *@
+@*             BorderColor = new List<string> { "rgba(0, 0, 0, 1)" }, *@
+@*             BorderWidth = 2, *@
+@*             Type = "line", *@
+@*         }; *@
+@*     } *@
+@* *@
+@*     private BarChartDataset<double> GetBarChartDataset() *@
+@*     { *@
+@*         return new BarChartDataset *@
+@*             <double> *@
+@*         { *@
+@*             Label = "Movie Ratings", *@
+@*             Data = ratingsCount, *@
+@*             BackgroundColor = backgroundColors, *@
+@*             BorderColor = borderColors, *@
+@*             BorderWidth = 1 *@
+@*         }; *@
+@*     } *@
+@* *@
+@*     List *@
+@*         <double> ratingsCount = new List *@
+@*             <double> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }; *@
+@* *@
+@*     List *@
+@*         <string> backgroundColors = new List *@
+@*             <string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) }; *@
+@* *@
+@*     List *@
+@*         <string> borderColors = new List *@
+@*             <string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) }; *@
+@* *@
+@*     List<string> Labels = new List<string> { "One Star", "Two Stars", "Three Stars", "Four Stars", "Five Stars", "Six Stars", "Seven Stars", "Eight Stars", "Nine Stars", "Ten Stars" }; *@
+@* *@
+@* *@
+@*     Task OnClicked(ChartMouseEventArgs e) *@
+@*     { *@
+@*         var model = e.Model as BarChartModel; *@
+@* *@
+@*         Console.WriteLine($"Handling event for {nameof(BarChartModel)}: x:{model.X} y:{model.Y}"); *@
+@*         return Task.CompletedTask; *@
+@*     } *@
+@* *@
+@* *@
+@*     private void OnMovieClick(string movieId) *@
+@*     { *@
+@*         NavManager.NavigateTo($"movieDetails/{movieId}"); *@
+@*     } *@
+@* *@
+@* } *@
+
+
+@page "/userprofile"
 @using Frontend.Model.MovieDetail
 @using Frontend.Model.FavoriteMovies
 @using Frontend.Model.UserProfiles
@@ -15,22 +323,33 @@
     @if (user == null)
     {
         <p>
-            <em>Loading...</em>
+            <LottieAnimation Path="/Animations/loadingAimation.json" Style="@(@"height: 200px")"/>
+
         </p>
     }
     else
     {
         <div class="user-profile__header">
-            <div class="user-profile__image">
-                <img src="@user.ProfilePicture" alt="Profile Picture"/>
-                <input type="file" @onchange="UpdateProfilePicture"/>
-            </div>
+           <div class="user-profile__image">
+               <img src="@(!string.IsNullOrEmpty(user.ProfilePicture) ? user.ProfilePicture : defaultProfilePicture)" alt="Profile Picture" />
+           </div>
+       
+<div class="upload-button">
+    <input type="file" @onchange="UpdateProfilePicture" accept="image/*" />
+</div>
+            
             <div class="user-profile__info">
                 <h4>@user.Username</h4>
                 <p>@user.Email</p>
                 <p>@user.Bio</p>
             </div>
         </div>
+
+
+        @if (user.LastLogin.HasValue)
+        {
+            <p>Last login: @user.LastLogin.Value.ToString("g")</p>
+        }
 
         <h5>Favorite Movies</h5>
         @if (favoriteMovies != null && favoriteMovies.Any())
@@ -39,11 +358,11 @@
                 @foreach (var movie in favoriteMovies)
                 {
                     <div class="user-profile__favorites__item">
-                           <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
-                           <TableRowCell>
-                               <img src="@movie.PosterUrl" height="30px"/>
-                           </TableRowCell>
-                           </TableRow>
+                        <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
+                            <TableRowCell>
+                                <img src="@movie.PosterUrl" height="30px"/>
+                            </TableRowCell>
+                        </TableRow>
                         <p>@movie.Title</p>
                     </div>
                 }
@@ -53,32 +372,75 @@
         {
             <p>No favorite movies yet.</p>
         }
-
-        <p>User's Average Rating on Movies: @averageRating</p>
-
-        <h5>Total Movies Reviewed: @totalMoviesReviewed</h5>
-
     }
+    <h5>Total Movies Reviewed: @totalMoviesReviewed</h5>
 
-     <div style="width: 90%; height: 33%;">
-                    <BarChart @ref="barChart" TItem="int">
-                        <ChartOptions Responsive="true" Title="Movie Ratings"/>
-                        <BarChartDataset TItem="int" Data="new ChartData<int> { Data = ratingsCount }" BackgroundColor="backgroundColors"/>
-                        <ChartLabels Labels="@Labels"/>
-                    </BarChart>
+    <div class="row">
+        <div class="col-md-6">
+            <p>User's Average Rating on Movies: @averageRating</p>
+            <div style="position: relative; width: 200px; height: 250px;">
+                <PieChart @ref="pieChart" TItem="double">
+                    <ChartOptions Responsive="true" Title="User's Average Rating On Movies">
+                        <ChartTitle Display="true" Text="User's Average Rating On Movies"/>
+                    </ChartOptions>
+                    <PieChartDataset TItem="double" Data="@pieChartData" BackgroundColor="@backgroundColors"/>
+                    <ChartLabels Labels="@chartLabels"/>
+                </PieChart>
+                <div style="position: absolute; top:25%; left: 50%; transform: translate(-50%, -50%); color: #000;">
+                    @averageRating.ToString("0.0")
                 </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <p>Favorited Movies Average: @averageRatingFavMovies.ToString("0.00")</p>
+            <div style="position: relative; width: 200px; height: 250px;">
+                <PieChart @ref="favMoviesPieChart" TItem="double">
+                    <ChartOptions Responsive="true" Title="User's Average Rating On Favorited Movies">
+                        <ChartTitle Display="true" Text="User's Average Rating On Favorited Movies"/>
+                    </ChartOptions>
+                    <PieChartDataset TItem="double" Data="@favMoviesPieChartData" BackgroundColor="@backgroundColors"/>
+                    <ChartLabels Labels="@chartLabels"/>
+                </PieChart>
+                <div style="position: absolute; top: 25%; left: 50%; transform: translate(-50%, -50%); color: #000;">
+                    @averageRatingFavMovies.ToString("0.0")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h5>Users Assessment summary on Movies</h5>
+
+    <div style="width: 90%; height: 33%;">
+        <BarChart @ref="barChart" TItem="double">
+            <ChartOptions Responsive="true" Title="Movie Ratings"/>
+            <BarChartDataset TItem="double" Data="@ratingsCount" BackgroundColor="backgroundColors"/>
+            <ChartLabels Labels="@Labels"/>
+        </BarChart>
+    </div>
+
 
 </div>
 
 
-
-
 @code {
-    BarChart<int> barChart;
+    BarChart<double> barChart;
+    PieChart<double> pieChart;
+    List<double> pieChartData = new List<double> { 10.0, 20.0, 30.0, 40.0, 50.0 };
+
+    private string defaultProfilePicture = "/Images/NotFoundImage.jpg";
+
+
+    List<string> chartLabels = new List<string>();
+
     private User user;
     private IList<Movie> favoriteMovies;
     private double averageRating;
     private int totalMoviesReviewed;
+    private double averageRatingFavMovies;
+    PieChart<double> favMoviesPieChart;
+    List<double> favMoviesPieChartData = new List<double> { 10.0, 20.0, 30.0, 40.0, 50.0 };
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -92,52 +454,92 @@
     {
         user = await UserProfilesModel.GetUserProfile(FirebaseModel.CurrentUser.UID);
         favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID);
+        ratingsCount = new List<double>();
 
-        // if (favoriteMovies != null && favoriteMovies.Any())
-        // {
-        //     totalMoviesReviewed = favoriteMovies.Count();
-        //     averageRating = favoriteMovies.Average(movie => movie.Rating?.AverageRating ?? 0);
-        //     ratingsCount = Enumerable.Range(1, 10).Select(rating => favoriteMovies.Count(movie => movie.Rating?.AverageRating == rating)).ToList();
-        // }
-        
-        ratingsCount.Clear();
-
+        if (favoriteMovies != null && favoriteMovies.Any())
+        {
+            averageRatingFavMovies = favoriteMovies.Average(movie => movie.Rating?.AverageRating ?? 0);
+        }
 
         if (user.RatingDataPoints != null && user.RatingDataPoints.Any())
         {
             totalMoviesReviewed = user.RatingDataPoints.Sum(r => r.Item2);
             averageRating = user.RatingDataPoints.Sum(r => r.Item1 * r.Item2) / (double)totalMoviesReviewed;
-            
-            ratingsCount.AddRange(user.RatingDataPoints.OrderBy(r=> r.Item1).Select(r=>r.Item2));
+
+            double averageRatingFavMoviesPercentage = averageRatingFavMovies * 10.0; // as averageRating is out of 10
+            double restOfFavMoviesPie = 100.0 - averageRatingFavMoviesPercentage;
+
+            favMoviesPieChartData = new List<double> { averageRatingFavMoviesPercentage, restOfFavMoviesPie };
+
+
+            chartLabels.Add($"User's Average Rating On Movies: {averageRating * 10}%");
+            chartLabels.Add("");
+            double averageRatingPercentage = averageRating * 10.0; // as averageRating is out of 10
+            double restOfPie = 100.0 - averageRatingPercentage;
+
+            pieChartData = new List<double> { averageRatingPercentage, restOfPie };
+
+            ratingsCount.AddRange(user.RatingDataPoints.OrderBy(r => r.Item1).Select(r => (double)r.Item2));
+
+            await HandleRedraw();
         }
+
         await InvokeAsync(StateHasChanged);
     }
+    
 
-
-    private async Task UpdateProfilePicture(ChangeEventArgs e)
+    public async Task Login(User user)
     {
-        var file = e.Value as IBrowserFile;
-
-        if (file != null)
-        {
-
-            //TODO logic to upload
-        }
+    // user.LastLogin = DateTime.UtcNow;
+    // await SaveUser(user); 
+    //TODO show last login of user ( should be stored in database) 
     }
-
 
     async Task HandleRedraw()
     {
         await barChart.Clear();
 
-        await barChart.AddLabelsDatasetsAndUpdate(Labels, GetBarChartDataset());
+        await barChart.AddLabelsDatasetsAndUpdate(Labels, GetBarChartDataset(), GetAverageLineDataset());
+
+        await pieChart.Clear();
+        var pieChartDataset = new PieChartDataset<double>
+        {
+            Data = new List<double> { averageRating, 10 - averageRating },
+            BackgroundColor = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), "rgba(0, 0, 0, 0)" }, // make the second segment transparent
+            BorderColor = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), "rgba(0, 0, 0, 0)" },
+            BorderWidth = 1
+        };
+        await pieChart.AddDataSet(pieChartDataset);
+        await pieChart.Update();
+
+        await favMoviesPieChart.Clear();
+        var favMoviesPieChartDataset = new PieChartDataset<double>
+        {
+            Data = new List<double> { averageRatingFavMovies, 10 - averageRatingFavMovies },
+            BackgroundColor = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), "rgba(0, 0, 0, 0)" }, // make the second segment transparent
+            BorderColor = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), "rgba(0, 0, 0, 0)" },
+            BorderWidth = 1
+        };
+        await favMoviesPieChart.AddDataSet(favMoviesPieChartDataset);
+        await favMoviesPieChart.Update();
     }
 
-    private BarChartDataset
-        <int> GetBarChartDataset()
+    private BarChartDataset<double> GetAverageLineDataset()
+    {
+        return new BarChartDataset<double>
+        {
+            Label = "Average Rating",
+            Data = Enumerable.Repeat(averageRating, Labels.Count).ToList(),
+            BorderColor = new List<string> { "rgba(0, 0, 0, 1)" },
+            BorderWidth = 2,
+            Type = "line",
+        };
+    }
+
+    private BarChartDataset<double> GetBarChartDataset()
     {
         return new BarChartDataset
-            <int>
+            <double>
         {
             Label = "Movie Ratings",
             Data = ratingsCount,
@@ -148,8 +550,8 @@
     }
 
     List
-        <int> ratingsCount = new List
-            <int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+        <double> ratingsCount = new List
+            <double> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
     List
         <string> backgroundColors = new List
@@ -159,9 +561,8 @@
         <string> borderColors = new List
             <string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
 
-    List
-        <string> Labels = new List
-            <string> { "One Star", "Two Stars", "Three Stars", "Four Stars", "Five Stars", "Sex Stars", "Seven Stars", "Eight Stars", "Nine Stars", "Ten Stars" };
+    List<string> Labels = new List<string> { "One Star", "Two Stars", "Three Stars", "Four Stars", "Five Stars", "Six Stars", "Seven Stars", "Eight Stars", "Nine Stars", "Ten Stars" };
+
 
     Task OnClicked(ChartMouseEventArgs e)
     {
@@ -176,6 +577,29 @@
     {
         NavManager.NavigateTo($"movieDetails/{movieId}");
     }
+    
+    
+    private async Task UpdateProfilePicture(ChangeEventArgs e)
+    {
+        var file = e.Value as IBrowserFile;
+
+        if (file != null)
+        {
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
+        
+            var filePath = Path.Combine("wwwroot", "UserPictures", fileName);
+
+            using (var fileStream = File.Create(filePath))
+            {
+                await file.OpenReadStream().CopyToAsync(fileStream);
+            }
+
+            user.ProfilePicture = $"/UserPictures/{fileName}";
+
+           // await UserProfilesModel.UpdateUserProfile(user);
+
+            await InvokeAsync(StateHasChanged);
+        }
+    }
 
 }
-

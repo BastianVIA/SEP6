@@ -58,3 +58,7 @@
     padding: 0;
     margin-bottom: 200px; /* you may adjust this value */
 }
+
+* {
+    cursor: pointer;
+}

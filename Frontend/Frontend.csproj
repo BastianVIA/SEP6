@@ -41,4 +41,8 @@
       <Content Remove="Data\**" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\UserPictures" />
+    </ItemGroup>
+
 </Project>
