@@ -34,7 +34,7 @@
                 {
                     <TableRowCell>@(_indexCount++)</TableRowCell>
                 }
-                <TableRowCell><img src="@movie.PosterUrl" height="200"/></TableRowCell>
+                <TableRowCell><img src="@movie.PosterUrl" height="@PosterSize"/></TableRowCell>
                 <TableRowCell>@movie.Title</TableRowCell>
                 <TableRowCell>@movie.ReleaseYear</TableRowCell>
                 <TableRowCell>@movie.Rating?.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/></TableRowCell>
@@ -56,6 +56,8 @@
     public EventCallback<Action> OnSortByRating { get; set; }
     [Parameter]
     public EventCallback<Action> OnSortByReleaseYear { get; set; }
+    [Parameter]
+    public int PosterSize { get; set; }
 
     private int _indexCount = 1;
 

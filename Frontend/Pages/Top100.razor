@@ -8,7 +8,7 @@
 
 @if (_movieList.Count > 0)
 {
-    <MovieTable MovieList="@_movieList" IndexedList="@true" OnMovieClicked="@OnMovieClick"/>
+    <MovieTable MovieList="@_movieList" PosterSize="200" IndexedList="true" OnMovieClicked="@OnMovieClick"/>
 }
 
 @code {
