@@ -25,8 +25,7 @@ else
     {
         _movieList = await Top100Model.GetTop100List();
     }
-
-
+    
     private void OnMovieClick(string movieId)
     {
         NavManager.NavigateTo($"movieDetails/{movieId}");
