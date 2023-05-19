@@ -22,24 +22,29 @@ public record MovieRecommendationRatingDto(float AverageRating, int Votes);
 
 public class QueryHandler : IRequestHandler<Query, MovieRecommendationsResponse>
 {
-    private const int MinVotesBeforeRecommending = 500000;
-    private const float MinRatingBeforeRecommending = 7f;
+    private int MinVotesBeforeRecommending;
+    private float MinRatingBeforeRecommending;
     
     private readonly IMovieRepository _repository;
     private readonly IImageService _imageService;
     private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
 
-    public QueryHandler(IMovieRepository repository, IImageService imageService, IDatabaseTransactionFactory databaseTransactionFactory)
+    public QueryHandler(IConfiguration configuration, IMovieRepository repository, IImageService imageService, IDatabaseTransactionFactory databaseTransactionFactory)
     {
         _repository = repository;
         _imageService = imageService;
         _databaseTransactionFactory = databaseTransactionFactory;
+        MinRatingBeforeRecommending = configuration.GetSection("QueryConstants").GetValue<float>("MinRating");
+        MinVotesBeforeRecommending = configuration.GetSection("QueryConstants").GetValue<int>("MinVotes");
     }
 
     public async Task<MovieRecommendationsResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var movies = await _repository.GetRecommendedMovies(MinVotesBeforeRecommending, MinRatingBeforeRecommending, transaction);
+        var movies = await _repository.GetRecommendedMovies(
+            MinVotesBeforeRecommending, 
+            MinRatingBeforeRecommending, 
+            transaction);
         var dtoMovies = new List<MovieRecommendationDto>();
         foreach (var domainMovie in movies)
         {
