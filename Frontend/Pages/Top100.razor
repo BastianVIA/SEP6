@@ -1,0 +1,26 @@
+﻿@page "/Top100"
+@using Frontend.Entities
+@inject NavigationManager NavManager
+@inject ITop100Model Top100Model
+@using Blazorise
+@using Frontend.Components
+@using Frontend.Model.Top100
+
+@if (_movieList.Count > 0)
+{
+    <MovieTable MovieList="@_movieList" IndexedList="@true" OnMovieClicked="@OnMovieClick"/>
+}
+
+@code {
+    private List<Movie> _movieList = new();
+    protected async override Task OnInitializedAsync()
+    {
+        _movieList = await Top100Model.GetTop100List();
+    }
+
+
+    private void OnMovieClick(string movieId)
+    {
+        NavManager.NavigateTo($"movieDetails/{movieId}");
+    }
+}
