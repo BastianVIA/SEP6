@@ -8,8 +8,14 @@ namespace Backend.Movie.Infrastructure;
 
 public class MovieRepository : IMovieRepository
 {
-    private const int NumberOfResultsPerPage = 10;
-    private const int Top100 = 100;
+    private int NumberOfResultsPerPage;
+    private int Top100;
+
+    public MovieRepository(IConfiguration configuration)
+    {
+        NumberOfResultsPerPage = configuration.GetSection("QueryConstants").GetValue<int>("MoviesPerPage");
+        Top100 = configuration.GetSection("QueryConstants").GetValue<int>("Top100");
+    }
 
     public async Task<List<Domain.Movie>> SearchForMovie(string title, MovieSortingKey movieSortingKey,
         SortingDirection sortingDirection, int requestPageNumber, DbReadOnlyTransaction tx)
