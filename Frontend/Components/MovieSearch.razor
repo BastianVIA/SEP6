@@ -76,7 +76,9 @@ else
 
     [Parameter]
     public string SearchTerm { get; set; } = string.Empty;
-    
+    private SortingDirection? ratingSortingDirection = SortingDirection.ASC;
+    private SortingDirection? releaseYearSortingDirection = SortingDirection.ASC;
+
 
     
     protected override async Task OnParametersSetAsync()
@@ -90,6 +92,14 @@ else
     {
         isDataFetched = false;
         movieList.Clear();
+        if (sortingKey == MovieSortingKey.Rating)
+        {
+            sortingDirection = ratingSortingDirection;
+        }
+        else if (sortingKey == MovieSortingKey.ReleaseYear)
+        {
+            sortingDirection = releaseYearSortingDirection;
+        }
         movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle, sortingKey, sortingDirection, pageNumber);
         isDataFetched = true;
     }
@@ -102,6 +112,7 @@ else
     private async Task SortByRating()
     {
         sortingKey = MovieSortingKey.Rating;
+        ratingSortingDirection = ratingSortingDirection == SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
         pageNumber = 1;
         await SearchForMovie();
     }
@@ -109,6 +120,7 @@ else
     private async Task SortByReleaseYear()
     {
         sortingKey = MovieSortingKey.ReleaseYear;
+        releaseYearSortingDirection = releaseYearSortingDirection == SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
         pageNumber = 1;
         await SearchForMovie();
     }
