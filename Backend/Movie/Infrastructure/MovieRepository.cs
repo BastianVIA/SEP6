@@ -9,6 +9,7 @@ namespace Backend.Movie.Infrastructure;
 public class MovieRepository : IMovieRepository
 {
     private const int NumberOfResultsPerPage = 10;
+    private const int Top100 = 100;
 
     public async Task<List<Domain.Movie>> SearchForMovie(string title, MovieSortingKey movieSortingKey,
         SortingDirection sortingDirection, int requestPageNumber, DbReadOnlyTransaction tx)
@@ -116,6 +117,17 @@ public class MovieRepository : IMovieRepository
         }
 
         tx.DataContext.Movies.Update(movieDao);
+    }
+
+    public async Task<List<Domain.Movie>> GetTop100Movies(int minVotes, DbReadOnlyTransaction tx)
+    {
+        var movies = tx.DataContext.Movies
+            .Include(m => m.Rating)
+            .Where(m => m.Rating != null && m.Rating.Votes > minVotes)
+            .OrderByDescending(m => m.Rating.Rating)
+            .Take(Top100)
+            .ToList();
+        return ToDomain(movies);
     }
 
     private static void excludeActorsAndDirectorsFromupdate(DbTransaction tx, MovieDAO movieDao)
