@@ -1,5 +1,6 @@
 ﻿using Backend.Database.Transaction;
 using Backend.People.Domain;
+using Backend.Service;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.People.Infrastructure;
@@ -7,7 +8,32 @@ namespace Backend.People.Infrastructure;
 public class PeopleRepository : IPeopleRepository
 {
     private const int NumberOfResultsPerPage = 20;
-    
+
+    public async Task<Person> ReadPersonFromId(string id, DbReadOnlyTransaction tx, bool includeActed = false,
+        bool includeDirected = false)
+    {
+        var query = tx.DataContext.People
+            .Where(p => p.Id == id);
+
+        if (includeActed)
+        {
+            query = query.Include(p => p.ActedMovies); //TODO: FIX performance
+        }
+
+        if (includeDirected)
+        {
+            query = query.Include(p => p.DirectedMovies); //TODO: FIX performance
+        }
+
+        var result = query.FirstOrDefault();
+        if (result == null)
+        {
+            throw new KeyNotFoundException($"Could not find person with id: {id}");
+        }
+
+        return ToDomain(result);
+    }
+
     public async Task<List<Person>> SearchForPerson(string name, int requestPageNumber, DbReadOnlyTransaction tx)
     {
         var query = tx.DataContext.People.Where(p => EF.Functions.Like(p.Name, $"%{name}%"));
@@ -44,13 +70,14 @@ public class PeopleRepository : IPeopleRepository
         {
             BirthYear = peopleDao.BirthYear,
             Id = peopleDao.Id,
+            ImdbId = peopleDao.ImdbId,
             Name = peopleDao.Name,
             ActedMoviesId = ToDomain(peopleDao.ActedMovies),
             DirectedMoviesId = ToDomain(peopleDao.DirectedMovies)
         };
     }
 
-    private ICollection<string> ToDomain(ICollection<PeopleMovieDAO>? personDaoActedMovies)
+    private ICollection<string>? ToDomain(ICollection<PeopleMovieDAO>? personDaoActedMovies)
     {
         if (personDaoActedMovies == null || personDaoActedMovies.Count == 0)
         {
