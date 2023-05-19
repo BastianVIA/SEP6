@@ -2,12 +2,21 @@
 @using Frontend.Entities
 @inject NavigationManager NavManager
 @inject ITop100Model Top100Model
+@using Blazorise.LottieAnimation
 @using Frontend.Components
 @using Frontend.Model.Top100
+@using Blazorise
 
 @if (_movieList.Count > 0)
 {
-    <MovieTable MovieList="@_movieList" PosterSize="200" IndexedList="true" OnMovieClicked="@OnMovieClick"/>
+    <div class="top100-container">
+        <Heading Size="HeadingSize.Is3">FarligTigerMDB Top100</Heading>
+        <MovieTable MovieList="@_movieList" PosterSize="200" IndexedList="true" OnMovieClicked="@OnMovieClick"/>
+    </div>
+}
+else
+{
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
 }
 
 @code {
