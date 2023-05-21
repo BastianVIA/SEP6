@@ -64,7 +64,7 @@
 #              artifactName: 'BuildPackages'
 #              targetPath: 'output/Publish'
 #
-#          - task: AzureCLI@2
+#          - task: AzureCLI@2 
 #            displayName: "Deploy frontend to Azure App Service"
 #            inputs:
 #              azureSubscription: $(AzureSubscriptionId)
