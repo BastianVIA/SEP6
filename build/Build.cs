@@ -34,7 +34,10 @@ class Build : NukeBuild
     [GitRepository] readonly GitRepository GitRepository;
     [GitVersion] readonly GitVersion GitVersion;
 
-    AbsolutePath OutputDirectory => RootDirectory / "output";
+    // AbsolutePath OutputDirectory => RootDirectory / "output";
+    AbsolutePath OutputDirectory => (AbsolutePath)Environment.GetEnvironmentVariable("Build.ArtifactStagingDirectory") / "output";
+
+
     AbsolutePath PublishDirectory => OutputDirectory / "Publish";
     AbsolutePath ZipFilePath => PublishDirectory / "app.zip";
     
@@ -43,21 +46,18 @@ class Build : NukeBuild
     Target Clean => _ => _.Before(Restore)
         .Executes(() =>
         {
+            // Ensuring that OutputDirectory exists.
+            EnsureExistingDirectory(OutputDirectory);
+        
             var projectsToClean = Solution.AllProjects.Where(project => project.Name != "_build");
 
             foreach (var project in projectsToClean)
             {
-                // EnsureCleanDirectory(project.Directory / "bin");
-                // EnsureCleanDirectory(project.Directory / "obj");
-                // EnsureCleanDirectory(PublishDirectory);
-                
-                (project.Directory / "bin").CreateOrCleanDirectory();
-                (project.Directory / "obj").CreateOrCleanDirectory();
-                PublishDirectory.CreateOrCleanDirectory();
-               
+                EnsureCleanDirectory(project.Directory / "bin");
+                EnsureCleanDirectory(project.Directory / "obj");
+                EnsureCleanDirectory(PublishDirectory);
             }
         });
-    
     
     Target Restore => _ => _
         .After(Clean)
@@ -89,6 +89,14 @@ class Build : NukeBuild
                     .SetConfiguration(Configuration)
                     .EnableNoRestore());
             }
+        });
+    
+    Target VerifyOutput => _ => _
+        .DependsOn(Compile)
+        .Executes(() =>
+        {
+            ControlFlow.Assert(Directory.Exists(OutputDirectory), $"Output directory does not exist: {OutputDirectory}");
+            // Add more checks here if needed, for example to check for specific files
         });
     
     Target PublishBackend => _ => _
@@ -179,7 +187,7 @@ class Build : NukeBuild
     
     
     Target Deploy => _ => _
-        .DependsOn(ZipBackend,ZipFrontend).Executes(() =>
+        .DependsOn(DeployBackend,DeployFrontend).Executes(() =>
         {
             if (Directory.Exists(PublishDirectory / "Backend"))
             {
