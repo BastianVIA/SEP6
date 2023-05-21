@@ -7,7 +7,6 @@ pool:
   vmImage: 'windows-latest'
 
 stages:
-
   - stage: BuildTestPackage
     displayName: Build, package
     jobs:
@@ -19,6 +18,11 @@ stages:
             displayName: "Build process"
             inputs:
               script: './build.cmd Compile --no-logo'
+
+          - script: |
+              echo 'Creating directory if it does not exist'
+              mkdir "$(Build.ArtifactStagingDirectory)\output"
+            displayName: 'Ensure Output Directory Exists'
 
           - task: PublishPipelineArtifact@1
             displayName: 'Collect build artifacts'
