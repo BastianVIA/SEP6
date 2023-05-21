@@ -26,7 +26,7 @@ stages:
 
           - script: |
               echo 'Listing directory contents'
-              ls "$(Build.ArtifactStagingDirectory)\output"
+              ls "$(Build.ArtifactStagingDirectory)\output\publish"
             displayName: 'List Output Directory Contents'
             
           - task: PublishPipelineArtifact@1
