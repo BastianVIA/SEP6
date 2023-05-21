@@ -47,9 +47,13 @@ class Build : NukeBuild
 
             foreach (var project in projectsToClean)
             {
-                EnsureCleanDirectory(project.Directory / "bin");
-                EnsureCleanDirectory(project.Directory / "obj");
-                EnsureCleanDirectory(PublishDirectory);
+                // EnsureCleanDirectory(project.Directory / "bin");
+                // EnsureCleanDirectory(project.Directory / "obj");
+                // EnsureCleanDirectory(PublishDirectory);
+                
+                (project.Directory / "bin").CreateOrCleanDirectory();
+                (project.Directory / "obj").CreateOrCleanDirectory();
+                PublishDirectory.CreateOrCleanDirectory();
                
             }
         });
@@ -164,12 +168,16 @@ class Build : NukeBuild
         {
             if (Directory.Exists(PublishDirectory / "Backend"))
             {
-                DeleteDirectory(PublishDirectory / "Backend");
+                // DeleteDirectory(PublishDirectory / "Backend");
+                (PublishDirectory / "Backend").DeleteDirectory();
+
             }
             
             if (Directory.Exists(PublishDirectory / "Frontend"))
             {
-                DeleteDirectory(PublishDirectory / "Frontend");
+                // DeleteDirectory(PublishDirectory / "Frontend");
+                (PublishDirectory / "Frontend").DeleteDirectory();
+
             }
 
         });
