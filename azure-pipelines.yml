@@ -24,10 +24,15 @@ stages:
               mkdir "$(Build.ArtifactStagingDirectory)\output"
             displayName: 'Ensure Output Directory Exists'
 
+          - script: |
+              echo 'Listing directory contents'
+              ls "$(Build.ArtifactStagingDirectory)\output"
+            displayName: 'List Output Directory Contents'
+            
           - task: PublishPipelineArtifact@1
             displayName: 'Collect build artifacts'
             inputs:
-              targetPath: '$(Build.ArtifactStagingDirectory)/output'
+              targetPath: '$(Build.ArtifactStagingDirectory)/output/publish'
               artifactName: 'BuildPackages'
               artifactType: 'pipeline'
 
@@ -48,7 +53,7 @@ stages:
             inputs:
               source: 'current'
               artifactName: 'BuildPackages'
-              targetPath: output/
+              targetPath: output/Publish
 
           - task: AzureCLI@2
             displayName: "Deploy backend to Azure App Service"
@@ -71,7 +76,7 @@ stages:
             inputs:
               source: 'current'
               artifactName: 'BuildPackages'
-              targetPath: output/
+              targetPath: output/Publish
 
           - task: AzureCLI@2
             displayName: "Deploy frontend to Azure App Service"
