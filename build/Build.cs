@@ -35,7 +35,7 @@ class Build : NukeBuild
     [GitVersion] readonly GitVersion GitVersion;
 
     // AbsolutePath OutputDirectory => RootDirectory / "output";
-    AbsolutePath OutputDirectory => (AbsolutePath)Environment.GetEnvironmentVariable("Build.ArtifactStagingDirectory") / "output";
+    AbsolutePath OutputDirectory => (AbsolutePath)Environment.GetEnvironmentVariable("Build.ArtifactStagingDirectory") / "output"; 
 
 
     AbsolutePath PublishDirectory => OutputDirectory / "Publish";
