@@ -19,12 +19,12 @@ stages:
             inputs:
               script: './build.cmd CiBuild --no-logo'
 
-      - task: PublishPipelineArtifact@1
-        displayName: 'Collect build artifacts'
-        inputs:
-          targetPath: output/
-          artifactName: 'BuildPackages'
-          artifactType: 'pipeline'
+          - task: PublishPipelineArtifact@1
+            displayName: 'Collect build artifacts'
+            inputs:
+            targetPath: output/
+            artifactName: 'BuildPackages'
+            artifactType: 'pipeline'
 
   - stage: DeployToAzure
     displayName: Deploy to Azure
