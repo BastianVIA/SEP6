@@ -99,19 +99,19 @@ class Build : NukeBuild
             ZipFile.CreateFromDirectory(PublishDirectory / "Backend", backendZipFilePath, compressionLevel,
                 includeBaseDirectory: false);
         });
-    //
-    // Target DeployBackend => _ => _
-    //     .DependsOn(ZipBackend)
-    //     .Executes(() =>
-    //     {
-    //         var backendPublishDirectory = OutputDirectory / "Publish" / "Backend";
-    //
-    //         var zipFilePath = backendPublishDirectory / "backend.zip";
-    //
-    //         ProcessTasks.StartProcess("az",
-    //             $"webapp deployment source config-zip --src \"{zipFilePath}\" --name {AzureAppServiceBackendName} --resource-group {AzureResourceGroupName} --subscription {AzureSubscriptionId}",
-    //             workingDirectory: backendPublishDirectory);
-    //     });
+    
+    Target DeployBackend => _ => _
+        .DependsOn(ZipBackend)
+        .Executes(() =>
+        {
+            var backendPublishDirectory = OutputDirectory / "Publish" / "Backend";
+    
+            var zipFilePath = backendPublishDirectory / "backend.zip";
+    
+            ProcessTasks.StartProcess("az",
+                $"webapp deployment source config-zip --src \"{zipFilePath}\" --name {AzureAppServiceBackendName} --resource-group {AzureResourceGroupName} --subscription {AzureSubscriptionId}",
+                workingDirectory: backendPublishDirectory);
+        });
     
     
     
@@ -144,20 +144,20 @@ class Build : NukeBuild
                 includeBaseDirectory: false);
         });
     
-    //
-    // Target DeployFrontend => _ => _
-    //     .DependsOn(ZipFrontend)
-    //     .Executes(() =>
-    //     {
-    //         var frontendPublishDirectory = OutputDirectory / "Publish" / "Frontend";
-    //
-    //         var zipFilePath = frontendPublishDirectory / "frontend.zip";
-    //
-    //         ProcessTasks.StartProcess("az",
-    //             $"webapp deployment source config-zip --src \"{zipFilePath}\" --name {AzureAppServiceFrontendName} --resource-group {AzureResourceGroupName} --subscription {AzureSubscriptionId}",
-    //             workingDirectory: frontendPublishDirectory);
-    //     });
-    //
+    
+    Target DeployFrontend => _ => _
+        .DependsOn(ZipFrontend)
+        .Executes(() =>
+        {
+            var frontendPublishDirectory = OutputDirectory / "Publish" / "Frontend";
+    
+            var zipFilePath = frontendPublishDirectory / "frontend.zip";
+    
+            ProcessTasks.StartProcess("az",
+                $"webapp deployment source config-zip --src \"{zipFilePath}\" --name {AzureAppServiceFrontendName} --resource-group {AzureResourceGroupName} --subscription {AzureSubscriptionId}",
+                workingDirectory: frontendPublishDirectory);
+        });
+    
     
     Target Deploy => _ => _
         .DependsOn(ZipBackend,ZipFrontend).Executes(() =>
@@ -166,7 +166,7 @@ class Build : NukeBuild
             {
                 DeleteDirectory(PublishDirectory / "Backend");
             }
-
+            
             if (Directory.Exists(PublishDirectory / "Frontend"))
             {
                 DeleteDirectory(PublishDirectory / "Frontend");
