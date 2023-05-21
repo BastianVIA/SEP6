@@ -148,3 +148,4 @@ stages:
               scriptLocation: 'inlineScript'
               inlineScript: |
                 az webapp deployment source config-zip --src "$(System.DefaultWorkingDirectory)/output/Publish/Frontend.zip" --name $(AzureAppServiceFrontendName) --resource-group $(AzureResourceGroupName)
+
