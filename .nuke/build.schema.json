@@ -72,12 +72,17 @@
           "items": {
             "type": "string",
             "enum": [
+              "CiBuild",
               "Clean",
               "Compile",
               "Deploy",
+              "DeployBackend",
+              "DeployFrontend",
+              "LocalBuild",
               "PublishBackend",
               "PublishFrontend",
               "Restore",
+              "VerifyOutput",
               "ZipBackend",
               "ZipFrontend"
             ]
@@ -93,12 +98,17 @@
           "items": {
             "type": "string",
             "enum": [
+              "CiBuild",
               "Clean",
               "Compile",
               "Deploy",
+              "DeployBackend",
+              "DeployFrontend",
+              "LocalBuild",
               "PublishBackend",
               "PublishFrontend",
               "Restore",
+              "VerifyOutput",
               "ZipBackend",
               "ZipFrontend"
             ]

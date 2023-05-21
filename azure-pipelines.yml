@@ -17,24 +17,14 @@ stages:
           - task: CmdLine@2
             displayName: "Build process"
             inputs:
-              script: './build.cmd Compile --no-logo'
+              script: './build.cmd CiBuild --no-logo'
 
-          - script: |
-                echo 'Creating directory if it does not exist'
-              mkdir "$(Build.SourcesDirectory)\SEP6\output\Publish"
-              displayName: 'Ensure Output Directory Exists'
-#
-#          - script: |
-#              echo 'Listing directory contents'
-#              ls "$(Build.ArtifactStagingDirectory)\output\publish"
-#            displayName: 'List Output Directory Contents'
-            
-          - task: PublishPipelineArtifact@1
-            displayName: 'Collect build artifacts'
-            inputs:
-              targetPath: '$(Pipeline.Workspace)/SEP6/output/Publish'
-              artifactName: 'BuildPackages'
-              artifactType: 'pipeline'
+      - task: PublishPipelineArtifact@1
+        displayName: 'Collect build artifacts'
+        inputs:
+          targetPath: output/
+          artifactName: 'BuildPackages'
+          artifactType: 'pipeline'
 
   - stage: DeployToAzure
     displayName: Deploy to Azure

@@ -25,7 +25,7 @@ using static Nuke.Common.IO.FileSystemTasks;
 [DotNetVerbosityMapping]
 class Build : NukeBuild
 {
-    public static int Main() => Execute<Build>(x => x.Deploy);
+    public static int Main() => Execute<Build>(x => x.LocalBuild);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -33,9 +33,13 @@ class Build : NukeBuild
     [Solution] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
     [GitVersion] readonly GitVersion GitVersion;
-
-    // AbsolutePath OutputDirectory => RootDirectory / "output";
-    AbsolutePath OutputDirectory => (AbsolutePath)Environment.GetEnvironmentVariable("Build.ArtifactStagingDirectory") / "output"; 
+    
+    Target CiBuild => _ => _
+        .DependsOn(Clean, Restore, Compile,VerifyOutput,PublishBackend,ZipBackend,PublishFrontend,ZipFrontend);
+    Target LocalBuild => _ => _
+        .DependsOn(Clean, Restore, Compile,VerifyOutput,PublishBackend,ZipBackend,PublishFrontend,ZipFrontend);
+    
+    AbsolutePath OutputDirectory => RootDirectory / "output";
 
 
     AbsolutePath PublishDirectory => OutputDirectory / "Publish";
