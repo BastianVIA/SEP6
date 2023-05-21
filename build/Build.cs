@@ -35,7 +35,7 @@ class Build : NukeBuild
     [GitVersion] readonly GitVersion GitVersion;
     
     Target CiBuild => _ => _
-        .DependsOn(Clean, Restore, Compile,VerifyOutput,PublishBackend,ZipBackend,PublishFrontend,ZipFrontend);
+        .DependsOn(Clean, Restore, Compile,VerifyOutput,PublishBackend,ZipBackend,PublishFrontend,ZipFrontend,CleanPublishFolder);
     Target LocalBuild => _ => _
         .DependsOn(Clean, Restore, Compile,VerifyOutput,PublishBackend,ZipBackend,PublishFrontend,ZipFrontend);
     
@@ -70,15 +70,6 @@ class Build : NukeBuild
             DotNetRestore(s => s.SetProjectFile(Solution));
         });
     
-    // Target Compile => _ => _
-    //     .DependsOn(Restore)
-    //     .Executes(() =>
-    //     {
-    //         DotNetBuild(s => s.SetProjectFile(Solution)
-    //             .SetConfiguration(Configuration)
-    //             .EnableNoRestore());
-    //     });
-    //
     
     Target Compile => _ => _
         .DependsOn(Restore)
@@ -100,7 +91,7 @@ class Build : NukeBuild
         .Executes(() =>
         {
             ControlFlow.Assert(Directory.Exists(OutputDirectory), $"Output directory does not exist: {OutputDirectory}");
-            // Add more checks here if needed, for example to check for specific files
+            // TODO check if i can set the movie.db with the backend or not
         });
     
     Target PublishBackend => _ => _
@@ -173,6 +164,25 @@ class Build : NukeBuild
 
             ZipFile.CreateFromDirectory(PublishDirectory / "Frontend", frontendZipFilePath, compressionLevel,
                 includeBaseDirectory: false);
+        });
+    
+    Target CleanPublishFolder => _ => _
+        .DependsOn(PublishBackend,PublishFrontend).Executes(() =>
+        {
+            if (Directory.Exists(PublishDirectory / "Backend"))
+            {
+                // DeleteDirectory(PublishDirectory / "Backend");
+                (PublishDirectory / "Backend").DeleteDirectory();
+
+            }
+            
+            if (Directory.Exists(PublishDirectory / "Frontend"))
+            {
+                // DeleteDirectory(PublishDirectory / "Frontend");
+                (PublishDirectory / "Frontend").DeleteDirectory();
+
+            }
+
         });
     
     
