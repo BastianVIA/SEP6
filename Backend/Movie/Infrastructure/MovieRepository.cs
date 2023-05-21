@@ -117,6 +117,22 @@ public class MovieRepository : IMovieRepository
 
         tx.DataContext.Movies.Update(movieDao);
     }
+    public async Task<List<Domain.Movie>> GetActedMoviesForPerson(string personId, DbReadOnlyTransaction tx)
+    {
+        var result = await tx.DataContext.Movies
+            .Include(m => m.Actors)
+            .Where(m => m.Actors != null && m.Actors.Any(a => a.Id == personId)).ToListAsync();
+        return ToDomain(result);
+    }
+
+    public async Task<List<Domain.Movie>> GetDirectedMoviesForPerson(string personId, DbReadOnlyTransaction tx)
+    {
+        var result = await tx.DataContext.Movies
+            .Include(m => m.Directors)
+            .Where(m => m.Directors != null && m.Directors.Any(a => a.Id == personId)).ToListAsync();
+        return ToDomain(result);
+        
+    }
 
     private static void excludeActorsAndDirectorsFromupdate(DbTransaction tx, MovieDAO movieDao)
     {
