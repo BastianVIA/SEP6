@@ -66,15 +66,30 @@ class Build : NukeBuild
             DotNetRestore(s => s.SetProjectFile(Solution));
         });
     
+    // Target Compile => _ => _
+    //     .DependsOn(Restore)
+    //     .Executes(() =>
+    //     {
+    //         DotNetBuild(s => s.SetProjectFile(Solution)
+    //             .SetConfiguration(Configuration)
+    //             .EnableNoRestore());
+    //     });
+    //
+    
     Target Compile => _ => _
         .DependsOn(Restore)
         .Executes(() =>
         {
-            DotNetBuild(s => s.SetProjectFile(Solution)
-                .SetConfiguration(Configuration)
-                .EnableNoRestore());
+            var projectsToCompile = Solution.AllProjects.Where(project => project.Name != "TestBackend");
+
+            foreach (var project in projectsToCompile)
+            {
+                DotNetBuild(s => s
+                    .SetProjectFile(project)
+                    .SetConfiguration(Configuration)
+                    .EnableNoRestore());
+            }
         });
-    
     
     Target PublishBackend => _ => _
         .DependsOn(Compile)
