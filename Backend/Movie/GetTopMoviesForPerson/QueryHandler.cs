@@ -1,4 +1,5 @@
-﻿using Backend.Database.TransactionManager;
+﻿using System.Diagnostics;
+using Backend.Database.TransactionManager;
 using Backend.Movie.Infrastructure;
 using MediatR;
 
@@ -30,7 +31,7 @@ public class QueryHandler : IRequestHandler<Query, GetTopMoviesForPersonResponse
     {
         var transaction = _transactionFactory.BeginReadOnlyTransaction();
         var actedMovies = _repository.GetActedMoviesForPerson(request.PersonId, transaction);
-        var directedMovies = _repository.GetActedMoviesForPerson(request.PersonId, transaction);
+        var directedMovies = _repository.GetDirectedMoviesForPerson(request.PersonId, transaction);
 
         return toDto(await actedMovies, await directedMovies);
     }

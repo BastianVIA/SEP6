@@ -1,4 +1,5 @@
-﻿using Backend.Database.Transaction;
+﻿using System.Diagnostics;
+using Backend.Database.Transaction;
 using Backend.People.Domain;
 using Backend.Service;
 using Microsoft.EntityFrameworkCore;
@@ -12,23 +13,27 @@ public class PeopleRepository : IPeopleRepository
     public async Task<Person> ReadPersonFromId(string id, DbReadOnlyTransaction tx, bool includeActed = false,
         bool includeDirected = false)
     {
-        var query = tx.DataContext.People
-            .Where(p => p.Id == id);
-
+        var result = await tx.DataContext.People
+            .Where(p => p.Id == id)
+            .FirstOrDefaultAsync();
+        
+        if (result == null)
+        {
+            throw new KeyNotFoundException($"Could not find person with id: {id}");
+        }
+        
         if (includeActed)
         {
-            query = query.Include(p => p.ActedMovies); //TODO: FIX performance
+            await tx.DataContext.Entry(result)
+                .Collection(p => p.ActedMovies)
+                .LoadAsync();
         }
 
         if (includeDirected)
         {
-            query = query.Include(p => p.DirectedMovies); //TODO: FIX performance
-        }
-
-        var result = query.FirstOrDefault();
-        if (result == null)
-        {
-            throw new KeyNotFoundException($"Could not find person with id: {id}");
+            await tx.DataContext.Entry(result)
+                .Collection(p => p.DirectedMovies)
+                .LoadAsync();
         }
 
         return ToDomain(result);
