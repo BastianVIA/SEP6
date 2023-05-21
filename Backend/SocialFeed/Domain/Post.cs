@@ -10,6 +10,7 @@ public enum Activity
     RemovedRating,
     NewUser,
     UnFavoriteMovie,
+    CreatedReview
     
 }
 

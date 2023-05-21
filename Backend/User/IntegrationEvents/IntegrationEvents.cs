@@ -79,3 +79,17 @@ public class UpdatedRatingIntegrationEvent : INotification
         NewRating = newRating;
     }
 }
+
+public class CreatedReviewIntegrationEvent : INotification
+{
+    public string UserId { get; set; }
+    public string MovieId { get; set; }
+    public string ReviewBody { get; set; }
+
+    public CreatedReviewIntegrationEvent(string userId, string movieId, string reviewBody)
+    {
+        UserId = userId;
+        MovieId = movieId;
+        ReviewBody = reviewBody;
+    }
+}

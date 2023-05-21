@@ -11,6 +11,8 @@ public class User : Foundation.BaseDomain
     public List<string>? FavoriteMovies { get; set; }
     public List<UserRating>? Ratings { get; set; }
     
+    public List<UserReview>? Reviews { get; set; }
+    
     public float AverageOfUserRatings { get; set; }
 
     public User()
@@ -52,6 +54,18 @@ public class User : Foundation.BaseDomain
         var newRating = new UserRating(movieId, rating);
         Ratings.Add(newRating);
         AddDomainEvent(new CreatedRatingEvent(Id, newRating));
+    }
+
+    public void AddReview(string movieId, string reviewBody)
+    {
+        if (Reviews == null)
+        {
+            Reviews = new List<UserReview>();
+        }
+    
+        var newReview = new UserReview(movieId, reviewBody);
+        Reviews.Add(newReview);
+        AddDomainEvent(new CreateReviewEvent(Id, newReview));
     }
 
     public void RemoveFavorite(string movieId)
