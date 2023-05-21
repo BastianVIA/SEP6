@@ -1,3 +1,75 @@
+#trigger:
+#  branches:
+#    include:
+#      - '*'
+#
+#pool:
+#  vmImage: 'windows-latest'
+#
+#stages:
+#
+#  - stage: BuildTestPackage
+#    displayName: Build, test, package
+#    jobs:
+#      - job: BuildDevVersionsJob
+#        displayName: Build, test, package
+#        steps:
+#
+#          - task: CmdLine@2
+#            displayName: "Build and test process"
+#            inputs:
+#              script: './build.cmd Compile Test --no-logo'
+#
+#          - task: PublishPipelineArtifact@1
+#            displayName: 'Collect build artifacts'
+#            inputs:
+#              targetPath: output/
+#              artifactName: 'BuildPackages'
+#              artifactType: 'pipeline'
+#
+#          - task: PublishBuildArtifacts@1
+#            displayName: "Collect test artifacts"
+#            inputs:
+#              artifactName: TestArtifact
+#              pathtoPublish: 'output/TestResults'
+#
+#          - task: PublishTestResults@2
+#            displayName: "Publish test results"
+#            condition: always()
+#            inputs:
+#              testResultsFormat: 'XUnit'
+#              testResultsFiles: 'output/TestResults/*.xml'
+#              failTaskOnFailedTests: true
+#
+#  - stage: DeployToAzure
+#    displayName: Deploy to Azure
+#    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#    dependsOn: BuildTestPackage
+#    jobs:
+#      - job: DeployProductionVersion
+#        displayName: Deploy to Azure App Service
+#        steps:
+#
+#          - checkout: self
+#            persistCredentials: true
+#
+#          - task: DownloadPipelineArtifact@2
+#            displayName: 'Download pipeline artifacts'
+#            inputs:
+#              source: 'current'
+#              artifactName: 'BuildPackages'
+#              targetPath: output/
+#
+#          - task: AzureCLI@2
+#            displayName: "Deploy to Azure App Service"
+#            inputs:
+#              azureSubscription: $(AzureSubscriptionId)
+#              scriptType: 'bash'
+#              scriptLocation: 'inlineScript'
+#              inlineScript: |
+#                az webapp deployment source config-zip --src "output/Publish/app.zip" --name $(AzureAppServiceName) --resource-group $(AzureResourceGroupName)
+
+
 trigger:
   branches:
     include:
@@ -46,25 +118,48 @@ stages:
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     dependsOn: BuildTestPackage
     jobs:
-      - job: DeployProductionVersion
-        displayName: Deploy to Azure App Service
+      - job: DeployBackendVersion
+        displayName: Deploy Backend to Azure App Service
         steps:
 
           - checkout: self
             persistCredentials: true
 
           - task: DownloadPipelineArtifact@2
-            displayName: 'Download pipeline artifacts'
+            displayName: 'Download backend artifacts'
             inputs:
               source: 'current'
               artifactName: 'BuildPackages'
               targetPath: output/
 
           - task: AzureCLI@2
-            displayName: "Deploy to Azure App Service"
+            displayName: "Deploy backend to Azure App Service"
             inputs:
               azureSubscription: $(AzureSubscriptionId)
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
               inlineScript: |
-                az webapp deployment source config-zip --src "output/Publish/app.zip" --name $(AzureAppServiceName) --resource-group $(AzureResourceGroupName)
+                az webapp deployment source config-zip --src "output/Publish/Backend.zip" --name $(AzureAppServiceBackendName) --resource-group $(AzureResourceGroupName)
+
+      - job: DeployFrontendVersion
+        displayName: Deploy Frontend to Azure App Service
+        steps:
+
+          - checkout: self
+            persistCredentials: true
+
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download frontend artifacts'
+            inputs:
+              source: 'current'
+              artifactName: 'BuildPackages'
+              targetPath: output/
+
+          - task: AzureCLI@2
+            displayName: "Deploy frontend to Azure App Service"
+            inputs:
+              azureSubscription: $(AzureSubscriptionId)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az webapp deployment source config-zip --src "output/Publish/Frontend.zip" --name $(AzureAppServiceFrontendName) --resource-group $(AzureResourceGroupName)
