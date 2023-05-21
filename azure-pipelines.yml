@@ -19,10 +19,10 @@ stages:
             inputs:
               script: './build.cmd Compile --no-logo'
 
-#          - script: |
-#              echo 'Creating directory if it does not exist'
-#              mkdir "$(Build.ArtifactStagingDirectory)\output\publish"
-#            displayName: 'Ensure Output Directory Exists'
+          - script: |
+                echo 'Creating directory if it does not exist'
+              mkdir "$(Build.SourcesDirectory)\SEP6\output\Publish"
+              displayName: 'Ensure Output Directory Exists'
 #
 #          - script: |
 #              echo 'Listing directory contents'
