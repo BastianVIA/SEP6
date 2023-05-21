@@ -226,4 +226,5 @@ class Build : NukeBuild
     string AzureResourceGroupName => Environment.GetEnvironmentVariable("AZURE_RESOURCE_GROUP_NAME");
     string AzureAppServiceBackendName => Environment.GetEnvironmentVariable("AZURE_APP_SERVICE_BACKEND_NAME");
     string AzureAppServiceFrontendName => Environment.GetEnvironmentVariable("AZURE_APP_SERVICE_FRONTEND_NAME");
+    
 }
