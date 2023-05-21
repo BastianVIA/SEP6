@@ -74,6 +74,7 @@
             "enum": [
               "CiBuild",
               "Clean",
+              "CleanPublishFolder",
               "Compile",
               "Deploy",
               "DeployBackend",
@@ -100,6 +101,7 @@
             "enum": [
               "CiBuild",
               "Clean",
+              "CleanPublishFolder",
               "Compile",
               "Deploy",
               "DeployBackend",
