@@ -14,7 +14,6 @@ public class DataContext : DbContext
     public DbSet<PersonDAO> Persons { get; set; }   
     public DbSet<UserDAO> Users { get; set; }
     public DbSet<PeopleDAO> People { get; set; }
-    
     public DbSet<PostDAO> Posts { get; set; }
     
     public DbSet<SocialUserDAO> SocialUsers { get; set; }
@@ -63,6 +62,14 @@ public class DataContext : DbContext
             .WithMany(u => u.UserRatings)
             .HasForeignKey(ur => ur.UserId);
 
+        modelBuilder.Entity<UserReviewDAO>()
+            .HasKey(dao => new {dao.MovieId, dao.UserId});
+
+        modelBuilder.Entity<UserReviewDAO>()
+            .HasOne(ur => ur.User)
+            .WithMany(u => u.UserReviews)
+            .HasForeignKey(ur => ur.UserId);
+        
 
         modelBuilder.Entity<PeopleMovieDAO>()
             .HasKey(dao => dao.MovieId);

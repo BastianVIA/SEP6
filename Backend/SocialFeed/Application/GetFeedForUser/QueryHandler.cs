@@ -23,6 +23,8 @@ public class ActivityDataDto
     public string? MovieId { get; set; }
     public int? NewRating { get; set; }
     public int? OldRating { get; set; }
+    
+    public string? ReviewBody { get; set; }
 }
 public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
 {
@@ -83,6 +85,7 @@ public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
             MovieId = activityData.MovieId,
             NewRating = activityData.NewRating,
             OldRating = activityData.OldRating,
+            ReviewBody = activityData.ReviewBody
         };
     }
 }

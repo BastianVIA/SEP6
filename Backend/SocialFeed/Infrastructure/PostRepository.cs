@@ -21,7 +21,8 @@ public class PostRepository : IPostRepository
                 PostId = post.Id.ToString(),
                 MovieId = post.ActivityData.MovieId,
                 NewRating = post.ActivityData.NewRating,
-                OldRating = post.ActivityData.OldRating
+                OldRating = post.ActivityData.OldRating,
+                ReviewBody = post.ActivityData.ReviewBody
             };
         }
 
@@ -96,6 +97,11 @@ public class PostRepository : IPostRepository
         if (dao.OldRating != null)
         {
             activity.OldRating = dao.OldRating;
+        }
+
+        if (dao.ReviewBody != null)
+        {
+            activity.ReviewBody = dao.ReviewBody;
         }
 
         return activity;
