@@ -27,7 +27,6 @@ stages:
 
   - stage: DeployToAzure
     displayName: Deploy to Azure
-    condition: and(succeeded(), eq(variables['Build.SourceBranch']))
 #    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
     dependsOn: BuildTestPackage
