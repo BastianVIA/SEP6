@@ -19,20 +19,20 @@ stages:
             inputs:
               script: './build.cmd Compile --no-logo'
 
-          - script: |
-              echo 'Creating directory if it does not exist'
-              mkdir "$(Build.ArtifactStagingDirectory)\output\publish"
-            displayName: 'Ensure Output Directory Exists'
-
-          - script: |
-              echo 'Listing directory contents'
-              ls "$(Build.ArtifactStagingDirectory)\output\publish"
-            displayName: 'List Output Directory Contents'
+#          - script: |
+#              echo 'Creating directory if it does not exist'
+#              mkdir "$(Build.ArtifactStagingDirectory)\output\publish"
+#            displayName: 'Ensure Output Directory Exists'
+#
+#          - script: |
+#              echo 'Listing directory contents'
+#              ls "$(Build.ArtifactStagingDirectory)\output\publish"
+#            displayName: 'List Output Directory Contents'
             
           - task: PublishPipelineArtifact@1
             displayName: 'Collect build artifacts'
             inputs:
-              targetPath: '$(Build.ArtifactStagingDirectory)/output/publish'
+              targetPath: '$(Pipeline.Workspace)/SEP6/output/Publish'
               artifactName: 'BuildPackages'
               artifactType: 'pipeline'
 
