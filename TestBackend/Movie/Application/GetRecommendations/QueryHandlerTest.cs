@@ -1,7 +1,10 @@
 ﻿using AutoFixture;
+using Backend.Database.Transaction;
+using Backend.Database.TransactionManager;
 using Backend.Movie.Application.GetRecommendations;
 using Backend.Movie.Infrastructure;
 using Backend.Service;
+using Microsoft.Extensions.Configuration;
 using NSubstitute;
 
 namespace TestBackend.Movie.Application.GetRecommendations;
@@ -10,12 +13,15 @@ public class QueryHandlerTest
 {
     private QueryHandler _handler;
     private Fixture _fixture = new();
+    private readonly IConfiguration _configuration = Substitute.For<IConfiguration>();
     private readonly IMovieRepository _repository = Substitute.For<IMovieRepository>();
     private readonly IImageService _imageService = Substitute.For<IImageService>();
+    private readonly IDatabaseTransactionFactory _transactionFactory = Substitute.For<IDatabaseTransactionFactory>();
+
     
     public QueryHandlerTest()
     {
-        _handler = new QueryHandler(_repository, _imageService);
+        _handler = new QueryHandler(_configuration,_repository, _imageService, _transactionFactory);
     }
     
     [Fact]
@@ -26,7 +32,7 @@ public class QueryHandlerTest
         var numberOfMoviesGenerated = 3;
         var expectedMovies = _fixture.CreateMany<Backend.Movie.Domain.Movie>(numberOfMoviesGenerated).ToList();
 
-        _repository.GetRecommendedMovies(Arg.Any<int>(), Arg.Any<float>())
+        _repository.GetRecommendedMovies(Arg.Any<int>(), Arg.Any<float>(), Arg.Any<DbReadOnlyTransaction>())
             .Returns(expectedMovies);
         //Act
         var result = await _handler.Handle(query, CancellationToken.None);

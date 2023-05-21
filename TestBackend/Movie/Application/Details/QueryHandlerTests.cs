@@ -1,5 +1,7 @@
 ﻿using System.Net.NetworkInformation;
 using AutoFixture;
+using Backend.Database.Transaction;
+using Backend.Database.TransactionManager;
 using Backend.Movie.Application.GetDetails;
 using Backend.Movie.Infrastructure;
 using Backend.Service;
@@ -16,11 +18,12 @@ public class QueryHandlerTests
     private readonly IMovieRepository _repository = Substitute.For<IMovieRepository>();
     private readonly IImageService _imageService = Substitute.For<IImageService>();
     private readonly IResumeService _resumeService = Substitute.For<IResumeService>();
+    private readonly IDatabaseTransactionFactory _transactionFactory = Substitute.For<IDatabaseTransactionFactory>();
     private readonly IMediator _mediator = Substitute.For<IMediator>();
 
     public QueryHandlerTests()
     {
-        _handler = new QueryHandler(_repository, _imageService, _resumeService, _mediator);
+        _handler = new QueryHandler(_repository, _imageService, _resumeService, _mediator, _transactionFactory);
     }
 
     [Fact]
@@ -28,7 +31,7 @@ public class QueryHandlerTests
     {
         //Arrange
         var query = _fixture.Create<Query>();
-        _repository.ReadMovieFromId(query.Id).Throws<KeyNotFoundException>();
+        _repository.ReadMovieFromId(query.Id, Arg.Any<DbReadOnlyTransaction>()).Throws<KeyNotFoundException>();
         //Act-Assert
         await Assert.ThrowsAsync<KeyNotFoundException>(()=>_handler.Handle(query, CancellationToken.None));
     }
@@ -42,7 +45,7 @@ public class QueryHandlerTests
         var expectedPoster = _fixture.Create<Uri>();
         var expectedResume = _fixture.Create<string>();
         
-        _repository.ReadMovieFromId(query.Id).Returns(expectedMovie);
+        _repository.ReadMovieFromId(query.Id, Arg.Any<DbReadOnlyTransaction>()).Returns(expectedMovie);
         _imageService.GetPathForPoster(query.Id).Returns(expectedPoster);
         _resumeService.GetResume(query.Id).Returns(expectedResume);
         

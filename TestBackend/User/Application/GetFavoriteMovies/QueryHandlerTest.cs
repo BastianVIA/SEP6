@@ -1,4 +1,6 @@
 ﻿using AutoFixture;
+using Backend.Database.Transaction;
+using Backend.Database.TransactionManager;
 using Backend.Movie.Application.GetInfoFromMovies;
 using Backend.User.Infrastructure;
 using MediatR;
@@ -13,11 +15,12 @@ public class QueryHandlerTest
     private readonly QueryHandler _handler;
     private readonly IUserRepository _userRepository = Substitute.For<IUserRepository>();
     private readonly IMediator _mediator = Substitute.For<IMediator>();
+    private readonly IDatabaseTransactionFactory _transactionFactory = Substitute.For<IDatabaseTransactionFactory>();
     private readonly Fixture _fixture = new();
 
     public QueryHandlerTest()
     {
-        _handler = new QueryHandler(_userRepository, _mediator);
+        _handler = new QueryHandler(_userRepository, _mediator, _transactionFactory);
     }
 
     [Fact]
@@ -31,7 +34,7 @@ public class QueryHandlerTest
             FavoriteMovies = new List<string>()
         };
         var expectedMovies = new MoviesInfoResponse(new List<MovieInfoDto>());
-        _userRepository.ReadUserFromIdAsync(Arg.Any<string>()).Returns(expectedUser);
+        _userRepository.ReadUserFromIdAsync(Arg.Any<string>(),Arg.Any<DbReadOnlyTransaction>()).Returns(expectedUser);
         _mediator.Send(Arg.Any<Backend.Movie.Application.GetInfoFromMovies.Query>()).Returns(expectedMovies);
         //Act
         var result = await _handler.Handle(request, CancellationToken.None);
@@ -53,7 +56,7 @@ public class QueryHandlerTest
             Id = "realId",
             FavoriteMovies = listOfFavoriteMovies
         };
-        _userRepository.ReadUserFromIdAsync(Arg.Any<string>()).Returns(expectedUser);
+        _userRepository.ReadUserFromIdAsync(Arg.Any<string>(), Arg.Any<DbReadOnlyTransaction>()).Returns(expectedUser);
         _mediator.Send(Arg.Any<Backend.Movie.Application.GetInfoFromMovies.Query>()).Returns(expectedResponse);
         //Act
         var result = await _handler.Handle(request, CancellationToken.None);
