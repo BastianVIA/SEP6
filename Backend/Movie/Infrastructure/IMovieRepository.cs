@@ -16,4 +16,6 @@ public interface IMovieRepository
     Task Update(Domain.Movie movie, DbTransaction tx);
 
     Task<List<Domain.Movie>> GetTop100Movies(int MinVotesBeforeTop100, DbReadOnlyTransaction transaction);
+    Task<List<Domain.Movie>?> GetActedMoviesForPerson(string personId, DbReadOnlyTransaction tx);
+    Task<List<Domain.Movie>?> GetDirectedMoviesForPerson(string personId, DbReadOnlyTransaction tx);
 }

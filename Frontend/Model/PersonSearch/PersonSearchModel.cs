@@ -13,7 +13,7 @@ public class PersonSearchModel : NSwagBaseClient, IPersonSearchModel
         _client = client;
     }
     
-    public async Task<List<Person>> SearchForPersonAsync(string name, int? pageNumber = null)
+    public async Task<List<Entities.Person>> SearchForPersonAsync(string name, int? pageNumber = null)
     {
         return await _client.SearchForPersonAsync(name, pageNumber);
     }

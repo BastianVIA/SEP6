@@ -16,7 +16,7 @@ public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
         }
         var response = await _api.MovieAsync(movieId);
 
-        var actors = response.MovieDetailsDto.Actors?.Select(actor => new Entities.Actor
+        var actors = response.MovieDetailsDto.Actors?.Select(actor => new Entities.Person
         {
             ID = actor.Id,
             Name = actor.Name,
