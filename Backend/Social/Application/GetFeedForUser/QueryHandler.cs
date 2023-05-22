@@ -23,6 +23,7 @@ public class FeedPostDto
 public class ActivityDataDto
 {
     public string? MovieId { get; set; }
+    public string? MovieTitle { get; set; }
     public int? NewRating { get; set; }
     public int? OldRating { get; set; }
 }
@@ -30,6 +31,7 @@ public class ActivityDataDto
 public class FeedCommentDto
 {
     public Guid Id { get; set; }
+    public string DisplayNameOfUser { get; set; }
     public string UserId { get; set; }
     public string Content { get; set; }
 }
@@ -39,12 +41,14 @@ public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
     private readonly IDatabaseTransactionFactory _transactionFactory;
     private readonly IPostRepository _postRepository;
     private readonly ISocialUserRepository _userRepository;
+    private readonly IMediator _mediator;
     
-    public QueryHandler(IDatabaseTransactionFactory transactionFactory, IPostRepository postRepository, ISocialUserRepository userRepository)
+    public QueryHandler(IDatabaseTransactionFactory transactionFactory, IPostRepository postRepository, ISocialUserRepository userRepository, IMediator mediator)
     {
         _transactionFactory = transactionFactory;
         _postRepository = postRepository;
         _userRepository = userRepository;
+        _mediator = mediator;
     }
 
     public async Task<GetFeedForUserResponse> Handle(Query request, CancellationToken cancellationToken)
@@ -56,21 +60,21 @@ public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
             return new GetFeedForUserResponse(new List<FeedPostDto>());
         }
         var feedForUser = await _postRepository.GetFeedWithPostsFromUsers(user.Following, request.pageNumber, transaction, includeComments:true, includeReactions:true);
-        return toDto(feedForUser);
+        return await toDto(feedForUser);
     }
 
-    private GetFeedForUserResponse toDto(IList<Post> listOfPosts)
+    private async Task<GetFeedForUserResponse> toDto(IList<Post> listOfPosts)
     {
         List<FeedPostDto> dtoPosts = new List<FeedPostDto>();
         foreach (var post in listOfPosts)
         {
-            dtoPosts.Add(toDto(post));
+            dtoPosts.Add(await toDto(post));
         }
 
         return new GetFeedForUserResponse(dtoPosts);
     }
 
-    private FeedPostDto toDto(Post post)
+    private async Task<FeedPostDto> toDto(Post post)
     {
         var noOfReactions = 0;
         if (post.Reactions != null)
@@ -82,28 +86,35 @@ public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
             Id = post.Id,
             UserId = post.UserId,
             Topic = post.Topic,
-            ActivityDataDto = toDto(post.ActivityData),
+            ActivityDataDto = await toDto(post.ActivityData),
             TimeOfActivity = post.TimeOfActivity,
-            Comments = toDto(post.Comments),
+            Comments = await toDto(post.Comments),
             numberOfReactions = noOfReactions
         };
     }
 
-    private ActivityDataDto? toDto(ActivityData? activityData)
+    private async Task<ActivityDataDto?> toDto(ActivityData? activityData)
     {
         if (activityData == null)
         {
             return null;
         }
+
+        string? movieTitle = null;
+        if (activityData.MovieId != null)
+        {
+            movieTitle = await _mediator.Send(new Movie.Application.GetTitle.Query(activityData.MovieId));
+        }
         return new ActivityDataDto
         {
             MovieId = activityData.MovieId,
+            MovieTitle = movieTitle,
             NewRating = activityData.NewRating,
             OldRating = activityData.OldRating,
         };
     }
 
-    private List<FeedCommentDto> toDto(List<Comment>? comments)
+    private async Task<List<FeedCommentDto>> toDto(List<Comment>? comments)
     {
         var dtoComments = new List<FeedCommentDto>();
         if (comments == null)
@@ -113,11 +124,14 @@ public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
 
         foreach (var comment in comments)
         {
+            var displayNameOfUser = _mediator.Send(new User.Application.GetNameOfUser.Query(comment.UserId));
             dtoComments.Add(new FeedCommentDto
             {
                 Id = comment.Id,
+                DisplayNameOfUser =await displayNameOfUser,
                 UserId = comment.UserId,
                 Content = comment.Contents
+                
             });
         }
 
