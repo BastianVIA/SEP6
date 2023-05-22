@@ -13,6 +13,7 @@ public class FeedPostDto
 {
     public Guid Id;
     public string UserId;
+    public string UserDisplayname;
     public Activity Topic;
     public ActivityDataDto? ActivityDataDto;
     public int numberOfReactions;
@@ -83,10 +84,13 @@ public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
         {
             noOfReactions = post.Reactions.Count;
         }
+        var displayNameOfUser = _mediator.Send(new User.Application.GetNameOfUser.Query(post.UserId));
+
         return new FeedPostDto
         {
             Id = post.Id,
             UserId = post.UserId,
+            UserDisplayname = await displayNameOfUser,
             Topic = post.Topic,
             ActivityDataDto = await toDto(post.ActivityData),
             TimeOfActivity = post.TimeOfActivity,
