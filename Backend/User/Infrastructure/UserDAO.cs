@@ -15,5 +15,6 @@ public class UserDAO
     public string? Bio { get; set; }
     public List<UserMovieDAO>? FavoriteMovies { get; set; }
     public List<UserRatingDAO>? UserRatings { get; set; }
+    public List<UserReviewDAO>? UserReviews { get; set; }
 
 }

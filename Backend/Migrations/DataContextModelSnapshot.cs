@@ -74,6 +74,10 @@ namespace Backend.Migrations
                     b.Property<int?>("BirthYear")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ImdbId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -111,6 +115,9 @@ namespace Backend.Migrations
 
                     b.Property<string>("PostId")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReviewBody")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -250,6 +257,25 @@ namespace Backend.Migrations
                     b.ToTable("UserRatingDAO");
                 });
 
+            modelBuilder.Entity("Backend.User.Infrastructure.UserReviewDAO", b =>
+                {
+                    b.Property<string>("MovieId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("MovieId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserReviewDAO");
+                });
+
             modelBuilder.Entity("MovieDAOPersonDAO", b =>
                 {
                     b.Property<string>("ActedMoviesId")
@@ -381,6 +407,17 @@ namespace Backend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Backend.User.Infrastructure.UserReviewDAO", b =>
+                {
+                    b.HasOne("Backend.User.Infrastructure.UserDAO", "User")
+                        .WithMany("UserReviews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MovieDAOPersonDAO", b =>
                 {
                     b.HasOne("Backend.Movie.Infrastructure.MovieDAO", null)
@@ -475,6 +512,8 @@ namespace Backend.Migrations
                     b.Navigation("FavoriteMovies");
 
                     b.Navigation("UserRatings");
+
+                    b.Navigation("UserReviews");
                 });
 #pragma warning restore 612, 618
         }

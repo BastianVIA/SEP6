@@ -70,3 +70,15 @@ public class UpdatedRatingEvent : INotification
         NewRating = newRating;
     }
 }
+
+public class CreateReviewEvent : INotification
+{
+    public string UserId { get; }
+    public UserReview Review { get; }
+
+    public CreateReviewEvent(string userId, UserReview review)
+    {
+        UserId = userId;
+        Review = review;
+    }
+}
