@@ -27,7 +27,7 @@ public class MovieDetailsDto
     public string? Resume { get; set; }
 }
 
-public record DetailsRatingDto(float AverageRating, int NumberOfVotes);
+public record DetailsRatingDto(double AverageRating, int NumberOfVotes);
 
 public record DetailsPersonsDto(string Id, string Name, int? BirthYear);
 
