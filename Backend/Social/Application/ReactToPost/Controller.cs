@@ -1,13 +1,14 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System.ComponentModel.DataAnnotations;
 using Backend.Middleware;
+using Backend.SocialFeed.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.SocialFeed.Application.FollowUser;
+namespace Backend.Social.Application.ReactToPost;
 
 [ApiController]
-[Route("SocialFeed")]
+[Route("Social")]
 
 public class Controller : ControllerBase
 {
@@ -17,15 +18,15 @@ public class Controller : ControllerBase
     {
         _mediator = mediator;
     }
-
+    
     [HttpPut]
-    [Route("followUser")]
-    [Tags("SocialFeed")]
+    [Route("reactToPost")]
+    [Tags("Social")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize]
-    public async Task<IActionResult> Put([FromBody] string userIdToFollow)
+    public async Task<IActionResult> Put([FromBody] ReactToPostRequest request)
     {
         var userid = (string?)HttpContext.Items[HttpContextKeys.UserId];
         if (userid == null)
@@ -33,8 +34,16 @@ public class Controller : ControllerBase
             return BadRequest("No token for user provided");
         }
 
-        await _mediator.Send(new Command(userid, userIdToFollow));
+        await _mediator.Send(new Command(request.PostId, userid, request.Reation));
         return Ok();
 
+    }
+    
+    public class ReactToPostRequest
+    {
+        [Required]
+        public string PostId { get; set; }
+        [Required]
+        public TypeOfReaction Reation { get; set; }
     }
 }
