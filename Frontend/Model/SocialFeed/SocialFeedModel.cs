@@ -16,4 +16,14 @@ public class SocialFeedModel : ISocialFeedModel
     {
         return await _client.GetSocialFeed(userToken, pageNumber);
     }
+
+    public async Task ReactToSocialFeed(string userToken, string postId)
+    {
+        await _client.ReactToSocialFeed(userToken, postId);
+    }
+
+    public async Task CommentOnPost(string userToken, string postId, string comment)
+    {
+        await _client.CommentOnPost(userToken, postId, comment);
+    }
 }

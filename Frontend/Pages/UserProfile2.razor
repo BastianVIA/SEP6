@@ -1,4 +1,4 @@
-﻿@page "/UserProfile2"
+﻿@page "/UserProfile2/{UID}"
 @using Frontend.Entities
 @using Blazorise
 @using Blazorise.Charts
@@ -6,6 +6,7 @@
 @using Frontend.Model.Firebase
 @using Frontend.Model.UserProfilePicture
 @using Frontend.Model.UserProfiles
+@using Frontend.Components
 @inject NavigationManager NavManager
 @inject IUserProfilesModel UserProfilesModel
 @inject IFirebaseModel FirebaseModel
@@ -31,38 +32,26 @@
                 </Field>
             </Column>
             <Column ColumnSize="ColumnSize.Is3">
-                <h3><b>@user.Username</b></h3>
+                <h3>Display Name: <b>@user.Username</b></h3>
             </Column>
         </Row>
 
-        <Divider/>
-        <h4>Favorite Movies</h4>
+        <Divider Margin="Margin.Is5.FromBottom.Is5.FromTop"/>
+        
+        <div class="favorite-container">
+            <h4>Favorite Movies</h4>
             @if (favoriteMovies != null && favoriteMovies.Any())
             {
-                <Row>
-                    <CardDeck Height="Height.Is50">
-                    @foreach (var movie in favoriteMovies)
-                    {
-                        <Card @onclick="@(() => OnMovieClick(movie.Id))">
-                            <CardImage Source="@movie.PosterUrl.ToString()" Alt="poster"/>
-                            <CardBody Padding="Padding.Is1.FromStart.Is1.FromEnd.Is2.FromTop">
-                                <CardTitle>
-                                    @movie.Title
-                                </CardTitle>
-                                <CardText Position="Position.Absolute.Bottom.Is0" Margin="Margin.Is1.FromBottom">
-                                    @movie.Rating.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/>
-                                </CardText>
-                            </CardBody>
-                        </Card>
-                    }
-                    </CardDeck>
-                </Row>
+                <MovieTable MovieList="@favoriteMovies" PosterSize="100" OnMovieClicked="@OnMovieClick"/>
             }
             else
             {
                 <p>No favorite movies yet.</p>
             }
-        <Divider Margin="Margin.Is5.FromBottom"/>
+        </div>
+        
+        <Divider Margin="Margin.Is5.FromBottom.Is5.FromTop"/>
+        
         <Row>
             <Column ColumnSize="ColumnSize.Is4" Flex="Flex.AlignItems.Start">
                 <h5>Total Movies Reviewed: <b>@totalMoviesReviewed</b></h5>
@@ -74,8 +63,8 @@
                 <h5>Favorited Movies Average: <b>@averageRatingFavMovies.ToString("0.00")</b> ⭐</h5>
             </Column>
         </Row>
-        <Divider Margin="Margin.Is5.FromTop"/>
         
+        <Divider Margin="Margin.Is5.FromBottom.Is5.FromTop"/>
     }
     
     <div class="chart-container">
@@ -91,6 +80,8 @@
 </div>
 
 @code {
+    [Parameter]
+    public string UID { get; set; }
     public Chart<double> barChart;
     private string defaultProfilePicture = "/Images/NotFoundImage.jpg";
     private User user;
@@ -100,6 +91,7 @@
     private int totalMoviesReviewed = 0;
     private double averageRatingFavMovies = 0;
     private string profilePicture;
+    private int pageNumber { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -120,10 +112,10 @@
 
     private async Task LoadUserData()
     {
-        user = await UserProfilesModel.GetUserProfile(FirebaseModel.CurrentUser.UID);
-        user.ProfilePicture = UserProfilePictureModel.GetProfilePicture(FirebaseModel.CurrentUser.UID).Result;
-        profilePicture = Convert.ToBase64String(user.ProfilePicture, 0, user.ProfilePicture.Length);
-        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID);
+        user = await UserProfilesModel.GetUserProfile(UID);
+        // user.ProfilePicture = UserProfilePictureModel.GetProfilePicture(FirebaseModel.CurrentUser.UID).Result;
+        // profilePicture = Convert.ToBase64String(user.ProfilePicture, 0, user.ProfilePicture.Length);
+        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, UID);
         if (favoriteMovies.Any())
         {
             averageRatingFavMovies = favoriteMovies.Average(movie => movie.Rating?.AverageRating ?? 0);
