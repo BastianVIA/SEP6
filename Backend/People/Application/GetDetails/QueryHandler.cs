@@ -3,13 +3,14 @@ using Backend.Movie.GetTopMoviesForPerson;
 using Backend.People.Domain;
 using Backend.People.Infrastructure;
 using Backend.Service;
+using FirebaseAdmin.Auth;
 using MediatR;
 
 namespace Backend.People.Application.GetDetails;
 
 public record Query(string PersonId) : IRequest<GetPersonDetailsResponse>;
 
-public record GetPersonDetailsResponse(string Name, List<PersonDetailsMovieDto> ActedMovies,
+public record GetPersonDetailsResponse(string Id, string Name, List<PersonDetailsMovieDto> ActedMovies,
     List<PersonDetailsMovieDto> DirectedMovies, int? BirthYear, string? KnownFor = null, Uri? PathToPic = null,
     string? Bio = null);
 
@@ -18,6 +19,7 @@ public class PersonDetailsMovieDto
     public string MovieId { get; set; }
     public string Title { get; set; }
     public int ReleaseYear { get; set; }
+    public Uri? PathToPoster { get; set; }
 }
 
 public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
@@ -57,10 +59,10 @@ public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
         
         if (personDetails == null)
         {
-            return new GetPersonDetailsResponse(person.Name,actedMovies,directedMovies , person.BirthYear);
+            return new GetPersonDetailsResponse( person.Id, person.Name,actedMovies,directedMovies , person.BirthYear);
         }
         
-        return new GetPersonDetailsResponse(person.Name, actedMovies, directedMovies, person.BirthYear,
+        return new GetPersonDetailsResponse(person.Id, person.Name, actedMovies, directedMovies, person.BirthYear,
             personDetails.KnownFor, personDetails.PathToProfilePic, personDetails.Bio);
     }
 
@@ -78,7 +80,8 @@ public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
             {
                 MovieId = m.MovieId,
                 Title = m.Title,
-                ReleaseYear = m.ReleaseYear
+                ReleaseYear = m.ReleaseYear,
+                PathToPoster = m.PathToPoster
             });
         }
 

@@ -8,7 +8,7 @@ namespace Backend.Service;
 
 public class TMDBService : IImageService, IResumeService, IPersonService
 {
-    private const string DefaultImageSize = "original";
+    private const string DefaultImageSize = "w500";
     private string _apiKey;
 
     private readonly TMDbClient _client;

@@ -142,7 +142,8 @@ public class MovieRepository : IMovieRepository
             .Include(movie => movie.Rating)
             .LoadAsync();
 
-        orderedMovies = orderedMovies.OrderByDescending(movie => movie.Rating?.Votes ?? 0).ToList();
+        orderedMovies = orderedMovies.OrderByDescending(movie => movie.Rating?.Votes ?? 0)
+            .Take(5).ToList();
         
         return ToDomain(orderedMovies);
     }
@@ -171,43 +172,13 @@ public class MovieRepository : IMovieRepository
             .Include(movie => movie.Rating)
             .LoadAsync();
 
-        orderedMovies = orderedMovies.OrderByDescending(movie => movie.Rating?.Votes ?? 0).ToList();
+        orderedMovies = orderedMovies.OrderByDescending(movie => movie.Rating?.Votes ?? 0)
+            .Take(5).ToList();
         
         return ToDomain(orderedMovies);
     }
 
     
-    /*
-    public async Task<List<Domain.Movie>?> GetDirectedMoviesForPerson(string personId, DbReadOnlyTransaction tx)
-    {
-        var result = await tx.DataContext.Persons
-            .FirstOrDefaultAsync(p => p.Id == personId);
-
-        if (result == null)
-        {
-            return null;
-        }
-
-        await tx.DataContext.Entry(result)
-            .Collection(p => p.DirectedMovies)
-            .LoadAsync();
-
-        var orderedMovies = result.DirectedMovies.ToList();
-        var movieIds = orderedMovies.Select(movie => movie.Id).ToList();
-
-        await tx.DataContext.Entry(result)
-            .Collection(p => p.DirectedMovies)
-            .Query()
-            .Where(movie => movieIds.Contains(movie.Id))
-            .Include(movie => movie.Rating)
-            .LoadAsync();
-
-        orderedMovies = orderedMovies.OrderByDescending(movie => movie.Rating?.Votes ?? 0).ToList();
-        
-        return ToDomain(orderedMovies);
-    }
-*/
-
     private List<Domain.Movie>? ToDomain(ICollection<MovieDAO>? movies)
     {
         if (movies == null || !movies.Any())

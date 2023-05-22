@@ -5,9 +5,11 @@
 @inject IPersonModel PersonModel
 @inject NavigationManager NavManager
 
-<div class="person-container">
+@if (_person != null)
+{
+    <div class="person-container">
     <Row RowColumns="RowColumns.Are3">
-        <Column ColumnSize="ColumnSize.Is3">
+        <Column ColumnSize="ColumnSize.Is4">
             <Div Display="Display.Flex" Flex="Flex.JustifyContent.Center">
                 <img src="@_person.ImageUrl"/>
             </Div>
@@ -17,13 +19,13 @@
             <Row><Heading Size="HeadingSize.Is5">Biography</Heading></Row>
             <Row><Paragraph>@_person.Bio</Paragraph></Row>
         </Column>
-        <Column ColumnSize="ColumnSize.Is3">
+        <Column ColumnSize="ColumnSize.Is2">
             <Row><Heading Size="HeadingSize.Is5">Birthyear</Heading></Row>
             <Row><Text>@_person.BirthYear</Text></Row>
         </Column>
     </Row>
     <Row>
-        @if (_person.ActedInList.Count > 0)
+        @if (_person.ActedInList != null && _person.ActedInList.Any())
         {
             <Column>
                 <Row Margin="Margin.Is2.FromTop"><Heading Size="HeadingSize.Is5">Acted in movies</Heading></Row>
@@ -50,7 +52,7 @@
                 </Table>
             </Column>
         }
-        @if (_person.DirectedList.Count > 0)
+        @if (_person.DirectedList != null && _person.DirectedList.Any())
                 {
                     <Column>
                         <Row Margin="Margin.Is2.FromTop"><Heading Size="HeadingSize.Is5">Directed Movies</Heading></Row>
@@ -82,6 +84,7 @@
 </div>
 
 
+}
 
 
 @code {

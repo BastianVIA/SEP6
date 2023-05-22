@@ -9,6 +9,7 @@
 @inject IFavoriteMoviesModel FavoriteMoviesModel
 @inject IFirebaseModel FirebaseModel
 @using Blazorise.LottieAnimation
+@inject NavigationManager NavManager
 
 @if (movieLoaded)
 {
@@ -29,7 +30,7 @@
                     {
                         foreach (var actor in movie.Actors)
                         {
-                            <li>@actor.Name, @actor.BirthYear</li>
+                            <li  @onclick="@(() => OnPersonClicked(actor.ID))">@actor.Name, @actor.BirthYear</li>
                         }
                     }
                     else
@@ -68,7 +69,7 @@
                     {
                         foreach (var director in movie.Directors)
                         {
-                            <li>@director.Name, @director.BirthYear</li>
+                            <li  @onclick="@(() => OnPersonClicked(director.ID))">@director.Name, @director.BirthYear</li>
                         }
                     }
                     else
@@ -151,6 +152,9 @@ else
     {
         return (movie.IsFavorite != null && movie.IsFavorite.Value);
     }
-}
+    
+    private void OnPersonClicked(string personId){
+        NavManager.NavigateTo($"PersonDetails/{personId}");
+    }
 
 }

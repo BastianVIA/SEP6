@@ -1,41 +1,42 @@
-﻿using Frontend.Entities;
+﻿using System.Net.Http.Headers;
+using Frontend.Entities;
 
 namespace Frontend.Network.PersonDetail;
 
-public class PersonDetailClient : IPersonDetailClient
+public class PersonDetailClient : NSwagBaseClient, IPersonDetailClient
 {
-    public async Task<Person> GetPersonDetail(string actorId)
+  
+    public async Task<Person> GetPersonDetail(string personId)
     {
-        Console.WriteLine("in client: " + actorId);
-        return MockActor();
-    }
+        var response = await _api.DetailsAsync(personId);
+        var actedMovies = response.ActedMovies?.Select(movie => new Movie
+        {
+            Id = movie.MovieId,
+            Title = movie.Title,
+            ReleaseYear = movie.ReleaseYear,
+            PosterUrl = movie.PathToPoster
+        }).ToList();
+        
+        var directedMovies = response.DirectedMovies?.Select(movie => new Movie
+        {
+            Id = movie.MovieId,
+            Title = movie.Title,
+            ReleaseYear = movie.ReleaseYear,
+            PosterUrl = movie.PathToPoster
+        }).ToList();
 
-    private Person MockActor()
-    {
-        var movies = new List<Movie>();
-        movies.Add(new Movie()
+        var person = new Person
         {
-            PosterUrl = new Uri("https://image.tmdb.org/t/p/original/c54HpQmuwXjHq2C9wmoACjxoom3.jpg"),
-            Id = "tt0109830",
-            Title = "Forest Gump",
-            ReleaseYear = 1994
-        });
-        movies.Add(new Movie()
-        {
-            PosterUrl = new Uri("https://image.tmdb.org/t/p/original/c54HpQmuwXjHq2C9wmoACjxoom3.jpg"),
-            Id = "tt0120815",
-            Title = "Saving Ryan fyren",
-            ReleaseYear = 1998
-        });
-        return new Person()
-        {
-            Name = "Katteøje",
-            Bio = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed id tempus eros, sed dignissim metus. Nam non sem in libero fringilla rhoncus. Donec eu dui eleifend, tristique mi at, elementum metus. Etiam gravida congue sem a porta. Sed tempor sit amet neque non pharetra. Aenean viverra lorem dui, id varius justo elementum faucibus. Aliquam tempus magna eget lacus malesuada venenatis. Sed interdum vitae purus a hendrerit.",
-            ImageUrl = new Uri("https://www.themoviedb.org/t/p/w300_and_h450_bestv2/xRk889LiJsKlijIVp8KfHiZWw7X.jpg"),
-            BirthYear = 1984,
-            ActedInList = new List<Movie>(),
-            DirectedList = movies
+            ID = response.Id,
+            Name = response.Name,
+            ActedInList = actedMovies,
+            DirectedList = directedMovies,
+            BirthYear = response.BirthYear,
+            ImageUrl = response.PathToPic,
+            Bio = response.Bio,
+            KnownFor = response.KnownFor
 
         };
+        return person;
     }
 }
