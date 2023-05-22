@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230519152923_UserReviewss")]
-    partial class UserReviewss
+    [Migration("20230522141310_addingMigrationForReviews")]
+    partial class addingMigrationForReviews
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,7 +58,7 @@ namespace Backend.Migrations
                     b.Property<string>("MovieId")
                         .HasColumnType("TEXT");
 
-                    b.Property<float>("Rating")
+                    b.Property<double>("Rating")
                         .HasColumnType("REAL");
 
                     b.Property<int>("Votes")
@@ -76,6 +76,10 @@ namespace Backend.Migrations
 
                     b.Property<int?>("BirthYear")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("ImdbId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -114,6 +118,9 @@ namespace Backend.Migrations
 
                     b.Property<string>("PostId")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReviewBody")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
