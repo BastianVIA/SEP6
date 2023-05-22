@@ -17,7 +17,7 @@ public class User
     
     public int RatedMovies { get; set; }
     
-    public float AverageOfUserRatings { get; set; }
+    public double AverageOfUserRatings { get; set; }
     
     public ICollection<Int32Int32ValueTuple> RatingDataPoints { get; set; }
     

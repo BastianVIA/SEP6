@@ -107,6 +107,7 @@
         if (searchTerm == null) return;
         NavManager.NavigateTo($"SearchResult/{searchTerm}");
     }
+    
 
     private void SetDisplayName(object? sender, AlertEventArgs args)
     {
@@ -115,6 +116,12 @@
 
         displayName = FirebaseModel.CurrentUser.DisplayName;
         StateHasChanged();
+    }
+
+
+    private void ToggleSearchUsers(bool isSearchUsers)
+    {
+        searchUsers = isSearchUsers;
     }
     
     public void Dispose()
@@ -131,7 +138,7 @@
 
     private void MyProfile()
     {
-        NavManager.NavigateTo("/userprofile");
+        NavManager.NavigateTo("/userprofile2");
     }
 
 }
