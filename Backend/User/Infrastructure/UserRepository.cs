@@ -1,4 +1,5 @@
 using Backend.Database.Transaction;
+using Backend.Enum;
 using Backend.User.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,8 +8,8 @@ namespace Backend.User.Infrastructure;
 
 public class UserRepository : IUserRepository
 {
-
-    public  async Task<Domain.User> ReadUserFromIdAsync(string userId, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeFavoriteMovies =false, bool includeReviews = false)
+    private const int NrOfResultsEachPage = 10;
+    public async Task<Domain.User> ReadUserFromIdAsync(string userId, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeFavoriteMovies =false, bool includeReviews = false)
     {
         var query = tx.DataContext.Users.Where(u => u.Id == userId);
         if (includeRatings)
@@ -87,8 +88,7 @@ public class UserRepository : IUserRepository
 
         tx.DataContext.Users.Update(user);
     }
-    
-    
+
     public async Task<List<Domain.User>> SearchForUser(string displayName, UserSortingKey userSortingKey, SortingDirection sortingDirection, int requestPageNumber,
         DbReadOnlyTransaction tx)
     {

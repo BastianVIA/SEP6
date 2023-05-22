@@ -8,7 +8,9 @@
 @inject IMovieDetailModel MovieDetailModel
 @inject IFavoriteMoviesModel FavoriteMoviesModel
 @inject IFirebaseModel FirebaseModel
+@inject IUserModel UserModel
 @using Blazorise.LottieAnimation
+@using Frontend.Model.User
 @inject NavigationManager NavManager
 
 @if (movieLoaded)
@@ -96,10 +98,34 @@
         <Row>
             <AuthorizeView>
                 <Authorized>
-                    <Rating Color="Color.Primary" @onclick="@OnRatingChange" @bind-SelectedValue="UserRating" MaxValue="10"/>
+                    <Column>
+                        <Rating Color="Color.Primary" @onclick="@OnRatingChange" @bind-SelectedValue="UserRating" MaxValue="10"/>
+                    </Column>
+                    <Column TextAlignment="TextAlignment.End">
+                        <Button Color="Color.Primary" @onclick="@OnAddReview">Add Review</Button>
+                    </Column>
                 </Authorized>
             </AuthorizeView>
         </Row>
+        
+        <Modal @ref="modalRef">
+            <ModalContent Centered>
+                <ModalHeader>
+                    <ModalTitle>Add Review</ModalTitle>
+                    <CloseButton />
+                </ModalHeader>
+                <ModalBody>
+                    <Field>
+                        <FieldLabel>Review</FieldLabel>
+                        <MemoEdit @ref="@reviewText" Rows="15" Placeholder="Write your review here..."/>
+                    </Field>
+                </ModalBody>
+                <ModalFooter>
+                    <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
+                    <Button Color="Color.Primary" Clicked="@HideModal">Save Changes</Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
         
     </div>
 }
@@ -113,6 +139,8 @@ else
     [Parameter]
     public string MovieId { get; set; }
 
+    private Modal modalRef;
+    private MemoEdit reviewText;
     private Movie movie;
     private bool movieLoaded = false;
     public int UserRating;
@@ -157,4 +185,15 @@ else
         NavManager.NavigateTo($"PersonDetails/{personId}");
     }
 
+    private void OnAddReview()
+    {
+        reviewText.Text = String.Empty;
+        modalRef.Show();
+    }
+
+    private async Task HideModal()
+    {
+        await UserModel.SetReview(FirebaseModel.CurrentUser.TokenValue, MovieId, reviewText.Text);
+        modalRef.Hide();
+    }
 }
