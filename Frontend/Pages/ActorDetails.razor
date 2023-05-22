@@ -1,0 +1,67 @@
+﻿@page "/ActorDetails/{actorId}"
+@using Blazorise
+@using Frontend.Entities
+@using Frontend.Model.Actor
+@inject IActorModel ActorModel
+@inject NavigationManager NavManager
+
+<div class="actor-container">
+    <Row RowColumns="RowColumns.Are3">
+        <Column ColumnSize="ColumnSize.Is3">
+            <Div Display="Display.Flex" Flex="Flex.JustifyContent.Center">
+                <img src="@_actor.ImageUrl"/>
+            </Div>
+        </Column>
+        <Column ColumnSize="ColumnSize.Is6">
+            <Row><Heading Size="HeadingSize.Is2">@_actor.Name</Heading></Row>
+            <Row><Heading Size="HeadingSize.Is5">Biography</Heading></Row>
+            <Row><Paragraph>@_actor.Bio</Paragraph></Row>
+        </Column>
+        <Column ColumnSize="ColumnSize.Is3">
+            <Row><Heading Size="HeadingSize.Is5">Birthyear</Heading></Row>
+            <Row><Text>@_actor.BirthYear</Text></Row>
+        </Column>
+    </Row>
+    <Row Margin="Margin.Is2.FromTop"><Heading Size="HeadingSize.Is5">Acted in movies</Heading></Row>
+    <Row>
+         <Table Hoverable Striped>
+            <TableHeader>
+                <TableRow>
+                    <TableHeaderCell>Poster</TableHeaderCell>
+                    <TableHeaderCell>Title</TableHeaderCell>
+                    <TableHeaderCell>Release Year</TableHeaderCell>
+                    <TableHeaderCell>Rating</TableHeaderCell>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                @foreach (Movie movie in _actor.ActedInList)
+                {
+                    <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
+                        <TableRowCell><img src="@movie.PosterUrl" height="100px"/></TableRowCell>
+                        <TableRowCell>@movie.Title</TableRowCell>
+                        <TableRowCell>@movie.ReleaseYear</TableRowCell>
+                        <TableRowCell>@movie.Rating?.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/></TableRowCell>
+                    </TableRow>
+                }
+            </TableBody>
+        </Table>
+    </Row>
+</div>
+
+
+
+
+@code {
+    [Parameter] public string ActorId { get; set; }
+    private Actor _actor;
+    protected override async Task OnInitializedAsync()
+    {
+       _actor=  await ActorModel.GetActorDetails(ActorId);
+    }
+    
+    private void OnMovieClick(string movieId)
+    {
+        NavManager.NavigateTo($"movieDetails/{movieId}");
+    }
+
+}

@@ -1,27 +1,26 @@
-﻿using Backend.Database;
+﻿using Backend.Database.Transaction;
 using Backend.Enum;
 using Backend.Movie.Domain;
-using Backend.Service;
-using Microsoft.AspNetCore.Html;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
+
 
 namespace Backend.Movie.Infrastructure;
 
 public class MovieRepository : IMovieRepository
 {
-    private readonly DataContext _database;
-    private const int NumberOfResultsPerPage = 10;
+    private int NumberOfResultsPerPage;
+    private int Top100;
 
-    public MovieRepository(DataContext database)
+    public MovieRepository(IConfiguration configuration)
     {
-        _database = database;
+        NumberOfResultsPerPage = configuration.GetSection("QueryConstants").GetValue<int>("MoviesPerPage");
+        Top100 = configuration.GetSection("QueryConstants").GetValue<int>("Top100");
     }
 
     public async Task<List<Domain.Movie>> SearchForMovie(string title, MovieSortingKey movieSortingKey,
-        SortingDirection sortingDirection, int requestPageNumber)
+        SortingDirection sortingDirection, int requestPageNumber, DbReadOnlyTransaction tx)
     {
-        var query = _database.Movies.Include(m => m.Rating)
+        var query = tx.DataContext.Movies.Include(m => m.Rating)
             .Where(m => EF.Functions.Like(m.Title, $"%{title}%"));
 
         switch (movieSortingKey)
@@ -46,6 +45,175 @@ public class MovieRepository : IMovieRepository
 
 
         return ToDomain(await foundMovies);
+    }
+
+
+    public async Task<Domain.Movie> ReadMovieFromId(string id, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeActors = false, bool includeDirectors = false)
+    {
+        var query = tx.DataContext.Movies.Where(m => m.Id == id);
+        if (includeRatings)
+        {
+            query = query.Include(m => m.Rating);
+        }
+
+        var result = await query.FirstOrDefaultAsync();
+        if (result == null)
+        {
+            throw new KeyNotFoundException($"Could not find movie with id: {id}");
+        }
+
+        if (includeActors)
+        {
+            result.Actors = await tx.DataContext.Persons.Where(p => p.ActedMovies.Contains(result))
+                .Take(NumberOfResultsPerPage)
+                .ToListAsync();
+        }
+        if (includeDirectors)
+        {
+            result.Directors = await tx.DataContext.Persons.Where(p => p.DirectedMovies.Contains(result))
+                .Take(NumberOfResultsPerPage)
+                .ToListAsync();
+        }
+
+        return ToDomain(result);
+    }
+
+    public async Task<List<Domain.Movie>> ReadMoviesFromList(List<string> movieIds, int requestedPageNumber,
+        DbReadOnlyTransaction tx)
+    {
+        var foundMovies = tx.DataContext.Movies.Include(m => m.Rating)
+            .Where(m => movieIds.Contains(m.Id))
+            .Skip(NumberOfResultsPerPage * (requestedPageNumber - 1))
+            .Take(NumberOfResultsPerPage)
+            .ToListAsync();
+        return ToDomain(await foundMovies);
+    }
+
+    public async Task<List<Domain.Movie>> GetRecommendedMovies(int minVotes, float minRating, DbReadOnlyTransaction tx)
+    {
+        var random = new Random();
+        var movies = tx.DataContext.Movies
+            .Include(m => m.Rating)
+            .Where(m => m.Rating != null && m.Rating.Votes > minVotes && m.Rating.Rating > minRating)
+            .OrderBy(m => m.Rating.Votes * m.Rating.Rating)
+            .Take(200)
+            .ToList()
+            .OrderBy(m => random.Next())
+            .Take(NumberOfResultsPerPage)
+            .ToList();
+        return ToDomain(movies);
+    }
+
+    public async Task Update(Domain.Movie movie, DbTransaction tx)
+    {
+        tx.AddDomainEvents(movie.ReadAllDomainEvents());
+        var movieDao = await tx.DataContext.Movies
+            .Include(m => m.Rating)
+            .SingleAsync(m => m.Id == movie.Id);
+
+
+        excludeActorsAndDirectorsFromupdate(tx, movieDao);
+
+        movieDao.Title = movie.Title;
+        movieDao.Year = movie.ReleaseYear;
+
+        if (movie.Rating != null)
+        {
+            movieDao.Rating = FromDomain(movie.Rating, movie.Id);
+        }
+
+        tx.DataContext.Movies.Update(movieDao);
+    }
+
+    public async Task<List<Domain.Movie>> GetTop100Movies(int minVotes, DbReadOnlyTransaction tx)
+    {
+        var movies = tx.DataContext.Movies
+            .Include(m => m.Rating)
+            .Where(m => m.Rating != null && m.Rating.Votes > minVotes)
+            .OrderByDescending(m => m.Rating.Rating)
+            .Take(Top100)
+            .ToList();
+        return ToDomain(movies);
+    }
+
+    private static void excludeActorsAndDirectorsFromupdate(DbTransaction tx, MovieDAO movieDao)
+    {
+        if (movieDao.Actors == null)
+        {
+            movieDao.Actors = new List<PersonDAO>();
+        }
+
+        if (movieDao.Directors == null)
+        {
+            movieDao.Directors = new List<PersonDAO>();
+        }
+
+        tx.DataContext.Entry(movieDao).Collection(m => m.Actors).IsModified = false;
+        tx.DataContext.Entry(movieDao).Collection(m => m.Directors).IsModified = false;
+    }
+
+    private List<Domain.Movie> ToDomain(List<MovieDAO> movieDaos)
+    {
+        var listOfDomainMovies = new List<Domain.Movie>();
+        foreach (var movieDao in movieDaos)
+        {
+            listOfDomainMovies.Add(ToDomain(movieDao));
+        }
+
+        return listOfDomainMovies;
+    }
+
+    private Domain.Movie ToDomain(MovieDAO movieDao)
+    {
+        return new Domain.Movie
+        {
+            Id = movieDao.Id,
+            Title = movieDao.Title,
+            ReleaseYear = movieDao.Year,
+            Rating = ToDomain(movieDao.Rating),
+            Actors = ToDomain(movieDao.Actors),
+            Directors = ToDomain(movieDao.Directors)
+        };
+    }
+
+    private Domain.Rating? ToDomain(RatingDAO? ratingDao)
+    {
+        if (ratingDao == null)
+        {
+            return null;
+        }
+
+        return new Domain.Rating
+        {
+            AverageRating = ratingDao.Rating,
+            Votes = ratingDao.Votes
+        };
+    }
+
+    private RatingDAO FromDomain(Domain.Rating rating, string movieId)
+    {
+        return new RatingDAO
+        {
+            MovieId = movieId,
+            Rating = rating.AverageRating,
+            Votes = rating.Votes
+        };
+    }
+
+    private List<string>? ToDomain(ICollection<PersonDAO>? personDaos)
+    {
+        if (personDaos == null || personDaos.Count == 0)
+        {
+            return null;
+        }
+
+        var listOfPersons = new List<string>();
+        foreach (var personDao in personDaos)
+        {
+            listOfPersons.Add(personDao.Id);
+        }
+
+        return listOfPersons;
     }
 
     private IOrderedQueryable<MovieDAO> SearchForMoveOrderByVotesAsync(IQueryable<MovieDAO> query,
@@ -89,88 +257,5 @@ public class MovieRepository : IMovieRepository
             default:
                 throw new KeyNotFoundException($"{sortingDirection} not a valid order direction ");
         }
-    }
-
-
-    public async Task<Domain.Movie> ReadMovieFromId(string id)
-    {
-        var result = await _database.Movies.Where(m => m.Id == id).Include(m => m.Rating).FirstOrDefaultAsync();
-
-        if (result == null)
-        {
-            throw new KeyNotFoundException($"Could not find movie with id: {id}");
-        }
-
-        result.Actors = await _database.Persons.Where(p => p.ActedMovies.Contains(result)).Take(NumberOfResultsPerPage)
-            .ToListAsync();
-        result.Directors = await _database.Persons.Where(p => p.DirectedMovies.Contains(result))
-            .Take(NumberOfResultsPerPage)
-            .ToListAsync();
-
-        return ToDomain(result);
-    }
-
-    private List<Domain.Movie> ToDomain(List<MovieDAO> movieDaos)
-    {
-        var listOfDomainMovies = new List<Domain.Movie>();
-        foreach (var movieDao in movieDaos)
-        {
-            listOfDomainMovies.Add(ToDomain(movieDao));
-        }
-
-        return listOfDomainMovies;
-    }
-
-    private Domain.Movie ToDomain(MovieDAO movieDao)
-    {
-        return new Domain.Movie
-        {
-            Id = movieDao.Id,
-            Title = movieDao.Title,
-            ReleaseYear = movieDao.Year,
-            Rating = ToDomain(movieDao.Rating),
-            Actors = ToDomain(movieDao.Actors),
-            Directors = ToDomain(movieDao.Directors)
-        };
-    }
-
-    private Domain.Rating? ToDomain(RatingDAO? ratingDao)
-    {
-        if (ratingDao == null)
-        {
-            return null;
-        }
-
-        return new Domain.Rating
-        {
-            AverageRating = ratingDao.Rating,
-            Votes = ratingDao.Votes
-        };
-    }
-
-    private Domain.Person ToDomain(PersonDAO personDao)
-    {
-        return new Person
-        {
-            Id = personDao.Id,
-            Name = personDao.Name,
-            BirthYear = personDao.BirthYear
-        };
-    }
-
-    private List<Domain.Person>? ToDomain(ICollection<PersonDAO>? personDaos)
-    {
-        if (personDaos == null || personDaos.Count == 0)
-        {
-            return null;
-        }
-
-        var listOfPersons = new List<Domain.Person>();
-        foreach (var personDao in personDaos)
-        {
-            listOfPersons.Add(ToDomain(personDao));
-        }
-
-        return listOfPersons;
     }
 }

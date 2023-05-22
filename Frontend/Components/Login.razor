@@ -1,0 +1,98 @@
+﻿@using Microsoft.AspNetCore.Components
+@using System.ComponentModel.DataAnnotations
+@using Blazorise
+@using Frontend.Model.Firebase
+@using Frontend.Service
+@inject IFirebaseModel FirebaseModel;
+@namespace Frontend.Components
+@inject CustomAuthenticationStateProvider AuthStateProvider
+
+<div class="login-content">
+    <Card>
+        <CardBody>
+            <CardTitle Size="4" TextWeight="TextWeight.Bold" TextColor="TextColor.Primary">
+                Login
+            </CardTitle>
+            <CardText>
+                Please fill out the login form.
+            </CardText>
+            <div class="divider-line"><Divider/></div>
+            <Validations @ref="@loginValidations" Mode="ValidationMode.Auto" Model="@user">
+                <Validation Validator="ValidationRule.IsEmail">
+                    <Field Horizontal>
+                        <FieldLabel ColumnSize="ColumnSize.Is3">Email</FieldLabel>
+                        <FieldBody ColumnSize="ColumnSize.Is9">
+                            <TextEdit Placeholder="Enter email" @bind-Text="@user.Email">
+                                <Feedback>
+                                    <ValidationError />
+                                </Feedback>
+                            </TextEdit>
+                        </FieldBody>
+                    </Field>
+                </Validation>
+                <Validation>
+                    <Field Horizontal>
+                        <FieldLabel ColumnSize="ColumnSize.Is3">Password</FieldLabel>
+                        <FieldBody ColumnSize="ColumnSize.Is9">
+                            <TextEdit Role="TextRole.Password" Placeholder="Password" @bind-Text="@user.Password">
+                                <Feedback>
+                                    <ValidationError />
+                                </Feedback>
+                            </TextEdit>
+                        </FieldBody>
+                    </Field>
+                </Validation>
+            </Validations>
+            <Field Flex="Flex.JustifyContent.End" Margin="Margin.Is0">
+                <Button Clicked="OnLogin" Color="Color.Secondary" PreventDefaultOnSubmit>Sign Up</Button>
+                <Button Margin="Margin.Is3.FromStart" Clicked="LoginUser" Color="Color.Primary" Type="ButtonType.Submit" PreventDefaultOnSubmit>Login</Button>
+            </Field>
+        </CardBody>
+    </Card>
+</div>
+
+
+
+@code {
+    User user = new User();
+    Validations loginValidations;
+
+    [Parameter]
+    public EventCallback<bool> LoginSuccess { get; set; }
+    
+    [Parameter]
+    public EventCallback<bool> ShowLoginComponent { get; set; }
+
+    public class User
+    {
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid email.")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Password is required")]
+        [DataType(DataType.Password)]
+        public string Password { get; set; }
+    }
+
+
+    private async Task LoginUser()
+    {
+        if (!await loginValidations.ValidateAll()) return;
+
+        if (await FirebaseModel.Login(user.Email, user.Password))
+        {
+            AuthStateProvider.SignIn();
+            await LoginSuccess.InvokeAsync(true);
+        }
+        else
+        {
+            await LoginSuccess.InvokeAsync(false);
+        }
+    }
+
+    private async Task OnLogin()
+    {
+        await ShowLoginComponent.InvokeAsync(false);
+    }
+
+}

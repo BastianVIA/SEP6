@@ -1,0 +1,133 @@
+﻿
+@using Frontend.Entities
+@using Frontend.Service
+@inject IMovieSearchModel MovieSearchModel
+@inject NavigationManager NavManager
+@using Blazorise.LottieAnimation
+@using Blazorise
+@using Frontend.Model.MovieSearch
+
+<PageTitle>Search Result</PageTitle>
+
+@if (isDataFetched)
+{
+    <div class="page-content">
+        <h3>Search Result</h3>
+
+        @if (movieList.Count == 0)
+        {
+            <p size="20px">No such movie exists.</p>
+        }
+        <MovieTable MovieList="@movieList" PosterSize="200" Sortable="true" OnSortByRating="@SortByRating" OnSortByReleaseYear="@SortByReleaseYear" OnMovieClicked="@OnMovieClick"/>
+
+        <div class="page-navigation">
+            <button class="btn btn-secondary" @onclick="@GoToPreviousPage">
+                <Icon Name="@IconName.AngleLeft"/>
+            </button>
+            <div class="page-number">
+                <p>Page @pageNumber</p>
+            </div>
+            <button class="btn btn-secondary" @onclick="@GoToNextPage">
+                <Icon Name="@IconName.AngleRight"/>
+            </button>
+        </div>
+
+    </div>
+}
+else
+{ 
+    @if (isConnected)
+{
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
+}
+}
+@code {
+    [Parameter]
+    public string MovieTitle { get; set; }
+    private List<Movie> movieList = new();
+    private string movieTitle { get; set; }
+    private int pageNumber { get; set; }
+    
+    private bool isDataFetched = false;
+    private MovieSortingKey? sortingKey;
+    private SortingDirection? sortingDirection;
+    private int moviesPerPage = 10;
+    private bool isConnected = true;
+
+    [Parameter]
+    public string SearchTerm { get; set; } = string.Empty;
+    private SortingDirection? ratingSortingDirection = SortingDirection.ASC;
+    private SortingDirection? releaseYearSortingDirection = SortingDirection.ASC;
+
+
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        movieTitle = MovieTitle;
+        pageNumber = 1;
+        await SearchForMovie();
+    }
+
+    private async Task SearchForMovie()
+    {
+        isDataFetched = false;
+        movieList.Clear();
+        if (sortingKey == MovieSortingKey.Rating)
+        {
+            sortingDirection = ratingSortingDirection;
+        }
+        else if (sortingKey == MovieSortingKey.ReleaseYear)
+        {
+            sortingDirection = releaseYearSortingDirection;
+        }
+        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle, sortingKey, sortingDirection, pageNumber);
+        isDataFetched = true;
+    }
+
+    private void OnMovieClick(string movieId)
+    {
+        NavManager.NavigateTo($"movieDetails/{movieId}");
+    }
+
+    private async Task SortByRating()
+    {
+        sortingKey = MovieSortingKey.Rating;
+        ratingSortingDirection = ratingSortingDirection == SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
+        pageNumber = 1;
+        await SearchForMovie();
+    }
+
+    private async Task SortByReleaseYear()
+    {
+        sortingKey = MovieSortingKey.ReleaseYear;
+        releaseYearSortingDirection = releaseYearSortingDirection == SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
+        pageNumber = 1;
+        await SearchForMovie();
+    }
+
+    private async Task GoToNextPage()
+    {
+        if (movieList.Count < moviesPerPage)
+        {
+            return;
+        }
+        pageNumber++;
+        await SearchForMovie();
+    }
+
+    private async Task GoToPreviousPage()
+    {
+        if (pageNumber <= 1)
+        {
+            return;
+        }
+        pageNumber--;
+        await SearchForMovie();
+    }
+    
+    protected override void OnAfterRender(bool firstRender)
+    {
+        isConnected = firstRender;
+    }
+}
+
