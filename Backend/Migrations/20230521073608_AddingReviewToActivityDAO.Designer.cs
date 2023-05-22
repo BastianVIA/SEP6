@@ -3,6 +3,7 @@ using System;
 using Backend.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230521073608_AddingReviewToActivityDAO")]
+    partial class AddingReviewToActivityDAO
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -55,7 +58,7 @@ namespace Backend.Migrations
                     b.Property<string>("MovieId")
                         .HasColumnType("TEXT");
 
-                    b.Property<double>("Rating")
+                    b.Property<float>("Rating")
                         .HasColumnType("REAL");
 
                     b.Property<int>("Votes")
@@ -73,10 +76,6 @@ namespace Backend.Migrations
 
                     b.Property<int?>("BirthYear")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("ImdbId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()

@@ -18,4 +18,9 @@ public class UserModel : NSwagBaseClient, IUserModel
     {
         await _client.CreateUser(userToken, displayName, email);
     }
+
+    public async Task SetReview(string userToken, string movieId, string review)
+    {
+        await _client.SetReview(userToken, movieId, review);
+    }
 }

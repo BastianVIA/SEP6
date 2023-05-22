@@ -3,6 +3,6 @@
 [Serializable]
 public class Rating
 {
-    public float? AverageRating { get; set; }
+    public double? AverageRating { get; set; }
     public int? RatingCount { get; set; }
 }

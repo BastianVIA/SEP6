@@ -23,4 +23,5 @@ public class MovieDetailModel :NSwagBaseClient, IMovieDetailModel
     {
         await _client.SetMovieRating(userToken, movieId, rating);
     }
+    
 }
