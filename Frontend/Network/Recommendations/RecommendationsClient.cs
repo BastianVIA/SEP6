@@ -31,4 +31,8 @@ public class RecommendationsClient : NSwagBaseClient, IRecommendationsClient
         }
         return movies;
     }
+
+    public RecommendationsClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    {
+    }
 }

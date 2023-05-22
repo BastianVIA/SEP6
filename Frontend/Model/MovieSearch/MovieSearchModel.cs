@@ -8,7 +8,7 @@ namespace Frontend.Model.MovieSearch
     public class MovieSearchModel : NSwagBaseClient, IMovieSearchModel
     {
             private IMovieSearchClient _client;
-            public MovieSearchModel(IMovieSearchClient client)
+            public MovieSearchModel(IMovieSearchClient client,IConfiguration configuration,IHttpClientFactory clientFactory):base(clientFactory,configuration)
             {
                 _client = client;
             }

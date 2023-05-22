@@ -8,7 +8,7 @@ public class PersonSearchModel : NSwagBaseClient, IPersonSearchModel
 {
     private IPersonSearchClient _client;
     
-    public PersonSearchModel(IPersonSearchClient client)
+    public PersonSearchModel(IPersonSearchClient client,IConfiguration configuration,IHttpClientFactory clientFactory):base(clientFactory,configuration)
     {
         _client = client;
     }

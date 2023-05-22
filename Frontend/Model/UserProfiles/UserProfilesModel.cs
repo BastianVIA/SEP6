@@ -1,13 +1,14 @@
-﻿using Frontend.Network.UserProfiles;
+﻿using Frontend.Network;
+using Frontend.Network.UserProfiles;
 
 namespace Frontend.Model.UserProfiles;
 
-public class UserProfilesModel: IUserProfilesModel
+public class UserProfilesModel: NSwagBaseClient, IUserProfilesModel
 {
     private IUserProfileClient _client;
     public double AverageRating { get; set; }
 
-    public UserProfilesModel(IUserProfileClient client)
+    public UserProfilesModel(IUserProfileClient client,IConfiguration configuration,IHttpClientFactory clientFactory):base(clientFactory,configuration)
     {
         _client = client;
     }

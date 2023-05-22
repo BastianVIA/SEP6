@@ -57,4 +57,8 @@ public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
         await _api.RateMovieAsync(new SetRatingRequest { MovieId = movieId, Rating = rating });
         
     }
+
+    public MovieDetailClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    {
+    }
 }

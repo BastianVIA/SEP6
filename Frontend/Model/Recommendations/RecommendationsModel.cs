@@ -8,7 +8,7 @@ public class RecommendationsModel : NSwagBaseClient, IRecommendationsModel
 {
     private IRecommendationsClient _client;
     
-    public RecommendationsModel(IRecommendationsClient client)
+    public RecommendationsModel(IRecommendationsClient client,IConfiguration configuration,IHttpClientFactory clientFactory):base(clientFactory,configuration)
     {
         _client = client;
     }

@@ -33,4 +33,9 @@ public class MovieSearchClient : NSwagBaseClient, IMovieSearchClient
         }
         return movies;
     }
+
+    public MovieSearchClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    {
+        
+    }
 }

@@ -10,4 +10,8 @@ public class UserClient : NSwagBaseClient, IUserClient
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
         await _api.UserPOSTAsync(new CreateUserRequest{DisplayName = displayName, Email = email});
 }
+
+    public UserClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    {
+    }
 }

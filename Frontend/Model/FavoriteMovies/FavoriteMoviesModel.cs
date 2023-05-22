@@ -12,7 +12,7 @@ public class FavoriteMoviesModel : NSwagBaseClient, IFavoriteMoviesModel
 
     private IFavoriteMoviesClient _client;
 
-    public FavoriteMoviesModel(IFavoriteMoviesClient client)
+    public FavoriteMoviesModel(IFavoriteMoviesClient client,IConfiguration configuration,IHttpClientFactory clientFactory):base(clientFactory,configuration)
     {
         _client = client;
     }

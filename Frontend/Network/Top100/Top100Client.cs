@@ -31,4 +31,8 @@ public class Top100Client : NSwagBaseClient, ITop100Client
         }
         return movies;
     }
+
+    public Top100Client(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    {
+    }
 }

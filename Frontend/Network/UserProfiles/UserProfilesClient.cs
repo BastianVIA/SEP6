@@ -42,5 +42,9 @@ namespace Frontend.Network.UserProfiles
 
             return user;
         }
+
+        public UserProfileClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+        {
+        }
     }
 }

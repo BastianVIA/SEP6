@@ -9,7 +9,7 @@ public class UserModel : NSwagBaseClient, IUserModel
 {
     private IUserClient _client;
 
-    public UserModel(IUserClient client)
+    public UserModel(IUserClient client,IConfiguration configuration,IHttpClientFactory clientFactory):base(clientFactory,configuration)
     {
         _client = client;
     }

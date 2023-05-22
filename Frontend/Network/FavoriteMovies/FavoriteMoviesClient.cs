@@ -55,4 +55,8 @@ public class FavoriteMoviesClient : NSwagBaseClient, IFavoriteMoviesClient
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
         await _api.FavoritePUTAsync(movieId);
     }
+
+    public FavoriteMoviesClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    {
+    }
 }

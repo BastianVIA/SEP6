@@ -1,12 +1,13 @@
-﻿using Frontend.Network.UserSearch;
+﻿using Frontend.Network;
+using Frontend.Network.UserSearch;
 using Frontend.Service;
 namespace Frontend.Model.UserSearch;
 
-public class UserSearchModel:IUserSearchModel
+public class UserSearchModel:NSwagBaseClient, IUserSearchModel
 {
  
     private IUserSearchClient _client;
-    public UserSearchModel(IUserSearchClient client)
+    public UserSearchModel(IUserSearchClient client,IConfiguration configuration,IHttpClientFactory clientFactory):base(clientFactory,configuration)
     {
         _client = client;
     }

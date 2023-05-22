@@ -45,4 +45,8 @@ public class SocialFeedClient : NSwagBaseClient, ISocialFeedClient
 
         return userFeeds;
     }
+
+    public SocialFeedClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    {
+    }
 }
