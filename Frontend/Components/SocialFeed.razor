@@ -9,9 +9,11 @@
 @using Frontend.Model.UserProfiles
 @using Frontend.Service
 @using System.Diagnostics
+@using Frontend.Model.UserProfilePicture
 @inject ISocialFeedModel SocialFeedModel
 @inject IUserProfilesModel UserProfilesModel
 @inject IMovieDetailModel MovieDetailModel
+@inject IUserProfilePictureModel UserProfilePictureModel
 
 <div class="card-deck-container">
     
@@ -76,7 +78,8 @@
         {
             User user = await UserProfilesModel.GetUserProfile(userFeed.UserId);
             string postText = await GetTextBasedOnTopic(userFeed, user.Username);
-            var profilePicture = user.ProfilePicture ?? "Images/NotFoundImage.jpg";
+            user.ProfilePicture = UserProfilePictureModel.GetProfilePicture(FirebaseModel.CurrentUser.UID).Result;
+            var profilePicture = user.ProfilePicture != null ? Convert.ToBase64String(user.ProfilePicture, 0, user.ProfilePicture.Length) : "Images/NotFoundImage.jpg";
             var timeSincePostText = GetTimeSincePost(userFeed.TimeOfActivity);
             posts.Add(new Post
             {

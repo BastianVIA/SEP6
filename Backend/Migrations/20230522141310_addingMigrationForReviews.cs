@@ -10,13 +10,6 @@ namespace Backend.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-
-            migrationBuilder.AddColumn<string>(
-                name: "ReviewBody",
-                table: "ActivityDAO",
-                type: "TEXT",
-                nullable: true);
-
             migrationBuilder.CreateTable(
                 name: "UserReviewDAO",
                 columns: table => new

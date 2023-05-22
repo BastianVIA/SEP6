@@ -15,4 +15,9 @@ public class UserProfilePictureModel : IUserProfilePictureModel
     {
         await _client.UploadProfilePicture(userToken, profilePicture);
     }
+
+    public async Task<byte[]> GetProfilePicture(string userId)
+    {
+        return await _client.GetProfilePicture(userId);
+    }
 }

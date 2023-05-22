@@ -12,4 +12,18 @@ public class UserProfilePictureClient : NSwagBaseClient, IUserProfilePictureClie
         body.ImageData = profilePicture;
         await _api.UserImagePUTAsync(body);
     }
+
+    public async Task<byte[]> GetProfilePicture(string userId)
+    {
+        try
+        {
+            var response = await _api.UserImageGETAsync(userId);
+            return response.UserImageDto.ImageData;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 }

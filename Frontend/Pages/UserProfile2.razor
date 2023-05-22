@@ -25,7 +25,7 @@
     {
         <Row Margin="Margin.Is2.FromBottom">
             <Column ColumnSize="ColumnSize.Is3" >
-                <img src="@(!string.IsNullOrEmpty(user.ProfilePicture) ? user.ProfilePicture : defaultProfilePicture)" alt="profile pic" width="100%">
+                <img src="@(!string.IsNullOrEmpty(profilePicture) ? profilePicture : defaultProfilePicture)" alt="profile pic" width="100%">
                 <Field Width="Width.Is100">
                     <FilePicker Upload="UpdateProfilePicture"/>
                 </Field>
@@ -99,6 +99,7 @@
     private double averageRating = 0;
     private int totalMoviesReviewed = 0;
     private double averageRatingFavMovies = 0;
+    private string profilePicture;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -110,14 +111,18 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Console.WriteLine("Start");
         await LoadUserData();
         isUserLoaded = true;
         await InvokeAsync(StateHasChanged);
+        Console.WriteLine("Stop");
     }
 
     private async Task LoadUserData()
     {
         user = await UserProfilesModel.GetUserProfile(FirebaseModel.CurrentUser.UID);
+        user.ProfilePicture = UserProfilePictureModel.GetProfilePicture(FirebaseModel.CurrentUser.UID).Result;
+        profilePicture = Convert.ToBase64String(user.ProfilePicture, 0, user.ProfilePicture.Length);
         favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID);
         if (favoriteMovies.Any())
         {
