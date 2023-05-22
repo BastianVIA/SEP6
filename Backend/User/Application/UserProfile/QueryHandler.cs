@@ -19,8 +19,8 @@ public class UserProfileDto
     
     public List<string> FavoriteMovies { get; set; }
     public (int, int)[] RatingsDataPoints { get; set; }
-    public float AverageOfUserRatings { get; set; }
-    public float AverageOfFavoriteMovies { get; set; }
+    public double AverageOfUserRatings { get; set; }
+    public double AverageOfFavoriteMovies { get; set; }
 }
 
 public class UserRatingDto
@@ -55,7 +55,7 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
     }
     
 
-    private UserProfileDto toDto(Domain.User user, (int,int)[] ratingDataPoints, float favoriteAvg)
+    private UserProfileDto toDto(Domain.User user, (int,int)[] ratingDataPoints, double favoriteAvg)
     {
         return new UserProfileDto
         {
@@ -69,9 +69,9 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
         };
     }
 
-    private float GetFavoritesAverage(MoviesInfoResponse movieInfo)
+    private double GetFavoritesAverage(MoviesInfoResponse movieInfo)
     {
-        var count = 0.0f;
+        var count = 0.0d;
         foreach (var movie in movieInfo.MovieInfoDtos)
         {
             count += movie.Rating.AverageRating;

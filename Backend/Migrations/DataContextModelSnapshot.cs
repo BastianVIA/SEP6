@@ -43,13 +43,6 @@ namespace Backend.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("BirthYear")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Id");
@@ -62,7 +55,7 @@ namespace Backend.Migrations
                     b.Property<string>("MovieId")
                         .HasColumnType("TEXT");
 
-                    b.Property<float>("Rating")
+                    b.Property<double>("Rating")
                         .HasColumnType("REAL");
 
                     b.Property<int>("Votes")
@@ -71,6 +64,35 @@ namespace Backend.Migrations
                     b.HasKey("MovieId");
 
                     b.ToTable("Ratings");
+                });
+
+            modelBuilder.Entity("Backend.People.Infrastructure.PeopleDAO", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("BirthYear")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id");
+
+                    b.ToTable("People");
+                });
+
+            modelBuilder.Entity("Backend.People.Infrastructure.PeopleMovieDAO", b =>
+                {
+                    b.Property<string>("MovieId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("MovieId");
+
+                    b.ToTable("PeopleMovieDAO");
                 });
 
             modelBuilder.Entity("Backend.SocialFeed.Infrastructure.ActivityDAO", b =>
@@ -213,6 +235,36 @@ namespace Backend.Migrations
                     b.ToTable("Directors", (string)null);
                 });
 
+            modelBuilder.Entity("PeopleDAOPeopleMovieDAO", b =>
+                {
+                    b.Property<string>("ActedMoviesMovieId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ActorsId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ActedMoviesMovieId", "ActorsId");
+
+                    b.HasIndex("ActorsId");
+
+                    b.ToTable("ActedMovies", (string)null);
+                });
+
+            modelBuilder.Entity("PeopleDAOPeopleMovieDAO1", b =>
+                {
+                    b.Property<string>("DirectedMoviesMovieId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DirectorsId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("DirectedMoviesMovieId", "DirectorsId");
+
+                    b.HasIndex("DirectorsId");
+
+                    b.ToTable("DirectedMovies", (string)null);
+                });
+
             modelBuilder.Entity("SocialUserFollowers", b =>
                 {
                     b.Property<string>("FollowingId")
@@ -294,6 +346,36 @@ namespace Backend.Migrations
                         .IsRequired();
 
                     b.HasOne("Backend.Movie.Infrastructure.PersonDAO", null)
+                        .WithMany()
+                        .HasForeignKey("DirectorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PeopleDAOPeopleMovieDAO", b =>
+                {
+                    b.HasOne("Backend.People.Infrastructure.PeopleMovieDAO", null)
+                        .WithMany()
+                        .HasForeignKey("ActedMoviesMovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.People.Infrastructure.PeopleDAO", null)
+                        .WithMany()
+                        .HasForeignKey("ActorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PeopleDAOPeopleMovieDAO1", b =>
+                {
+                    b.HasOne("Backend.People.Infrastructure.PeopleMovieDAO", null)
+                        .WithMany()
+                        .HasForeignKey("DirectedMoviesMovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.People.Infrastructure.PeopleDAO", null)
                         .WithMany()
                         .HasForeignKey("DirectorsId")
                         .OnDelete(DeleteBehavior.Cascade)

@@ -29,6 +29,9 @@
                     </Authorized>
                 </AuthorizeView>
                 <BarItem>
+                    <BarLink To="/Top100">Top 100 Movies</BarLink>
+                </BarItem>
+                <BarItem>
                     <BarLink To="/ActorDetails/{224513}">Actor Page</BarLink>
                 </BarItem>
             </BarStart>
@@ -36,30 +39,10 @@
                 <BarItem>
                     <Addons>
                         <Addon AddonType="AddonType.Body">
-                            <TextEdit @bind-Text="@searchTerm" Placeholder="Search term" @onkeydown="HandleKeyDown" />
+                            <TextEdit @bind-Text="@searchTerm" Placeholder="Search"/>
                         </Addon>
-                
-                        <Addon AddonType="AddonType.Body">                
-                            <Dropdown>
-                                <DropdownToggle Color="Color.Primary" TextWeight="TextWeight.Bold">
-                                    @if (searchOptionName != null && !string.IsNullOrEmpty(searchOptionName))
-                                    {
-                                        @searchOptionName
-                                    }
-                                    else
-                                    {
-                                        <span>Search Options</span>
-                                    }
-                                </DropdownToggle>
-                                <DropdownMenu>
-                                    <DropdownItem Clicked="@(async () =>  await ToggleDropdown(true))">Search User</DropdownItem>
-                                    <DropdownItem Clicked="@(async () =>  await ToggleDropdown(false))">Search Movie</DropdownItem>
-                                </DropdownMenu>
-                            </Dropdown>
-                        </Addon>
-                        
                         <Addon AddonType="AddonType.End">
-                            <Button Color="Color.Primary" @onclick="PerformSearch">
+                            <Button Color="Color.Primary" Clicked="PerformSearch">
                                 <Icon Name="IconName.Search"/>
                             </Button>
                         </Addon>
@@ -111,32 +94,19 @@
 
         
     }
-    
-    private async Task HandleKeyDown(KeyboardEventArgs e)
+    private void HandleKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
-            await PerformSearch();
+            PerformSearch();
         }
     }
-    private async Task PerformSearch()
+
+    private void PerformSearch()
     {
         if (searchTerm == null) return;
-
-        if (searchUsers)
-        {
-            searchOptionName = "Search User";
-            NavManager.NavigateTo($"userSearch/{searchTerm}");
-        }
-        else
-        {
-            searchOptionName = "Search Movie";
-            NavManager.NavigateTo($"searchResult/{searchTerm}");
-        }
-
-        await InvokeAsync(StateHasChanged);
+        NavManager.NavigateTo($"SearchResult/{searchTerm}");
     }
-    
 
     private void SetDisplayName(object? sender, AlertEventArgs args)
     {
@@ -145,28 +115,6 @@
 
         displayName = FirebaseModel.CurrentUser.DisplayName;
         StateHasChanged();
-    }
-
-
-    private void ToggleSearchUsers(bool isSearchUsers)
-    {
-        searchUsers = isSearchUsers;
-    }
-    
-    private async Task ToggleDropdown(bool searchUsers)
-    {
-        this.searchUsers = searchUsers;
-
-        if (searchUsers)
-        {
-            searchOptionName = "Search User";
-        }
-        else
-        {
-            searchOptionName = "Search Movie";
-        }
-
-        await InvokeAsync(StateHasChanged);
     }
     
     public void Dispose()

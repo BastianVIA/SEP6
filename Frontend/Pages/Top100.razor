@@ -1,0 +1,33 @@
+﻿@page "/Top100"
+@using Frontend.Entities
+@inject NavigationManager NavManager
+@inject ITop100Model Top100Model
+@using Blazorise.LottieAnimation
+@using Frontend.Components
+@using Frontend.Model.Top100
+@using Blazorise
+
+@if (_movieList.Count > 0)
+{
+    <div class="top100-container">
+        <Heading Size="HeadingSize.Is3">FarligTigerMDB Top100</Heading>
+        <MovieTable MovieList="@_movieList" PosterSize="200" IndexedList="true" OnMovieClicked="@OnMovieClick"/>
+    </div>
+}
+else
+{
+    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
+}
+
+@code {
+    private List<Movie> _movieList = new();
+    protected async override Task OnInitializedAsync()
+    {
+        _movieList = await Top100Model.GetTop100List();
+    }
+    
+    private void OnMovieClick(string movieId)
+    {
+        NavManager.NavigateTo($"movieDetails/{movieId}");
+    }
+}

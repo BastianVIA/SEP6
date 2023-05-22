@@ -1,0 +1,79 @@
+﻿@using Frontend.Entities
+@inject NavigationManager NavManager
+@using Blazorise
+
+
+<Table Hoverable Striped>
+    <TableHeader>
+        <TableRow>
+            @if (IndexedList)
+            {
+                <TableHeaderCell>#</TableHeaderCell>
+            }
+            <TableHeaderCell>Poster</TableHeaderCell>
+            <TableHeaderCell>Title</TableHeaderCell>
+            <TableHeaderCell>Release Year
+                @if (Sortable)
+                {
+                    <Button Color="Color.Secondary" Clicked="SortByReleaseYear"><Icon Name="@IconName.AngleDown"/></Button>
+                }
+            </TableHeaderCell>
+            <TableHeaderCell>Rating
+                @if (Sortable)
+                {
+                    <Button Color="Color.Secondary" Clicked="SortByRating"><Icon Name="@IconName.AngleDown"/></Button>
+                }
+            </TableHeaderCell>
+        </TableRow>
+    </TableHeader>
+    <TableBody>
+        @foreach (Movie movie in MovieList)
+        {
+            <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
+                @if (IndexedList)
+                {
+                    <TableRowCell>@(_indexCount++)</TableRowCell>
+                }
+                <TableRowCell><img src="@movie.PosterUrl" height="@PosterSize"/></TableRowCell>
+                <TableRowCell>@movie.Title</TableRowCell>
+                <TableRowCell>@movie.ReleaseYear</TableRowCell>
+                <TableRowCell>@movie.Rating?.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/></TableRowCell>
+            </TableRow>
+        }
+    </TableBody>
+</Table>
+
+@code {
+    [Parameter]
+    public List<Movie> MovieList { get; set; }
+    [Parameter]
+    public bool Sortable { get; set; }
+    [Parameter]
+    public bool IndexedList { get; set; }
+    [Parameter]
+    public EventCallback<string> OnMovieClicked { get; set; }
+    [Parameter]
+    public EventCallback<Action> OnSortByRating { get; set; }
+    [Parameter]
+    public EventCallback<Action> OnSortByReleaseYear { get; set; }
+    [Parameter]
+    public int PosterSize { get; set; }
+
+    private int _indexCount = 1;
+
+    private void OnMovieClick(string movieId)
+    {
+        OnMovieClicked.InvokeAsync(movieId);
+    }
+
+    private void SortByReleaseYear()
+    {
+        OnSortByReleaseYear.InvokeAsync();
+    }
+
+    private void SortByRating()
+    {
+        OnSortByRating.InvokeAsync();
+    }
+
+}

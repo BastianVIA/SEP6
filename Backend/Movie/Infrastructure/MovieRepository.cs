@@ -8,7 +8,14 @@ namespace Backend.Movie.Infrastructure;
 
 public class MovieRepository : IMovieRepository
 {
-    private const int NumberOfResultsPerPage = 10;
+    private int NumberOfResultsPerPage;
+    private int Top100;
+
+    public MovieRepository(IConfiguration configuration)
+    {
+        NumberOfResultsPerPage = configuration.GetSection("QueryConstants").GetValue<int>("MoviesPerPage");
+        Top100 = configuration.GetSection("QueryConstants").GetValue<int>("Top100");
+    }
 
     public async Task<List<Domain.Movie>> SearchForMovie(string title, MovieSortingKey movieSortingKey,
         SortingDirection sortingDirection, int requestPageNumber, DbReadOnlyTransaction tx)
@@ -118,6 +125,17 @@ public class MovieRepository : IMovieRepository
         tx.DataContext.Movies.Update(movieDao);
     }
 
+    public async Task<List<Domain.Movie>> GetTop100Movies(int minVotes, DbReadOnlyTransaction tx)
+    {
+        var movies = tx.DataContext.Movies
+            .Include(m => m.Rating)
+            .Where(m => m.Rating != null && m.Rating.Votes > minVotes)
+            .OrderByDescending(m => m.Rating.Rating)
+            .Take(Top100)
+            .ToList();
+        return ToDomain(movies);
+    }
+
     private static void excludeActorsAndDirectorsFromupdate(DbTransaction tx, MovieDAO movieDao)
     {
         if (movieDao.Actors == null)
@@ -172,16 +190,6 @@ public class MovieRepository : IMovieRepository
         };
     }
 
-    private Domain.Person ToDomain(PersonDAO personDao)
-    {
-        return new Person
-        {
-            Id = personDao.Id,
-            Name = personDao.Name,
-            BirthYear = personDao.BirthYear
-        };
-    }
-
     private RatingDAO FromDomain(Domain.Rating rating, string movieId)
     {
         return new RatingDAO
@@ -192,17 +200,17 @@ public class MovieRepository : IMovieRepository
         };
     }
 
-    private List<Domain.Person>? ToDomain(ICollection<PersonDAO>? personDaos)
+    private List<string>? ToDomain(ICollection<PersonDAO>? personDaos)
     {
         if (personDaos == null || personDaos.Count == 0)
         {
             return null;
         }
 
-        var listOfPersons = new List<Domain.Person>();
+        var listOfPersons = new List<string>();
         foreach (var personDao in personDaos)
         {
-            listOfPersons.Add(ToDomain(personDao));
+            listOfPersons.Add(personDao.Id);
         }
 
         return listOfPersons;

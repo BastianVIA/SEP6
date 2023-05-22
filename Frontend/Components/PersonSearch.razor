@@ -1,0 +1,107 @@
+﻿
+@using Frontend.Entities
+@using Frontend.Service
+@inject NavigationManager NavManager
+@using Blazorise.LottieAnimation
+@using Blazorise
+@using Frontend.Model.PersonSearch
+@inject IPersonSearchModel PersonSearchModel
+
+<PageTitle>Search Result</PageTitle>
+
+@if (isDataFetched)
+{
+    <div class="page-content">
+        <h3>Search Result</h3>
+
+        @if (personList.Count == 0)
+        {
+            <p size="20px">No such person exists.</p>
+        }
+        <Table Hoverable Striped>
+            <TableHeader>
+                <TableRow>
+                    <TableHeaderCell>Name</TableHeaderCell>
+                    <TableHeaderCell>Birth Year</TableHeaderCell>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                @foreach(Person person in personList)
+                {
+                    <TableRow @onclick="@(() => OnPersonClick(person.ID))">
+                        <TableRowCell>@person.Name</TableRowCell>
+                        <TableRowCell>@person.BirthYear</TableRowCell>
+                    </TableRow> 
+                }
+            </TableBody>
+        </Table>
+
+        <div class="page-navigation">
+            <button class="btn btn-secondary" @onclick="@GoToPreviousPage">
+                <Icon Name="@IconName.AngleLeft"/>
+            </button>
+            <div class="page-number">
+                <p>Page @pageNumber</p>
+            </div>
+            <button class="btn btn-secondary" @onclick="@GoToNextPage">
+                <Icon Name="@IconName.AngleRight"/>
+            </button>
+        </div>
+
+    </div>
+}
+else
+{
+    @* <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/> *@
+}
+
+@code {
+    [Parameter]
+    public string PersonName { get; set; }
+    private IList<Person> personList = new List<Person>();
+    private int pageNumber { get; set; }
+    
+    private bool isDataFetched = false;
+    private int peoplePerPage = 20;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        pageNumber = 1;
+        await SearchForPeople();
+    }
+
+    private async Task SearchForPeople()
+    {
+        isDataFetched = false;
+        personList.Clear();
+        personList = await PersonSearchModel.SearchForPersonAsync(PersonName, pageNumber);
+        isDataFetched = true;
+    }
+
+    private async Task GoToNextPage()
+    {
+        if (personList.Count < peoplePerPage)
+        {
+            return;
+        }
+        pageNumber++;
+        await SearchForPeople();
+    }
+
+    private async Task GoToPreviousPage()
+    {
+        if (pageNumber <= 1)
+        {
+            return;
+        }
+        pageNumber--;
+        await SearchForPeople();
+    }
+
+    private void OnPersonClick(string personId)
+    {
+        return;
+    }
+
+}
+
