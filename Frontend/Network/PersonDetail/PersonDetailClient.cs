@@ -1,16 +1,16 @@
 ﻿using Frontend.Entities;
 
-namespace Frontend.Network.Actor;
+namespace Frontend.Network.PersonDetail;
 
-public class ActorDetailClient : IActorDetailClient
+public class PersonDetailClient : IPersonDetailClient
 {
-    public async Task<Entities.Actor> GetActorDetail(string actorId)
+    public async Task<Person> GetPersonDetail(string actorId)
     {
         Console.WriteLine("in client: " + actorId);
         return MockActor();
     }
 
-    private Entities.Actor MockActor()
+    private Person MockActor()
     {
         var movies = new List<Movie>();
         movies.Add(new Movie()
@@ -27,14 +27,15 @@ public class ActorDetailClient : IActorDetailClient
             Title = "Saving Ryan fyren",
             ReleaseYear = 1998
         });
-        return new Entities.Actor()
+        return new Person()
         {
             Name = "Katteøje",
             Bio = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed id tempus eros, sed dignissim metus. Nam non sem in libero fringilla rhoncus. Donec eu dui eleifend, tristique mi at, elementum metus. Etiam gravida congue sem a porta. Sed tempor sit amet neque non pharetra. Aenean viverra lorem dui, id varius justo elementum faucibus. Aliquam tempus magna eget lacus malesuada venenatis. Sed interdum vitae purus a hendrerit.",
             ImageUrl = new Uri("https://www.themoviedb.org/t/p/w300_and_h450_bestv2/xRk889LiJsKlijIVp8KfHiZWw7X.jpg"),
             BirthYear = 1984,
-            ActedInList = movies
-            
+            ActedInList = new List<Movie>(),
+            DirectedList = movies
+
         };
     }
 }

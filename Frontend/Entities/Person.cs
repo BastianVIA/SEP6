@@ -10,4 +10,6 @@ public class Person
     
     public string Bio { get; set; }
     public int? BirthYear { get; set; }
+    public List<Movie> ActedInList { get; set; }
+    public List<Movie> DirectedList { get; set; }
 }

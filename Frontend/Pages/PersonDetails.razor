@@ -1,0 +1,100 @@
+﻿@page "/PersonDetails/{personId}"
+@using Blazorise
+@using Frontend.Entities
+@using Frontend.Model.Person
+@inject IPersonModel PersonModel
+@inject NavigationManager NavManager
+
+<div class="person-container">
+    <Row RowColumns="RowColumns.Are3">
+        <Column ColumnSize="ColumnSize.Is3">
+            <Div Display="Display.Flex" Flex="Flex.JustifyContent.Center">
+                <img src="@_person.ImageUrl"/>
+            </Div>
+        </Column>
+        <Column ColumnSize="ColumnSize.Is6">
+            <Row><Heading Size="HeadingSize.Is2">@_person.Name</Heading></Row>
+            <Row><Heading Size="HeadingSize.Is5">Biography</Heading></Row>
+            <Row><Paragraph>@_person.Bio</Paragraph></Row>
+        </Column>
+        <Column ColumnSize="ColumnSize.Is3">
+            <Row><Heading Size="HeadingSize.Is5">Birthyear</Heading></Row>
+            <Row><Text>@_person.BirthYear</Text></Row>
+        </Column>
+    </Row>
+    <Row>
+        @if (_person.ActedInList.Count > 0)
+        {
+            <Column>
+                <Row Margin="Margin.Is2.FromTop"><Heading Size="HeadingSize.Is5">Acted in movies</Heading></Row>
+                <Table Hoverable Striped>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHeaderCell>Poster</TableHeaderCell>
+                            <TableHeaderCell>Title</TableHeaderCell>
+                            <TableHeaderCell>Release Year</TableHeaderCell>
+                            <TableHeaderCell>Rating</TableHeaderCell>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        @foreach (Movie movie in _person.ActedInList)
+                        {
+                            <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
+                                <TableRowCell><img src="@movie.PosterUrl" height="100px"/></TableRowCell>
+                                <TableRowCell>@movie.Title</TableRowCell>
+                                <TableRowCell>@movie.ReleaseYear</TableRowCell>
+                                <TableRowCell>@movie.Rating?.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/></TableRowCell>
+                            </TableRow>
+                        }
+                    </TableBody>
+                </Table>
+            </Column>
+        }
+        @if (_person.DirectedList.Count > 0)
+                {
+                    <Column>
+                        <Row Margin="Margin.Is2.FromTop"><Heading Size="HeadingSize.Is5">Directed Movies</Heading></Row>
+                        <Table Hoverable Striped>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHeaderCell>Poster</TableHeaderCell>
+                                    <TableHeaderCell>Title</TableHeaderCell>
+                                    <TableHeaderCell>Release Year</TableHeaderCell>
+                                    <TableHeaderCell>Rating</TableHeaderCell>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                @foreach (Movie movie in _person.DirectedList)
+                                {
+                                    <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
+                                        <TableRowCell><img src="@movie.PosterUrl" height="100px"/></TableRowCell>
+                                        <TableRowCell>@movie.Title</TableRowCell>
+                                        <TableRowCell>@movie.ReleaseYear</TableRowCell>
+                                        <TableRowCell>@movie.Rating?.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/></TableRowCell>
+                                    </TableRow>
+                                }
+                            </TableBody>
+                        </Table>
+                    </Column>
+                }
+
+    </Row>
+</div>
+
+
+
+
+@code {
+    [Parameter] public string PersonId { get; set; }
+    private Person _person;
+    protected override async Task OnInitializedAsync()
+    {
+       _person=  await PersonModel.GetPersonDetails(PersonId);
+    }
+    
+    private void OnMovieClick(string movieId)
+    {
+        NavManager.NavigateTo($"movieDetails/{movieId}");
+    }
+
+}
