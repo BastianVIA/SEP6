@@ -1,7 +1,5 @@
-using Frontend.Model.MovieDetailModel;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Frontend.Model.MovieSearchModel;
 using Frontend.Service;
 
 using Blazorise.Bootstrap;
@@ -50,14 +48,6 @@ builder.Services.AddScoped<IRecommendationsClient, RecommendationsClient>();
 builder.Services.AddScoped<IPersonSearchClient, PersonSearchClient>();
 builder.Services.AddScoped<IMovieSearchModel, MovieSearchModel>();
 builder.Services.AddScoped<IMovieDetailModel, MovieDetailModel>();
-
-var configuration = builder.Configuration;
-var backendApiUrl = configuration.GetValue<string>("BackendApiUrl"); // You should define this in your configuration
-
-builder.Services.AddHttpClient("BackendApi", client => 
-{
-    client.BaseAddress = new Uri(backendApiUrl);
-});
 builder.Services.AddScoped<IFirebaseModel, FirebaseModel>();
 builder.Services.AddScoped<IFavoriteMoviesModel, FavoriteMoviesModel>();
 builder.Services.AddScoped<IUserModel, UserModel>();
@@ -77,6 +67,16 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
 builder.Services.AddAuthorizationCore();
+
+
+
+var configuration = builder.Configuration;
+var backendApiUrl = configuration.GetValue<string>("BackendApiUrl");
+
+builder.Services.AddHttpClient("BackendApi", client => 
+{
+    client.BaseAddress = new Uri(backendApiUrl);
+});
 
 builder.Services
     .AddBlazorise( options =>
