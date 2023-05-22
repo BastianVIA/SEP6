@@ -50,4 +50,9 @@ public class FavoriteMoviesClient : NSwagBaseClient, IFavoriteMoviesClient
         await _api.FavoritePUTAsync(movieId);
     }
     
+    public async Task DeleteFavoriteMovie(string bearerToken, string movieId)
+    {
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+        await _api.FavoritePUTAsync(movieId);
+    }
 }
