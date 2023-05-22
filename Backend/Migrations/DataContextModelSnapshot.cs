@@ -55,7 +55,7 @@ namespace Backend.Migrations
                     b.Property<string>("MovieId")
                         .HasColumnType("TEXT");
 
-                    b.Property<float>("Rating")
+                    b.Property<double>("Rating")
                         .HasColumnType("REAL");
 
                     b.Property<int>("Votes")
@@ -73,6 +73,10 @@ namespace Backend.Migrations
 
                     b.Property<int?>("BirthYear")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("ImdbId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()

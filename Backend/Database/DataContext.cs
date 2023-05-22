@@ -15,7 +15,6 @@ public class DataContext : DbContext
     public DbSet<UserDAO> Users { get; set; }
     public DbSet<PeopleDAO> People { get; set; }
     public DbSet<PostDAO> Posts { get; set; }
-    
     public DbSet<SocialUserDAO> SocialUsers { get; set; }
 
     public DataContext(IConfiguration configuration, DbContextOptions options) : base(options)

@@ -5,6 +5,7 @@
 @inject NavigationManager NavManager
 @inject IRecommendationsModel RecommendationsModel
 @using Blazorise.LottieAnimation
+@using Frontend.Components
 
 @if (recommendationsLoaded)
 {
@@ -67,13 +68,20 @@
         </Carousel>
         
     </div>
+    
+    
+    <AuthorizeView>
+        <Authorized>
+            <SocialFeed/>
+        </Authorized>
+    </AuthorizeView>
+    
 }
 
 else
 {
     <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
 }
-
 @code {
 
     private IList<Movie> recommendations = new List<Movie>();

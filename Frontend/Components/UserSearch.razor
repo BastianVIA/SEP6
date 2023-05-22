@@ -1,5 +1,4 @@
-﻿
-@using Frontend.Entities
+﻿@using Frontend.Entities
 @using Frontend.Service
 @inject IUserSearchModel UserSearchModel
 @inject NavigationManager NavManager
@@ -22,20 +21,39 @@
             <TableHeader>
                 <TableRow>
                     <TableHeaderCell>Profile Picture</TableHeaderCell>
-                    <TableHeaderCell>Username</TableHeaderCell>
+                    <TableHeaderCell>
+                        <div>
+                            Username
+                            <Button Color="Color.Secondary" Clicked="SortByDisplayName">
+                                <Icon Name="@IconName.AngleDown"/>
+                            </Button>
+                        </div>
+                    </TableHeaderCell>
+                    <TableHeaderCell>
+                        <div>
+                            Number Rated Movies
+                            <Button Color="Color.Secondary" Clicked="SortByNumberOfVotedMovies">
+                                <Icon Name="@IconName.AngleDown"/>
+                            </Button>
+                        </div>
+                    </TableHeaderCell>
                 </TableRow>
             </TableHeader>
             <TableBody>
-                @foreach(User user in userList)
+                @foreach (User user in userList)
                 {
                     <TableRow @onclick="@(() => OnUserClick(user.Id))">
-                        <TableRowCell><img src="@user.ProfilePicture" height="200"/></TableRowCell>
+                        <TableRowCell>
+                            <img src="@user.ProfilePicture" height="200"/>
+                        </TableRowCell>
                         <TableRowCell>@user.Username</TableRowCell>
-                    </TableRow> 
+                        <TableRowCell>@user.RatedMovies</TableRowCell>
+
+                    </TableRow>
                 }
             </TableBody>
         </Table>
-        
+
         <div class="page-navigation">
             <button class="btn btn-secondary" @onclick="@GoToPreviousPage">
                 <Icon Name="@IconName.AngleLeft"/>
@@ -49,18 +67,17 @@
         </div>
     </div>
 }
-else
-{
-    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
-}
 
 @code {
+
     [Parameter]
-    public string Username { get; set; }
+    public string DisplayName { get; set; }
+
     private IList<User> userList = new List<User>();
     public bool isDataFetched = false;
     private int pageNumber { get; set; }
     private int usersPerPage = 10;
+    private UserSortingKey? userSortingKey;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -72,10 +89,39 @@ else
     {
         isDataFetched = false;
         userList.Clear();
-        userList = await UserSearchModel.SearchForUserAsync(Username, pageNumber);
+        if (userSortingKey == UserSortingKey.MoviesVoted)
+        {
+            sortingDirection = sortingDirection;
+        }
+        else if (userSortingKey == UserSortingKey.DisplayName)
+        {
+            sortingDirection = displayNameSortingDirection;
+        }
+        userList = await UserSearchModel.SearchForUserAsync(DisplayName, userSortingKey, sortingDirection, pageNumber);
         isDataFetched = true;
     }
+   
 
+    private SortingDirection2 sortingDirection = SortingDirection2.ASC;
+    private SortingDirection2 displayNameSortingDirection = SortingDirection2.ASC;
+
+    private async Task SortByNumberOfVotedMovies()
+    {
+        userSortingKey = UserSortingKey.MoviesVoted;
+        sortingDirection = sortingDirection == SortingDirection2.ASC ? SortingDirection2.DESC : SortingDirection2.ASC;
+        pageNumber = 1;
+        await SearchForUser();
+    }
+    
+    private async Task SortByDisplayName()
+    {
+        userSortingKey = UserSortingKey.DisplayName;
+        displayNameSortingDirection = displayNameSortingDirection == SortingDirection2.ASC ? SortingDirection2.DESC : SortingDirection2.ASC;
+        pageNumber = 1;
+        await SearchForUser();
+    }
+
+    
     private void OnUserClick(string userId)
     {
         NavManager.NavigateTo($"userProfile/{userId}");

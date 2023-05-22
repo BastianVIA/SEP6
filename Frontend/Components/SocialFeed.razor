@@ -1,0 +1,161 @@
+﻿@using Blazorise
+@using Frontend.Entities
+@using Frontend.Model.Firebase
+@using Frontend.Model.MovieDetail
+@using Frontend.Model.MovieSearch
+@inject IFirebaseModel FirebaseModel
+@using Frontend.Model.SocialFeed
+@using Frontend.Model.User
+@using Frontend.Model.UserProfiles
+@using Frontend.Service
+@using System.Diagnostics
+@inject ISocialFeedModel SocialFeedModel
+@inject IUserProfilesModel UserProfilesModel
+@inject IMovieDetailModel MovieDetailModel
+
+<div class="card-deck-container">
+    
+    <h3>Social Feed</h3>
+
+    @if (userFeedsLoaded)
+    {
+        @if (feedPosts.Count >= 1)
+        {
+            foreach (var post in posts)
+            {
+                <Div Border="Border.Is2.Rounded.Secondary" Padding="Padding.Is4" Margin="Margin.Is4">
+                    <Row Margin="Margin.Is2.FromBottom">
+                        <Column ColumnSize="ColumnSize.Is1" Margin="Margin.Is4.FromEnd">
+                            <img src="@post.ProfilePicture" alt="profile pic">
+                        </Column>
+                        <Column ColumnSize="ColumnSize.Is3">
+                            <h4>@post.Username</h4>
+                            <p>@post.TimeSincePostText</p>
+                        </Column>
+                    </Row>
+                    <Divider/>
+                    <Row>
+                        <Column ColumnSize="ColumnSize.Is12">
+                            @post.PostText
+                        </Column>
+                    </Row>
+                </Div>
+            }
+        }
+    }
+
+</div>
+
+@code {
+    private List<UserFeed> feedPosts;
+    private List<Post> posts = new List<Post>();
+    private bool userFeedsLoaded = false;
+    private int pageNumber = 1;
+    private User userInfo;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUserFeeds();
+    }
+
+    private async Task LoadUserFeeds()
+    {
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        feedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue, pageNumber);
+        await LoadUserInfo(feedPosts);
+        userFeedsLoaded = true;
+        StateHasChanged();
+        stopwatch.Stop();
+        Console.WriteLine(stopwatch.Elapsed);
+    }
+
+    private async Task LoadUserInfo(List<UserFeed> feedPostList)
+    {
+        foreach (var userFeed in feedPostList)
+        {
+            User user = await UserProfilesModel.GetUserProfile(userFeed.UserId);
+            string postText = await GetTextBasedOnTopic(userFeed, user.Username);
+            var profilePicture = user.ProfilePicture ?? "Images/NotFoundImage.jpg";
+            var timeSincePostText = GetTimeSincePost(userFeed.TimeOfActivity);
+            posts.Add(new Post
+            {
+                Id = userFeed.Id,
+                ActivityData = userFeed.ActivityData,
+                TimeSincePostText = timeSincePostText,
+                PostText = postText,
+                Username = user.Username,
+                ProfilePicture = profilePicture
+            });
+        }
+    }
+
+    private async Task<string> GetTextBasedOnTopic(UserFeed userFeed, string username)
+    {
+        var textToReturn = "";
+        switch (userFeed.Topic)
+        {
+            case FeedPostDtoTopic.FavoriteMovie:
+                textToReturn = $"{username} just added {await GetMovieTitle(userFeed.ActivityData.MovieId)} to their favorite movies";
+                break;
+            case FeedPostDtoTopic.CreatedRating:
+                textToReturn = $"{username} just rated {await GetMovieTitle(userFeed.ActivityData.MovieId)} {userFeed.ActivityData.NewRating}⭐";
+                break;
+            case FeedPostDtoTopic.UpdatedRating:
+                textToReturn = "";
+                break;
+            case FeedPostDtoTopic.RemovedRating:
+                textToReturn = "";
+                break;
+            case FeedPostDtoTopic.NewUser:
+                textToReturn = $"{username} created their account";
+                break;
+            case FeedPostDtoTopic.UnFavoriteMovie:
+                textToReturn = "";
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(userFeed.Topic), userFeed.Topic, null);
+        }
+        return textToReturn;
+    }
+
+    private async Task<string> GetMovieTitle(string movieId)
+    {
+        var movie = await MovieDetailModel.GetMovieDetails(movieId, FirebaseModel.CurrentUser.TokenValue);
+        return movie.Title;
+    }
+
+    private string GetTimeSincePost(DateTimeOffset timeOfActivity)
+    {
+        var timeSpan = DateTimeOffset.Now - timeOfActivity;
+
+        var timeSincePost = "";
+        
+        if (timeSpan.Days > 1)
+        {
+            timeSincePost = $"{timeSpan.Days} days ago";
+        }
+        else if (timeSpan.Days == 1)
+        {
+            timeSincePost = $"{timeSpan.Days} day ago";
+        }
+        else if (timeSpan.Hours > 1)
+        {
+            timeSincePost = $"{timeSpan.Hours} hours ago";
+        }
+        else if (timeSpan.Hours == 1)
+        {
+            timeSincePost = $"{timeSpan.Hours} hour ago";
+        }
+        else if (timeSpan.Minutes <= 2)
+        {
+            timeSincePost = "Just now";
+        }
+        else
+        {
+            timeSincePost = $"{timeSpan.Minutes} minutes ago";
+        }
+
+        return timeSincePost;
+    }
+}

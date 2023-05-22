@@ -54,7 +54,6 @@ public class UserRepository : IUserRepository
         var user = await tx.DataContext.Users
             .Include(u => u.FavoriteMovies)
             .Include(u => u.UserRatings)
-            .Include(u => u.UserReviews)
             .SingleAsync(user => user.Id == domainUser.Id);
         
         
@@ -88,8 +87,64 @@ public class UserRepository : IUserRepository
 
         tx.DataContext.Users.Update(user);
     }
+    
+    
+    public async Task<List<Domain.User>> SearchForUser(string displayName, UserSortingKey userSortingKey, SortingDirection sortingDirection, int requestPageNumber,
+        DbReadOnlyTransaction tx)
+    {
+        var query = tx.DataContext.Users.Include(u=> u.FavoriteMovies)
+            .Where(u => EF.Functions.Like(u.DisplayName, $"%{displayName}%"));
 
-   
+        switch (userSortingKey)
+        {
+            case UserSortingKey.DisplayName:
+                query = SearchForUserOrderByUsernameAsync(query, sortingDirection);
+                break;
+            case UserSortingKey.MoviesVoted:
+                query = SearchForUserOrderByVotedMoviesAsync(query, sortingDirection);
+                break; ;
+            default:
+                throw new KeyNotFoundException($"{userSortingKey} not a valid user sorting key ");
+        }
+        
+
+        List<UserDAO> foundUsers = await query
+            .Skip(NrOfResultsEachPage * (requestPageNumber - 1))
+            .Take(NrOfResultsEachPage)
+            .ToListAsync();
+
+        return foundUsers.Select(userDao => ToDomain(userDao)).ToList();
+    }
+    
+    private IOrderedQueryable<UserDAO> SearchForUserOrderByUsernameAsync(IQueryable<UserDAO> query,
+        SortingDirection sortingDirection)
+    {
+        switch (sortingDirection)
+        {
+            case SortingDirection.DESC:
+                return query.OrderByDescending(user => user.DisplayName == null).ThenByDescending(user => user.DisplayName);
+            case SortingDirection.ASC:
+                return query.OrderBy(user => user.DisplayName == null).ThenBy(user => user.DisplayName);
+            default:
+                throw new KeyNotFoundException($"{sortingDirection} not a valid order direction ");
+        }
+    }
+    
+    
+    private IOrderedQueryable<UserDAO> SearchForUserOrderByVotedMoviesAsync(IQueryable<UserDAO> query,
+        SortingDirection sortingDirection)
+    {
+        switch (sortingDirection)
+        {
+            case SortingDirection.DESC:
+                return query.OrderByDescending(user => user.FavoriteMovies.Count);
+            case SortingDirection.ASC:
+                return query.OrderBy(user => user.FavoriteMovies.Count);
+            default:
+                throw new KeyNotFoundException($"{sortingDirection} not a valid order direction ");
+        }
+    }
+
 
     private Domain.User ToDomain(UserDAO userDao)
     {

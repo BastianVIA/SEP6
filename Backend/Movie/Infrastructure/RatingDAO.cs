@@ -10,7 +10,7 @@ public class RatingDAO
     [ForeignKey("Movie")]
     public string MovieId  { get; set; }
     [Required]
-    public float Rating  { get; set; }
+    public double Rating  { get; set; }
     [Required]
     public int Votes { get; set; }
 }
