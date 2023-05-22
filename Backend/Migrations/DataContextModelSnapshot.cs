@@ -74,6 +74,10 @@ namespace Backend.Migrations
                     b.Property<int?>("BirthYear")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ImdbId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -113,12 +117,38 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ReviewBody")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PostId")
                         .IsUnique();
 
                     b.ToTable("ActivityDAO");
+                });
+
+            modelBuilder.Entity("Backend.SocialFeed.Infrastructure.CommentDAO", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Contents")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PostDAOId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostDAOId");
+
+                    b.ToTable("CommentDAO");
                 });
 
             modelBuilder.Entity("Backend.SocialFeed.Infrastructure.PostDAO", b =>
@@ -139,6 +169,28 @@ namespace Backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("Backend.SocialFeed.Infrastructure.ReactionDAO", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PostDAOId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TypeOfReaction")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostDAOId");
+
+                    b.ToTable("ReactionDAO");
                 });
 
             modelBuilder.Entity("Backend.SocialFeed.Infrastructure.SocialUserDAO", b =>
@@ -203,6 +255,25 @@ namespace Backend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserRatingDAO");
+                });
+
+            modelBuilder.Entity("Backend.User.Infrastructure.UserReviewDAO", b =>
+                {
+                    b.Property<string>("MovieId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("MovieId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserReviewDAO");
                 });
 
             modelBuilder.Entity("MovieDAOPersonDAO", b =>
@@ -300,6 +371,20 @@ namespace Backend.Migrations
                     b.Navigation("PostThisBelongsTo");
                 });
 
+            modelBuilder.Entity("Backend.SocialFeed.Infrastructure.CommentDAO", b =>
+                {
+                    b.HasOne("Backend.SocialFeed.Infrastructure.PostDAO", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("PostDAOId");
+                });
+
+            modelBuilder.Entity("Backend.SocialFeed.Infrastructure.ReactionDAO", b =>
+                {
+                    b.HasOne("Backend.SocialFeed.Infrastructure.PostDAO", null)
+                        .WithMany("Reactions")
+                        .HasForeignKey("PostDAOId");
+                });
+
             modelBuilder.Entity("Backend.User.Infrastructure.UserMovieDAO", b =>
                 {
                     b.HasOne("Backend.User.Infrastructure.UserDAO", "User")
@@ -315,6 +400,17 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.User.Infrastructure.UserDAO", "User")
                         .WithMany("UserRatings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Backend.User.Infrastructure.UserReviewDAO", b =>
+                {
+                    b.HasOne("Backend.User.Infrastructure.UserDAO", "User")
+                        .WithMany("UserReviews")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -405,6 +501,10 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.SocialFeed.Infrastructure.PostDAO", b =>
                 {
                     b.Navigation("ActivityData");
+
+                    b.Navigation("Comments");
+
+                    b.Navigation("Reactions");
                 });
 
             modelBuilder.Entity("Backend.User.Infrastructure.UserDAO", b =>
@@ -412,6 +512,8 @@ namespace Backend.Migrations
                     b.Navigation("FavoriteMovies");
 
                     b.Navigation("UserRatings");
+
+                    b.Navigation("UserReviews");
                 });
 #pragma warning restore 612, 618
         }

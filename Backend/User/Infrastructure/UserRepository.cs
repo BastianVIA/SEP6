@@ -9,9 +9,7 @@ namespace Backend.User.Infrastructure;
 public class UserRepository : IUserRepository
 {
     private const int NrOfResultsEachPage = 10;
-
-    
-    public  async Task<Domain.User> ReadUserFromIdAsync(string userId, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeFavoriteMovies =false)
+    public async Task<Domain.User> ReadUserFromIdAsync(string userId, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeFavoriteMovies =false, bool includeReviews = false)
     {
         var query = tx.DataContext.Users.Where(u => u.Id == userId);
         if (includeRatings)
@@ -22,6 +20,11 @@ public class UserRepository : IUserRepository
         if (includeFavoriteMovies)
         {
             query = query.Include(u => u.FavoriteMovies);
+        }
+
+        if (includeReviews)
+        {
+            query = query.Include(u => u.UserReviews);
         }
 
         var user = await query.SingleOrDefaultAsync();
@@ -73,10 +76,19 @@ public class UserRepository : IUserRepository
             }
             FromDomain(user.UserRatings, domainUser.Ratings);
         }
+
+        if (domainUser.Reviews != null)
+        {
+            if (user.UserReviews == null)
+            {
+                user.UserReviews = new List<UserReviewDAO>();
+            }
+            FromDomain(user.UserReviews, domainUser.Reviews);
+        }
+
         tx.DataContext.Users.Update(user);
     }
-    
-    
+
     public async Task<List<Domain.User>> SearchForUser(string displayName, UserSortingKey userSortingKey, SortingDirection sortingDirection, int requestPageNumber,
         DbReadOnlyTransaction tx)
     {
@@ -157,6 +169,17 @@ public class UserRepository : IUserRepository
             }
         }
 
+        List<UserReview>? userReviews = null;
+        if (userDao.UserReviews != null)
+        {
+            userReviews = new List<UserReview>();
+
+            foreach (var review in userDao.UserReviews)
+            {
+                userReviews.Add(new UserReview(review.MovieId, review.Body));
+            }
+        }
+
         return new Domain.User
         {
             Id = userDao.Id,
@@ -164,12 +187,31 @@ public class UserRepository : IUserRepository
             Email = userDao.Email,
             Bio = userDao.Bio,
             FavoriteMovies = favMovies,
-            Ratings = userRatings
+            Ratings = userRatings,
+            Reviews = userReviews
         };
     }
 
     
+    private void FromDomain(List<UserReviewDAO> userDaoReviews, List<UserReview> domainReviews)
+    {
+        var movieIds = domainReviews.Select(r => r.MovieId).ToList();
+        userDaoReviews.RemoveAll(daoMovie => !movieIds.Contains(daoMovie.MovieId));
+        foreach (var review in domainReviews)
+        {
+            var existingReview = userDaoReviews.FirstOrDefault(daoReview => daoReview.MovieId == review.MovieId);
 
+            if (existingReview == null)
+            {
+                userDaoReviews.Add(new UserReviewDAO{MovieId = review.MovieId, Body = review.ReviewBody});
+            }
+            else
+            {
+                existingReview.Body = review.ReviewBody;
+            }
+            
+        }
+    }
    
 
     private void FromDomain(List<UserMovieDAO> userDaoMovies, List<string> movieIds)

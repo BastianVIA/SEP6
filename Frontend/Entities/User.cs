@@ -23,7 +23,6 @@ public class User
     
     
     public DateTime? LastLogin { get; set; }
-
     
     
 }

@@ -10,6 +10,7 @@ public class PeopleDAO
     public string Id { get; set; }
     [Required]
     public string Name { get; set; }
+    public string ImdbId { get; set; }
     public int? BirthYear { get; set; }
     public ICollection<PeopleMovieDAO>? ActedMovies { get; set; }
     public ICollection<PeopleMovieDAO>? DirectedMovies { get; set; }
