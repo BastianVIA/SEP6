@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.SocialFeed.Application.GetFollows;
 [ApiController]
-[Route("SocialFeed")]
+[Route("Social")]
 public class Controller: ControllerBase
 {
     private readonly IMediator _mediator;
@@ -16,7 +16,7 @@ public class Controller: ControllerBase
     
     [HttpGet]
     [Route("follows/{userId}")]
-    [Tags("SocialFeed")]
+    [Tags("Social")]
     [ProducesResponseType(typeof(GetFollowingResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetFeedForUser(string userId)
     {

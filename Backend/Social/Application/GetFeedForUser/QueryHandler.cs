@@ -15,6 +15,8 @@ public class FeedPostDto
     public string UserId;
     public Activity Topic;
     public ActivityDataDto? ActivityDataDto;
+    public int numberOfReactions;
+    public List<FeedCommentDto>? Comments;
     public DateTime TimeOfActivity { get; set; }
 }
 
@@ -24,6 +26,14 @@ public class ActivityDataDto
     public int? NewRating { get; set; }
     public int? OldRating { get; set; }
 }
+
+public class FeedCommentDto
+{
+    public Guid Id { get; set; }
+    public string UserId { get; set; }
+    public string Content { get; set; }
+}
+
 public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
 {
     private readonly IDatabaseTransactionFactory _transactionFactory;
@@ -45,7 +55,7 @@ public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
         {
             return new GetFeedForUserResponse(new List<FeedPostDto>());
         }
-        var feedForUser = await _postRepository.GetFeedWithPostsFromUsers(user.Following, request.pageNumber, transaction);
+        var feedForUser = await _postRepository.GetFeedWithPostsFromUsers(user.Following, request.pageNumber, transaction, includeComments:true, includeReactions:true);
         return toDto(feedForUser);
     }
 
@@ -62,13 +72,20 @@ public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
 
     private FeedPostDto toDto(Post post)
     {
+        var noOfReactions = 0;
+        if (post.Reactions != null)
+        {
+            noOfReactions = post.Reactions.Count;
+        }
         return new FeedPostDto
         {
             Id = post.Id,
             UserId = post.UserId,
             Topic = post.Topic,
             ActivityDataDto = toDto(post.ActivityData),
-            TimeOfActivity = post.TimeOfActivity
+            TimeOfActivity = post.TimeOfActivity,
+            Comments = toDto(post.Comments),
+            numberOfReactions = noOfReactions
         };
     }
 
@@ -84,5 +101,26 @@ public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
             NewRating = activityData.NewRating,
             OldRating = activityData.OldRating,
         };
+    }
+
+    private List<FeedCommentDto> toDto(List<Comment>? comments)
+    {
+        var dtoComments = new List<FeedCommentDto>();
+        if (comments == null)
+        {
+            return dtoComments;
+        }
+
+        foreach (var comment in comments)
+        {
+            dtoComments.Add(new FeedCommentDto
+            {
+                Id = comment.Id,
+                UserId = comment.UserId,
+                Content = comment.Contents
+            });
+        }
+
+        return dtoComments;
     }
 }

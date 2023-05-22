@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.SocialFeed.Application.GetFeedForUser;
 
 [ApiController]
-[Route("SocialFeed")]
+[Route("Social")]
 public class Controller : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -32,7 +32,7 @@ public class Controller : ControllerBase
     /// </remarks>
     [HttpGet]
     [Route("userFeed")]
-    [Tags("SocialFeed")]
+    [Tags("Social")]
     [ProducesResponseType(typeof(GetFeedForUserResponse), StatusCodes.Status200OK)]
     [Authorize]
     public async Task<IActionResult> GetFeedForUser(int pageNumber = 1)
