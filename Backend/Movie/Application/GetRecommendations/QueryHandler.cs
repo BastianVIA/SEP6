@@ -18,7 +18,7 @@ public class MovieRecommendationDto
     public MovieRecommendationRatingDto? Rating { get; set; }
 }
 
-public record MovieRecommendationRatingDto(float AverageRating, int Votes);
+public record MovieRecommendationRatingDto(double AverageRating, int Votes);
 
 public class QueryHandler : IRequestHandler<Query, MovieRecommendationsResponse>
 {

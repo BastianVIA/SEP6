@@ -55,7 +55,7 @@ namespace Backend.Migrations
                     b.Property<string>("MovieId")
                         .HasColumnType("TEXT");
 
-                    b.Property<float>("Rating")
+                    b.Property<double>("Rating")
                         .HasColumnType("REAL");
 
                     b.Property<int>("Votes")
