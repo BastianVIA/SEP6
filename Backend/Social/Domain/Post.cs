@@ -10,7 +10,7 @@ public enum Activity
     RemovedRating,
     NewUser,
     UnFavoriteMovie,
-    
+    CreatedReview,
 }
 
 public class Post : BaseDomain

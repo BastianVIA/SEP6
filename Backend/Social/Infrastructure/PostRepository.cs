@@ -46,7 +46,8 @@ public class PostRepository : IPostRepository
                 PostId = post.Id.ToString(),
                 MovieId = post.ActivityData.MovieId,
                 NewRating = post.ActivityData.NewRating,
-                OldRating = post.ActivityData.OldRating
+                OldRating = post.ActivityData.OldRating,
+                ReviewBody = post.ActivityData.ReviewBody
             };
         }
 
@@ -244,21 +245,13 @@ public class PostRepository : IPostRepository
             return null;
         }
 
-        var activity = new ActivityData();
-        if (dao.MovieId != null)
+        var activity = new ActivityData
         {
-            activity.MovieId = dao.MovieId;
-        }
-
-        if (dao.NewRating != null)
-        {
-            activity.NewRating = dao.NewRating;
-        }
-
-        if (dao.OldRating != null)
-        {
-            activity.OldRating = dao.OldRating;
-        }
+            MovieId = dao.MovieId,
+            NewRating = dao.NewRating,
+            OldRating = dao.OldRating,
+            ReviewBody = dao.ReviewBody
+        };
 
         return activity;
     }
