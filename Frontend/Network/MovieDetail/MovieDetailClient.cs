@@ -6,8 +6,6 @@ namespace Frontend.Network.MovieDetail;
 
 public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
 {
-    
-    
     public async Task<Movie?> GetMovieDetails(string movieId, string? userToken)
     {
         if (userToken != null)

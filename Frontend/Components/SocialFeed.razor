@@ -9,9 +9,11 @@
 @using Frontend.Model.UserProfiles
 @using Frontend.Service
 @using System.Diagnostics
+@using Frontend.Model.UserProfilePicture
 @inject ISocialFeedModel SocialFeedModel
 @inject IUserProfilesModel UserProfilesModel
 @inject IMovieDetailModel MovieDetailModel
+@inject IUserProfilePictureModel UserProfilePictureModel
 
 <div class="card-deck-container">
     
@@ -23,13 +25,13 @@
         {
             foreach (var post in posts)
             {
-                <Div Border="Border.Is2.Rounded.Secondary" Padding="Padding.Is4" Margin="Margin.Is4">
+                <div class="post-container">
                     <Row Margin="Margin.Is2.FromBottom">
-                        <Column ColumnSize="ColumnSize.Is1" Margin="Margin.Is4.FromEnd">
+                        <Column ColumnSize="ColumnSize.Is2" Margin="Margin.Is4.FromEnd">
                             <img src="@post.ProfilePicture" alt="profile pic">
                         </Column>
                         <Column ColumnSize="ColumnSize.Is3">
-                            <h4>@post.Username</h4>
+                            <h4>@post.DisplayName</h4>
                             <p>@post.TimeSincePostText</p>
                         </Column>
                     </Row>
@@ -39,12 +41,57 @@
                             @post.PostText
                         </Column>
                     </Row>
-                </Div>
+                    <Row Margin="Margin.Is2.FromTop">
+                        <Column ColumnSize="ColumnSize.Is12">
+                            <Button Color="Color.Primary" Clicked="() => OnLikePost(post)">@post.NumberOfReactions <Icon Name="IconName.ThumbsUp" TextColor="TextColor.Light"/></Button>
+                            <Button Color="Color.Primary" Clicked="() => OnCommentClicked(post)">Comment</Button>
+                        </Column>
+                    </Row>
+                    <Row Margin="Margin.Is2.FromTop">
+                        <Column ColumnSize="ColumnSize.Is12">
+                            <Accordion>
+                                <Collapse Visible="@showComments">
+                                    <CollapseHeader>
+                                        <Heading Size="HeadingSize.Is5">
+                                            <AccordionToggle>Comments</AccordionToggle>
+                                        </Heading>
+                                    </CollapseHeader>
+                                    <CollapseBody>
+                                        @foreach (Comment comment in post.Comments)
+                                        {
+                                            <Div Border="Border.Is1.Dark">
+                                                @comment.DisplayNameOfUser: @comment.Content
+                                            </Div>
+                                        }
+                                    </CollapseBody>
+                                </Collapse>
+                            </Accordion>
+                        </Column>
+                    </Row>
+                </div>
             }
         }
     }
-
 </div>
+
+<Modal @ref="modalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Comment on post</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Field>
+                <FieldLabel>Comment</FieldLabel>
+                <TextEdit @bind-Text="@commentToUpload"/>
+            </Field>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Cancel</Button>
+            <Button Color="Color.Primary" Clicked="@UploadComment">Upload comment</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
 
 @code {
     private List<UserFeed> feedPosts;
@@ -52,6 +99,10 @@
     private bool userFeedsLoaded = false;
     private int pageNumber = 1;
     private User userInfo;
+    private bool showComments = false;
+    private Modal modalRef;
+    private string postIdToCommentOn;
+    private string commentToUpload;
     
     protected override async Task OnInitializedAsync()
     {
@@ -62,21 +113,23 @@
     {
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
-        feedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue, pageNumber);
-        await LoadUserInfo(feedPosts);
+        
+        await LoadUserInfo();
         userFeedsLoaded = true;
         StateHasChanged();
+        
         stopwatch.Stop();
         Console.WriteLine(stopwatch.Elapsed);
     }
 
-    private async Task LoadUserInfo(List<UserFeed> feedPostList)
+    private async Task LoadUserInfo()
     {
-        foreach (var userFeed in feedPostList)
+        feedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue, pageNumber);
+        foreach (var userFeed in feedPosts)
         {
-            User user = await UserProfilesModel.GetUserProfile(userFeed.UserId);
-            string postText = await GetTextBasedOnTopic(userFeed, user.Username);
-            var profilePicture = user.ProfilePicture ?? "Images/NotFoundImage.jpg";
+            string postText = GetTextBasedOnTopic(userFeed);
+            // var profilePicture = UserProfilePictureModel.GetProfilePicture(FirebaseModel.CurrentUser.UID).Result;
+            // var profilePictureString = Convert.ToBase64String(profilePicture, 0, profilePicture.Length);
             var timeSincePostText = GetTimeSincePost(userFeed.TimeOfActivity);
             posts.Add(new Post
             {
@@ -84,22 +137,24 @@
                 ActivityData = userFeed.ActivityData,
                 TimeSincePostText = timeSincePostText,
                 PostText = postText,
-                Username = user.Username,
-                ProfilePicture = profilePicture
+                DisplayName = userFeed.DisplayName,
+                ProfilePicture = "/Images/NotFoundImage.jpg",
+                Comments = userFeed.Comments,
+                NumberOfReactions = userFeed.NumberOfReactions
             });
         }
     }
 
-    private async Task<string> GetTextBasedOnTopic(UserFeed userFeed, string username)
+    private string GetTextBasedOnTopic(UserFeed userFeed)
     {
         var textToReturn = "";
         switch (userFeed.Topic)
         {
             case FeedPostDtoTopic.FavoriteMovie:
-                textToReturn = $"{username} just added {await GetMovieTitle(userFeed.ActivityData.MovieId)} to their favorite movies";
+                textToReturn = $"{userFeed.DisplayName} just added {userFeed.ActivityData.MovieTitle} to their favorite movies";
                 break;
             case FeedPostDtoTopic.CreatedRating:
-                textToReturn = $"{username} just rated {await GetMovieTitle(userFeed.ActivityData.MovieId)} {userFeed.ActivityData.NewRating}⭐";
+                textToReturn = $"{userFeed.DisplayName} just rated {userFeed.ActivityData.MovieTitle} {userFeed.ActivityData.NewRating}⭐";
                 break;
             case FeedPostDtoTopic.UpdatedRating:
                 textToReturn = "";
@@ -108,7 +163,7 @@
                 textToReturn = "";
                 break;
             case FeedPostDtoTopic.NewUser:
-                textToReturn = $"{username} created their account";
+                textToReturn = $"{userFeed.DisplayName} created their account";
                 break;
             case FeedPostDtoTopic.UnFavoriteMovie:
                 textToReturn = "";
@@ -117,12 +172,6 @@
                 throw new ArgumentOutOfRangeException(nameof(userFeed.Topic), userFeed.Topic, null);
         }
         return textToReturn;
-    }
-
-    private async Task<string> GetMovieTitle(string movieId)
-    {
-        var movie = await MovieDetailModel.GetMovieDetails(movieId, FirebaseModel.CurrentUser.TokenValue);
-        return movie.Title;
     }
 
     private string GetTimeSincePost(DateTimeOffset timeOfActivity)
@@ -158,4 +207,42 @@
 
         return timeSincePost;
     }
+
+    private async Task OnLikePost(Post post)
+    {
+        try
+        {
+            await SocialFeedModel.ReactToSocialFeed(FirebaseModel.CurrentUser.TokenValue, post.Id.ToString());
+            post.NumberOfReactions++;
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    private Task OnCommentClicked(Post post)
+    {
+        postIdToCommentOn = post.Id.ToString();
+        return modalRef.Show();
+    }
+
+
+    private async Task UploadComment()
+    {
+        await SocialFeedModel.CommentOnPost(FirebaseModel.CurrentUser.TokenValue, postIdToCommentOn, commentToUpload);
+        postIdToCommentOn = "";
+        commentToUpload = "";
+        await modalRef.Hide();
+    }
+
+    private Task HideModal()
+    {
+        postIdToCommentOn = "";
+        commentToUpload = "";
+        return modalRef.Hide();
+    }
+
 }

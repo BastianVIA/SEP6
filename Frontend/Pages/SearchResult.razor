@@ -8,7 +8,11 @@
             <h4>Filter</h4>
             <RadioGroup Orientation="Orientation.Vertical" TValue="string" Name="searchType" CheckedValue="@checkedValue" Buttons CheckedValueChanged="@OnChange">
                 <Radio Value="@("movies")">Movies</Radio>
-                <Radio Value="@("users")">Users</Radio>
+                <AuthorizeView>
+                    <Authorized>
+                        <Radio Value="@("users")">Users</Radio>
+                    </Authorized>
+                </AuthorizeView>
                 <Radio Value="@("persons")">Persons</Radio>
             </RadioGroup>
         </Div>

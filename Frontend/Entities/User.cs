@@ -1,4 +1,6 @@
-﻿namespace Frontend.Entities;
+﻿using Frontend.Service;
+
+namespace Frontend.Entities;
 
 public class User
 {
@@ -10,12 +12,17 @@ public class User
     
     public List<UserRating> UserRatings { get; set; }
     
-    public string? ProfilePicture { get; set;}
+    public byte[]? ProfilePicture { get; set;}
     public List<Movie> FavoriteMovies { get; set; }
     
     public int RatedMovies { get; set; }
     
     public double AverageOfUserRatings { get; set; }
+    
+    public ICollection<Int32Int32ValueTuple> RatingDataPoints { get; set; }
+    
+    
+    public DateTime? LastLogin { get; set; }
     
     
 }

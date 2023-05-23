@@ -10,11 +10,14 @@
 @if (recommendationsLoaded)
 {
     <div class="card-deck-container">
-        <Carousel SelectedSlideChanged="LoadRecommendedMovies" Crossfade="true" Autoplay="false" ShowControls="false" ShowIndicators="false" SelectedSlide="@selectedSlide.ToString()">
+        <Carousel Crossfade="true" Autoplay="false" ShowControls="false" ShowIndicators="false" SelectedSlide="@selectedSlide.ToString()">
+
             <CarouselSlide Name="1">
                 <Div Display="Display.Flex" Flex="Flex.JustifyContent.Between" Margin="Margin.Is2.FromBottom">
                     <h2>Recommended Movies</h2>
-                    <Button Color="Color.Primary" Clicked="NextSlide" Height="Height.Is75"><Icon Name="IconName.Sync"/></Button>
+                    <Button Color="Color.Primary" Clicked="NextSlide" Height="Height.Is75">
+                        <Icon Name="IconName.Sync"/>
+                    </Button>
                 </Div>
                 <CardDeck>
                     @foreach (Movie movie in recommendations)
@@ -66,10 +69,8 @@
                 </CardDeck>
             </CarouselSlide>
         </Carousel>
-        
     </div>
-    
-    
+
     <AuthorizeView>
         <Authorized>
             <SocialFeed/>
@@ -90,10 +91,6 @@ else
     private int counter = 0;
     private int selectedSlide = 1;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadRecommendedMovies();
-    }
 
     private async Task LoadRecommendedMovies()
     {
@@ -101,13 +98,20 @@ else
         recommendationsLoaded = true;
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRecommendedMovies();
+    }
+
     private void OnMovieClick(string movieId)
     {
         NavManager.NavigateTo($"movieDetails/{movieId}");
     }
 
-    private void NextSlide()
+    private async Task NextSlide()
     {
         selectedSlide++;
+        await LoadRecommendedMovies();
     }
+
 }
