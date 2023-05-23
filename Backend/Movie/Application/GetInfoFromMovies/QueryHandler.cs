@@ -36,11 +36,11 @@ public class QueryHandler : IRequestHandler<Query, MoviesInfoResponse>
     public async Task<MoviesInfoResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var listOfMovies = _repository.ReadMoviesFromList(request.movieIds, request.requestedPageNumber, transaction);
+        var listOfMovies = _repository.ReadMoviesFromListAsync(request.movieIds, request.requestedPageNumber, transaction);
         var listOfMoviesAsDto = new List<MovieInfoDto>();
         foreach (var movie in await listOfMovies)
         {
-            var pathToPoster = _imageService.GetPathForPoster(movie.Id);
+            var pathToPoster = _imageService.GetPathForPosterAsync(movie.Id);
             listOfMoviesAsDto.Add(toDto(movie, await pathToPoster));
         }
 

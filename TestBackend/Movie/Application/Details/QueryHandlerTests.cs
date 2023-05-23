@@ -38,7 +38,7 @@ public class QueryHandlerTests
     {
         //Arrange
         var query = _fixture.Create<Query>();
-        _repository.ReadMovieFromId(query.Id, Arg.Any<DbReadOnlyTransaction>(),  Arg.Any<bool>(), Arg.Any<bool>(),
+        _repository.ReadMovieFromIdAsync(query.Id, Arg.Any<DbReadOnlyTransaction>(),  Arg.Any<bool>(), Arg.Any<bool>(),
             Arg.Any<bool>()).Throws<KeyNotFoundException>();
         //Act-Assert
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _handler.Handle(query, CancellationToken.None));
@@ -60,10 +60,10 @@ public class QueryHandlerTests
         AddPeopleToList(expectedMovie2.Actors, actorDtoList);
         AddPeopleToList(expectedMovie2.Directors, directorDtoList);
         
-        _repository.ReadMovieFromId(query.Id, Arg.Any<DbReadOnlyTransaction>(), Arg.Any<bool>(), Arg.Any<bool>(),
+        _repository.ReadMovieFromIdAsync(query.Id, Arg.Any<DbReadOnlyTransaction>(), Arg.Any<bool>(), Arg.Any<bool>(),
             Arg.Any<bool>()).Returns(expectedMovie2);
-        _imageService.GetPathForPoster(query.Id).Returns(expectedPoster);
-        _resumeService.GetResume(query.Id).Returns(expectedResume);
+        _imageService.GetPathForPosterAsync(query.Id).Returns(expectedPoster);
+        _resumeService.GetResumeAsync(query.Id).Returns(expectedResume);
         _mediator.Send(Arg.Any<Backend.User.Application.GetUserInfoForMovie.Query>()).Returns(expectedUserInfoForMovie);
         _mediator.Send(Arg.Is(new Backend.People.Application.GetPeopleFromId.Query(expectedMovie2.Actors)))
             .Returns(new PersonResponse(actorDtoList));

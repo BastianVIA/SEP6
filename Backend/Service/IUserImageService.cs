@@ -2,6 +2,6 @@
 
 public interface IUserImageService
 {
-    public Task<byte[]?> GetImageData(string userId);
-    public Task UploadImage(string userId, byte[] data);
+    public Task<byte[]?> GetImageDataAsync(string userId);
+    public Task UploadImageAsync(string userId, byte[] data);
 }

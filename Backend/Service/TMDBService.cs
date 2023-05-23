@@ -31,7 +31,7 @@ public class TMDBService : IImageService, IResumeService, IPersonService, ITrail
         _client.SetConfig(tmdbConfig);
     }
 
-    public async Task<Uri?> GetPathForPoster(string id)
+    public async Task<Uri?> GetPathForPosterAsync(string id)
     {
         var movie = await _client.GetMovieAsync(id);
         if (movie == null)
@@ -43,7 +43,7 @@ public class TMDBService : IImageService, IResumeService, IPersonService, ITrail
         return _client.GetImageUrl(DefaultImageSize, movie.PosterPath);
     }
 
-    public async Task<string?> GetMovieTrailer(string movieId)
+    public async Task<string?> GetMovieTrailerAsync(string movieId)
     {
         var movie = await _client.GetMovieAsync(movieId, MovieMethods.Videos);
         var movies = movie.Videos.Results;
@@ -63,7 +63,7 @@ public class TMDBService : IImageService, IResumeService, IPersonService, ITrail
         return null;
     }
 
-    public async Task<string?> GetResume(string id)
+    public async Task<string?> GetResumeAsync(string id)
     {
         var movie = await _client.GetMovieAsync(id);
         if (movie == null)
