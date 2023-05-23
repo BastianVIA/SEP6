@@ -122,7 +122,7 @@
                     </Field>
                 </ModalBody>
                 <ModalFooter>
-                    <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
+                    <Button Color="Color.Secondary" Clicked="@CancelModal">Close</Button>
                     <Button Color="Color.Primary" Clicked="@HideModal">Save Changes</Button>
                 </ModalFooter>
             </ModalContent>
@@ -171,7 +171,15 @@ else
         try
         {
             movie.IsFavorite = !movie.IsFavorite;
-            await FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.CurrentUser!.TokenValue, MovieId);
+            if (IsOnFavorites())
+            {
+                await FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.CurrentUser!.TokenValue, MovieId);
+            }
+            else
+            {
+                await FavoriteMoviesModel.RemoveFromFavoriteMovies(FirebaseModel.CurrentUser!.TokenValue, MovieId);
+            }
+            
              await LoadMovieDetails();
         }
         catch (Exception e)
@@ -192,7 +200,6 @@ else
 
     private void OnAddReview()
     {
-        reviewText.Text = String.Empty;
         modalRef.Show();
     }
 
@@ -201,4 +208,10 @@ else
         await UserModel.SetReview(FirebaseModel.CurrentUser.TokenValue, MovieId, reviewText.Text);
         modalRef.Hide();
     }
+
+    private void CancelModal()
+    {
+        modalRef.Hide();
+    }
+
 }

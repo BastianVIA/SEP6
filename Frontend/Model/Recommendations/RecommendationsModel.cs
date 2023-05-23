@@ -8,9 +8,9 @@ public class RecommendationsModel : NSwagBaseClient, IRecommendationsModel
 {
     private IRecommendationsClient _client;
     
-    public RecommendationsModel(IRecommendationsClient client)
+    public RecommendationsModel()
     {
-        _client = client;
+        _client = new RecommendationsClient();
     }
     
     public async Task<List<Movie>> GetRecommendations()

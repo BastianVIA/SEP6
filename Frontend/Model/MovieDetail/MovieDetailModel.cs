@@ -1,17 +1,20 @@
 using Frontend.Entities;
+using Frontend.Events;
 using Frontend.Network;
 using Frontend.Network.MovieDetail;
 using Frontend.Service;
 
 namespace Frontend.Model.MovieDetail;
 
-public class MovieDetailModel :NSwagBaseClient, IMovieDetailModel
+public class MovieDetailModel :NSwagBaseClient, IMovieDetailModel, IAlertNotifier
 
 {
     private IMovieDetailClient _client;
-    public MovieDetailModel(IMovieDetailClient client)
+    private IAlertAggregator _alertAggregator;
+    public MovieDetailModel(IAlertAggregator alertAggregator)
     {
-        _client = client;
+        _client = new MovieDetailClient();
+        _alertAggregator = alertAggregator;
     }
 
     public async Task<Movie?> GetMovieDetails(string movieId, string userToken)
@@ -21,7 +24,28 @@ public class MovieDetailModel :NSwagBaseClient, IMovieDetailModel
 
     public async Task SetMovieRating(string? userToken, string movieId, int? rating = null)
     {
-        await _client.SetMovieRating(userToken, movieId, rating);
+        try
+        {
+            await _client.SetMovieRating(userToken, movieId, rating);
+            if(rating == null) return;
+            FireAlertEvent(AlertBoxHelper.AlertType.SetRatingSuccess,
+                $"New rating registered.");
+        }
+        catch (Exception e)
+        {
+            FireAlertEvent(AlertBoxHelper.AlertType.SetRatingFail,
+                $"Could not set new rating. Reason: {e.Message}");
+            throw;
+        }
+        
     }
-    
+
+    public void FireAlertEvent(AlertBoxHelper.AlertType type, string message)
+    {
+        _alertAggregator.BroadCast(new AlertEventArgs
+        {
+            Type = type,
+            Message = message
+        });
+    }
 }

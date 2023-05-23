@@ -7,9 +7,9 @@ public class SocialFeedModel : ISocialFeedModel
 {
     private ISocialFeedClient _client;
 
-    public SocialFeedModel(ISocialFeedClient client)
+    public SocialFeedModel()
     {
-        _client = client;
+        _client = new SocialFeedClient();
     }
     
     public async Task<List<UserFeed>> GetSocialFeed(string userToken, int? pageNumber = null)

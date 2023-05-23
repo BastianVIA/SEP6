@@ -10,7 +10,17 @@ public class AlertBoxHelper
         LoginFail,
         SignupSuccess,
         SignupFail,
-        LogoutSuccess
+        LogoutSuccess,
+        AddFavoriteMovieSuccess,
+        AddFavoriteMovieFail,
+        RemoveFavouriteMovieSuccess,
+        RemoveFavouriteMovieFail,
+        SetRatingSuccess,
+        SetRatingFail,
+        CreateReviewSuccess,
+        CreateReviewFail,
+        UploadProfileImageSuccess,
+        UploadProfileImageFail
     }
 
     private static readonly Dictionary<AlertType, Func<string, Alert>> Alerts = new()
@@ -19,8 +29,118 @@ public class AlertBoxHelper
         { AlertType.LoginFail , LoginFailed},
         { AlertType.SignupSuccess , SignupSuccess},
         { AlertType.SignupFail , SignupFailed},
-        { AlertType.LogoutSuccess , LogoutSuccess}
+        { AlertType.LogoutSuccess , LogoutSuccess},
+        { AlertType.AddFavoriteMovieSuccess, AddFavouriteSuccess},
+        { AlertType.AddFavoriteMovieFail , AddFavouriteFailed},
+        { AlertType.RemoveFavouriteMovieSuccess , RemoveFavouriteSuccess},
+        { AlertType.RemoveFavouriteMovieFail , RemoveFavouriteFailed},
+        { AlertType.SetRatingSuccess , SetRatingSuccess},
+        { AlertType.SetRatingFail , SetRatingFailed},
+        { AlertType.CreateReviewSuccess , CreateRatingSuccess},
+        { AlertType.CreateReviewFail, CreateRatingFailed},
+        { AlertType.UploadProfileImageSuccess , UploadProfileImageSuccess},
+        { AlertType.UploadProfileImageFail , UploadProfileImageFailed}
     };
+
+    private static Alert RemoveFavouriteFailed(string message)
+    {
+        return new Alert
+        {
+            Success = false,
+            Header = "Remove Favourite Error",
+            Message = message
+        };
+    }
+
+    private static Alert RemoveFavouriteSuccess(string message)
+    {
+        return new Alert
+        {
+            Success = true,
+            Header = "Remove Favourite Success",
+            Message = message
+        };
+    }
+
+    private static Alert UploadProfileImageFailed(string message)
+    {
+        return new Alert
+        {
+            Success = false,
+            Header = "Image Upload Error",
+            Message = message
+        };
+    }
+
+    private static Alert UploadProfileImageSuccess(string message)
+    {
+        return new Alert
+        {
+            Success = true,
+            Header = "Image Upload Success",
+            Message = message
+        };
+    }
+
+    private static Alert CreateRatingFailed(string message)
+    {
+        return new Alert
+        {
+            Success = false,
+            Header = "New Review Error",
+            Message = message
+        };
+    }
+
+    private static Alert CreateRatingSuccess(string message)
+    {
+        return new Alert
+        {
+            Success = true,
+            Header = "New Review Success",
+            Message = message
+        };
+    }
+
+    private static Alert SetRatingFailed(string message)
+    {
+        return new Alert
+        {
+            Success = false,
+            Header = "New Rating Error",
+            Message = message
+        };
+    }
+
+    private static Alert SetRatingSuccess(string message)
+    {
+        return new Alert
+        {
+            Success = true,
+            Header = "New Rating Success",
+            Message = message
+        };
+    }
+
+    private static Alert AddFavouriteFailed(string message)
+    {
+        return new Alert
+        {
+            Success = true,
+            Header = "New Favourite Error",
+            Message = message
+        };
+    }
+
+    private static Alert AddFavouriteSuccess(string message)
+    {
+        return new Alert
+        {
+            Success = true,
+            Header = "New Favourite Success",
+            Message = message
+        };
+    }
 
     private static Alert LoginSuccess(string message)
     {
