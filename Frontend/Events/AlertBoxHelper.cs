@@ -22,60 +22,60 @@ public class AlertBoxHelper
         { AlertType.LogoutSuccess , LogoutSuccess}
     };
 
-    private static Alert LoginSuccess(string ignored)
-    {
-        return new Alert()
-        {
-            Success = true,
-            Message = $"Login Successful!",
-            Description = $"You have successfully logged in."
-        };
-    }
-
-    private static Alert LoginFailed(string reason)
-    {
-        return new Alert
-        {
-            Success = false,
-            Message = "Login Failed!",
-            Description = $"Reason: {reason}."
-        };
-    }
-
-    private static Alert SignupSuccess(string ignored)
+    private static Alert LoginSuccess(string message)
     {
         return new Alert
         {
             Success = true,
-            Message = "Signup Success!",
-            Description = $"You have successfully created an account."
+            Header = "Login Successful!",
+            Message = message
         };
     }
 
-    private static Alert SignupFailed(string reason)
+    private static Alert LoginFailed(string message)
     {
         return new Alert
         {
             Success = false,
-            Message = "Signup Failed!",
-            Description = $"Reason: {reason}"
+            Header = "Login Failed!",
+            Message = message
+        };
+    }
+
+    private static Alert SignupSuccess(string message)
+    {
+        return new Alert
+        {
+            Success = true,
+            Header = "Signup Success!",
+            Message = message
+        };
+    }
+
+    private static Alert SignupFailed(string message)
+    {
+        return new Alert
+        {
+            Success = false,
+            Header = "Signup Failed!",
+            Message = message
         };
     }
     
-    private static Alert LogoutSuccess(string arg)
+    private static Alert LogoutSuccess(string message)
     {
-        return new Alert()
+        return new Alert
         {
             Success = true,
-            Message = $"Logout Successful!",
-            Description = $"You have successfully logged out."
+            Header = "Logout Successful!",
+            Message = message
         };
     }
 
-    public Alert? GetAlert(AlertType type, string data)
+    public Alert? GetAlert(AlertType type, string message)
     {
         if (!Alerts.TryGetValue(type, out var alertMethod)) return null;
     
-        return alertMethod.Invoke(data);
+        return alertMethod.Invoke(message);
     }
 }

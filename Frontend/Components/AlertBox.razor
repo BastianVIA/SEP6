@@ -9,8 +9,8 @@
 @if(Alert != null){
     <div class="alert-container">
         <Alert Color="@(Alert!.Success? Color.Success : Color.Warning)" @bind-Visible="@_visibility" Margin="Margin.Is0">
-            <AlertMessage>@Alert.Message</AlertMessage>
-            <AlertDescription>@Alert.Description</AlertDescription>
+            <AlertMessage>@Alert.Header</AlertMessage>
+            <AlertDescription>@Alert.Message</AlertDescription>
         </Alert>
     </div>
 }
@@ -31,7 +31,7 @@
 
     private void HandleAlertEvent(object? sender, AlertEventArgs args)
     {
-        Alert = _helper.GetAlert(args.Type, args.Reason);
+        Alert = _helper.GetAlert(args.Type, args.Message);
         if (Alert == null) return;
         
         _visibility = true;
