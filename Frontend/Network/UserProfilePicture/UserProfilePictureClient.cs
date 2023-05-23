@@ -15,6 +15,7 @@ public class UserProfilePictureClient : NSwagBaseClient, IUserProfilePictureClie
 
     public async Task<byte[]> GetProfilePicture(string userId)
     {
+        Console.WriteLine("GetProfilePictureClient");
         try
         {
             Console.WriteLine("Start");

@@ -9,14 +9,13 @@ public class UserImageService : IUserImageService
         _imageFolder = Path.Combine(root, "Images");
     }
     
-    public async Task<byte[]>? GetImageData(string userId)
+    public async Task<byte[]?> GetImageData(string userId)
     {
-        byte[] data;
         var path = Path.Combine(_imageFolder, $"{userId}.jpg");
 
         try
         {
-            data = await File.ReadAllBytesAsync(path);
+            return await File.ReadAllBytesAsync(path);
         }
         catch (FileNotFoundException e)
         {
@@ -28,8 +27,6 @@ public class UserImageService : IUserImageService
             Console.WriteLine(e);
             return null;
         }
-
-        return data;
     }
 
     public async Task UploadImage(string userId, byte[] data)
