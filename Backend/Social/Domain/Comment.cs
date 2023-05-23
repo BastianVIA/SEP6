@@ -5,4 +5,5 @@ public class Comment
     public Guid Id  { get; set; }
     public string UserId { get; set; }
     public string Contents { get; set; }
+    public DateTime TimeStamp { get; set; }
 }

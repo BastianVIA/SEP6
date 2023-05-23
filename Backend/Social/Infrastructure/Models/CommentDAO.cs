@@ -8,4 +8,5 @@ public class CommentDAO
     public string Id  { get; set; }
     public string UserId { get; set; }
     public string Contents { get; set; }
+    public DateTime TimeStamp { get; set; }
 }

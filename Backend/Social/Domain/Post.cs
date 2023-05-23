@@ -53,7 +53,8 @@ public class Post : BaseDomain
         {
             Id = Guid.NewGuid(),
             UserId = userId,
-            Contents = Content
+            Contents = Content,
+            TimeStamp = DateTime.Now
         });
     }
 

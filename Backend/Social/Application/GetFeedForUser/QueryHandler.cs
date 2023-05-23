@@ -37,6 +37,7 @@ public class FeedCommentDto
     public string DisplayNameOfUser { get; set; }
     public string UserId { get; set; }
     public string Content { get; set; }
+    public DateTime TimeStamp { get; set; }
 }
 
 public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
@@ -137,8 +138,8 @@ public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
                 Id = comment.Id,
                 DisplayNameOfUser =await displayNameOfUser,
                 UserId = comment.UserId,
-                Content = comment.Contents
-                
+                Content = comment.Contents,
+                TimeStamp = comment.TimeStamp
             });
         }
 

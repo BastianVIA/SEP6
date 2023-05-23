@@ -107,7 +107,8 @@ public class PostRepository : IPostRepository
                 {
                     Id = comment.Id.ToString(),
                     UserId = comment.UserId,
-                    Contents = comment.Contents
+                    Contents = comment.Contents,
+                    TimeStamp = comment.TimeStamp,
                 });
             }
             else
@@ -214,7 +215,8 @@ public class PostRepository : IPostRepository
             {
                 Id = new Guid(commentDao.Id),
                 UserId = commentDao.UserId,
-                Contents = commentDao.Contents
+                Contents = commentDao.Contents,
+                TimeStamp = commentDao.TimeStamp,
             });
         }
 
