@@ -8,7 +8,7 @@ public class User : Foundation.BaseDomain
     public string DisplayName { get; set; }
     public string Email { get; set; }
     public string? Bio { get; set; }
-    public List<string>? FavoriteMovies { get; set; }
+    public List<UserFavoriteMovie>? FavoriteMovies { get; set; }
     public List<UserRating>? Ratings { get; set; }
     
     public List<UserReview>? Reviews { get; set; }
@@ -35,7 +35,7 @@ public class User : Foundation.BaseDomain
 
         foreach (var favoriteMovie in FavoriteMovies)
         {
-            if (favoriteMovie == movieId)
+            if (favoriteMovie.MovieId == movieId)
             {
                 return true;
             }
@@ -79,7 +79,7 @@ public class User : Foundation.BaseDomain
         {
             var movie = FavoriteMovies[i];
 
-            if (movieId == movie)
+            if (movieId == movie.MovieId)
             {
                 FavoriteMovies.RemoveAt(i);
                 AddDomainEvent(new UnFavoritedMovie(Id, movieId));
@@ -110,10 +110,10 @@ public class User : Foundation.BaseDomain
     {
         if (FavoriteMovies == null)
         {
-            FavoriteMovies = new List<string>();
+            FavoriteMovies = new List<UserFavoriteMovie>();
         }
 
-        FavoriteMovies.Add(movieId);
+        FavoriteMovies.Add(new UserFavoriteMovie{MovieId = movieId, TimeMovieWasAdded = DateTime.Now});
         AddDomainEvent(new FavoritedMovie(Id, movieId));
     }
 

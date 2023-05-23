@@ -21,6 +21,6 @@ public class QueryHandler : IRequestHandler<Query, bool>
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
         var requestedUser = await _repository.ReadUserFromIdAsync(request.userId, transaction, includeFavoriteMovies:true);
-        return requestedUser.FavoriteMovies.Contains(request.movieId);
+        return requestedUser.HasAlreadyFavoritedMovie(request.movieId);
     }
 }
