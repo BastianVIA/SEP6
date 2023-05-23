@@ -16,6 +16,15 @@ public class Controller : ControllerBase
     }
     
     
+    /// <summary>
+    /// Get image for specified user.
+    /// 
+    /// </summary>
+    /// <param name="userId">Id to specify user</param>
+    /// <returns></returns>
+    /// <remarks>
+    /// A "UserImageDto" will be returned, it will contain either 
+    /// a picture if specified, or if the user has not yet specified a picture it will contain null.</remarks>
     [HttpGet]
     [Route("userImage/{userId}")]
     [Tags("UserApi")]

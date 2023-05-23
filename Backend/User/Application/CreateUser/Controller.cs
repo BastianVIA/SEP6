@@ -20,6 +20,13 @@ public class Controller : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Create new user for system.
+    /// The user must have been created in Firebase before calling this, and the token must match the user from firebase
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    /// <remarks>This method requires authorization. Make sure to provide authorization when calling this method.</remarks>
     [HttpPost]
     [Tags("UserApi")]
     [ProducesResponseType(StatusCodes.Status200OK)]

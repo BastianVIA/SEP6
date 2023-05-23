@@ -11,5 +11,5 @@ public class UserFeed
     public FeedPostDtoTopic Topic { get; set; }
     public DateTimeOffset TimeOfActivity { get; set; }
     public ActivityData? ActivityData { get; set; }
-    public List<Comment> Comments { get; set; }
+    public List<Comment>? Comments { get; set; }
 }

@@ -10,12 +10,10 @@ namespace Backend.Movie.Infrastructure;
 public class MovieRepository : IMovieRepository
 {
     private int NumberOfResultsPerPage;
-    private int Top100;
 
     public MovieRepository(IConfiguration configuration)
     {
         NumberOfResultsPerPage = configuration.GetSection("QueryConstants").GetValue<int>("MoviesPerPage");
-        Top100 = configuration.GetSection("QueryConstants").GetValue<int>("Top100");
     }
 
     public async Task<Domain.Movie> ReadMovieFromIdAsync(string id, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeActors = false, bool includeDirectors = false)
@@ -184,15 +182,16 @@ public class MovieRepository : IMovieRepository
         return ToDomain(orderedMovies);
     }
     
-    public async Task<List<Domain.Movie>> GetTop100MoviesAsync(int minVotes, DbReadOnlyTransaction tx)
+    public async Task<List<Domain.Movie>> GetTopMoviesAsync(int minVotes,int pageNumber, DbReadOnlyTransaction tx)
     {
         var movies = tx.DataContext.Movies
             .Include(m => m.Rating)
             .Where(m => m.Rating != null && m.Rating.Votes > minVotes)
             .OrderByDescending(m => m.Rating.Rating)
-            .Take(Top100)
-            .ToList();
-        return ToDomain(movies);
+            .Skip(NumberOfResultsPerPage * (pageNumber - 1))
+            .Take(NumberOfResultsPerPage)
+            .ToListAsync();
+        return ToDomain(await movies);
     }
 
     private static void excludeActorsAndDirectorsFromupdate(DbTransaction tx, MovieDAO movieDao)

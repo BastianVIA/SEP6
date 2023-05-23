@@ -22,6 +22,8 @@ public class Controller : ControllerBase
     /// <param name="pageNumber">Specifies the page number for paginated results. Default value is 1.</param>
     /// <response code="200">The social feed data for the user.</response>
     /// <remarks>
+    /// This method requires authorization. Make sure to provide authorization when calling this method.
+    /// 
     /// The data optionally includes an "ActivityDataDto", and the fields filled out in this dto depend on the topic:
     /// - FavoriteMovie: No ActivityDataDto provided.
     /// - CreatedRating: ActivityDataDto provided with "MovieId" and "NewRating" fields.

@@ -18,8 +18,14 @@ public class Controller : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Follow another user
+    /// </summary>
+    /// <param name="userIdToFollow"></param>
+    /// <returns></returns>
+    /// <remarks>This method requires authorization. Make sure to provide authorization when calling this method.</remarks>
     [HttpPut]
-    [Route("followUser")]
+    [Route("followUser/{userIdToFollow}")]
     [Tags("Social")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

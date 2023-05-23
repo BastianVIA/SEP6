@@ -20,6 +20,12 @@ public class Controller : ControllerBase
 
 
   
+    /// <summary>
+    /// Update the users rating of the movie.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    /// <remarks>This method requires authorization. Make sure to provide authorization when calling this method.</remarks>
     [HttpPut]
     [Route("rateMovie")]
     [Tags("UserApi")]

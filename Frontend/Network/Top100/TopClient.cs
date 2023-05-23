@@ -2,11 +2,11 @@
 
 namespace Frontend.Network.Top100;
 
-public class Top100Client : NSwagBaseClient, ITop100Client
+public class TopClient : NSwagBaseClient, ITopClient
 {
-    public async Task<List<Movie>> GetTop100()
+    public async Task<List<Movie>> GetTop100(int pageNumber)
     {
-        var response = await _api.Top100Async();
+        var response = await _api.TopAsync(pageNumber);
         List<Movie> movies = new List<Movie>();
         Rating rating = new Rating();
         foreach (var movie in response.TopMovies)
