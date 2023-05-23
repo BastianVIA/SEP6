@@ -72,21 +72,39 @@
 </div>
 
 @code {
+    private string movieTitle;
     private string displayName;
+    private string searchOptionName;
     private string searchTerm;
     private bool searchUsers = false;
+
+    private void SearchForMovie()
+    {
+        if (movieTitle == null) return;
+        NavManager.NavigateTo($"searchResult/{movieTitle}");
+    }
 
     protected override void OnInitialized()
     {
         FirebaseModel.OnNotifyAlert += SetDisplayName;
-    }
+        searchOptionName = "Search Movie";
 
+        
+    }
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            PerformSearch();
+        }
+    }
 
     private void PerformSearch()
     {
         if (searchTerm == null) return;
         NavManager.NavigateTo($"SearchResult/{searchTerm}");
     }
+    
 
     private void SetDisplayName(object? sender, AlertEventArgs args)
     {
@@ -97,6 +115,12 @@
         StateHasChanged();
     }
 
+
+    private void ToggleSearchUsers(bool isSearchUsers)
+    {
+        searchUsers = isSearchUsers;
+    }
+    
     public void Dispose()
     {
         FirebaseModel.OnNotifyAlert -= SetDisplayName;
@@ -111,7 +135,7 @@
 
     private void MyProfile()
     {
-        NavManager.NavigateTo("/userprofile");
+        NavManager.NavigateTo($"/userprofile2/{FirebaseModel.CurrentUser.UID}");
     }
 
 }

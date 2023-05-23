@@ -1,4 +1,6 @@
 ﻿using AutoFixture;
+using Backend.Database.Transaction;
+using Backend.Database.TransactionManager;
 using Backend.Enum;
 using Backend.Movie.Application.Search;
 using Backend.Movie.Infrastructure;
@@ -12,11 +14,12 @@ public class QueryHandlerTests
     private readonly QueryHandler _handler;
     private readonly IMovieRepository _movieRepository = Substitute.For<IMovieRepository>();
     private readonly IImageService _imageService = Substitute.For<IImageService>();
+    private readonly IDatabaseTransactionFactory _transactionFactory = Substitute.For<IDatabaseTransactionFactory>();
     private readonly Fixture _fixture = new();
     
     public QueryHandlerTests()
     {
-        _handler = new QueryHandler(_movieRepository, _imageService);
+        _handler = new QueryHandler(_movieRepository, _imageService, _transactionFactory);
     }
 
     [Fact]
@@ -25,7 +28,7 @@ public class QueryHandlerTests
         //Arrange
         var request = _fixture.Create<Query>();
         var expected = new List<Backend.Movie.Domain.Movie>();
-        _movieRepository.SearchForMovie(request.Title, request.sortingKey, request.sortingDirection, request.pageNumber)
+        _movieRepository.SearchForMovie(request.Title, request.sortingKey, request.sortingDirection, request.pageNumber, Arg.Any<DbReadOnlyTransaction>())
             .Returns(expected);
         
         //Act
@@ -46,7 +49,8 @@ public class QueryHandlerTests
         _movieRepository.SearchForMovie(request.Title, 
                 Arg.Any<MovieSortingKey>(), 
                 Arg.Any<SortingDirection>(), 
-                Arg.Any<int>())
+                Arg.Any<int>(), 
+                Arg.Any<DbReadOnlyTransaction>())
             .Returns(expected);
 
         //Act
@@ -69,7 +73,8 @@ public class QueryHandlerTests
         _movieRepository.SearchForMovie(request.Title, 
                 Arg.Any<MovieSortingKey>(), 
                 Arg.Any<SortingDirection>(), 
-                Arg.Any<int>())
+                Arg.Any<int>(), 
+                Arg.Any<DbReadOnlyTransaction>())
             .Returns(returnedMovies);
 
         //Act

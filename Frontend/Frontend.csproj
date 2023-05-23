@@ -8,8 +8,10 @@
 
     <ItemGroup>
       <PackageReference Include="Blazorise.Bootstrap" Version="1.2.3" />
+      <PackageReference Include="Blazorise.Charts" Version="1.2.3" />
       <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.2.3" />
       <PackageReference Include="Blazorise.LottieAnimation" Version="1.2.3" />
+      <PackageReference Include="Blazorise.Video" Version="1.2.3" />
       <PackageReference Include="FirebaseAuthentication.net" Version="4.0.2" />
       <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0-preview1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.5" />
@@ -31,10 +33,17 @@
 
     <ItemGroup>
       <None Remove="Data\**" />
+      <None Update="Pages\UserProfile.razor.css">
+        <DependentUpon>UserProfile.razor</DependentUpon>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
       <Content Remove="Data\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\UserPictures" />
     </ItemGroup>
 
 </Project>

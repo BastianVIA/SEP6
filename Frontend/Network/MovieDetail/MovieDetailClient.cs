@@ -6,8 +6,6 @@ namespace Frontend.Network.MovieDetail;
 
 public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
 {
-    
-    
     public async Task<Movie?> GetMovieDetails(string movieId, string? userToken)
     {
         if (userToken != null)
@@ -37,6 +35,7 @@ public class MovieDetailClient : NSwagBaseClient, IMovieDetailClient
             ReleaseYear = response.MovieDetailsDto.ReleaseYear,
             UserRating = response.MovieDetailsDto.UserRating,
             PosterUrl = response.MovieDetailsDto.PathToPoster == null || string.IsNullOrWhiteSpace(response.MovieDetailsDto.PathToPoster.ToString()) ? new Uri(DEFAULT_POSTER_URL, UriKind.Relative) : response.MovieDetailsDto.PathToPoster,
+            MovieTrailer = response.MovieDetailsDto.MovieTrailer,
             Rating = new Rating
             {
                 AverageRating = response.MovieDetailsDto.Ratings?.AverageRating ?? 0,
