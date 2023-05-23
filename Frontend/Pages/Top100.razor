@@ -21,11 +21,35 @@ else
 
 @code {
     private List<Movie> _movieList = new();
+    private int _currentPage = 1;
+    private bool _reachedEnd = false;
+
     protected async override Task OnInitializedAsync()
     {
-        _movieList = await Top100Model.GetTop100List();
+        await  Load100Movies();
     }
-    
+
+    private async Task LoadMovies()
+    {
+        List<Movie> movies = await Top100Model.GetTopList(_currentPage);
+        if (movies.Count > 0)
+        {
+            _movieList.AddRange(movies);
+            _currentPage++;
+        }
+        
+    }
+
+    private async Task Load100Movies()
+    {
+        do
+        {
+            await LoadMovies();
+            StateHasChanged();
+        } while (_movieList.Count < 100);
+        
+    }
+
     private void OnMovieClick(string movieId)
     {
         NavManager.NavigateTo($"movieDetails/{movieId}");

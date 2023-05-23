@@ -5,15 +5,15 @@ namespace Frontend.Model.Top100;
 
 public class Top100Model : ITop100Model
 {
-    private ITop100Client _client;
+    private ITopClient _client;
 
     public Top100Model()
     {
-        _client = new Top100Client();
+        _client = new TopClient();
     }
 
-    public async Task<List<Movie>> GetTop100List()
+    public async Task<List<Movie>> GetTopList(int pageNumber)
     {
-        return await _client.GetTop100();
+        return await _client.GetTop100(pageNumber);
     }
 }

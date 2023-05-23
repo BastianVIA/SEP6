@@ -32,7 +32,7 @@
             <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
                 @if (IndexedList)
                 {
-                    <TableRowCell>@(_indexCount++)</TableRowCell>
+                    <TableRowCell>@(MovieList.IndexOf(movie) + 1)</TableRowCell>
                 }
                 <TableRowCell><img src="@movie.PosterUrl" height="@PosterSize"/></TableRowCell>
                 <TableRowCell>@movie.Title</TableRowCell>

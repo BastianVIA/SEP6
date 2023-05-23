@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Backend.Movie.Application.GetTop100;
 
-public record Query() : IRequest<MovieTop100Response>;
+public record Query(int PageNumber) : IRequest<MovieTop100Response>;
 
 public record MovieTop100Response(List<MovieTop100Dto> topMovies);
 
@@ -41,8 +41,9 @@ public class QueryHandler : IRequestHandler<Query, MovieTop100Response>
     public async Task<MovieTop100Response> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _transactionFactory.BeginReadOnlyTransaction();
-        var movies = await _repository.GetTop100MoviesAsync(
+        var movies = await _repository.GetTopMoviesAsync(
             MinVotesForQuery, 
+            request.PageNumber,
             transaction);
 
         var dtoMovies = new List<MovieTop100Dto>();
