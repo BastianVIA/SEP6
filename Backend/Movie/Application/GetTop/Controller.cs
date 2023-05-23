@@ -14,6 +14,12 @@ public class Controller : ControllerBase
         _mediator = mediator;
     }
     
+    /// <summary>
+    /// Get top movies
+    /// </summary>
+    /// <param name="pageNumber">The number of movies per. page can be set in the
+    /// configuration with "MoviesPerPage"</param>
+    /// <returns></returns>
     [HttpGet]
     [Route("top")]
     [Tags("MovieApi")]
