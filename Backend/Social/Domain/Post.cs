@@ -15,7 +15,10 @@ public enum Activity
 }
 public enum TypeOfReaction
 {
-    LIKE
+    LIKE,
+    LOVE,
+    HAHA,
+    WOW
 }
 
 
