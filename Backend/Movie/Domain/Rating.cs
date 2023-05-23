@@ -4,7 +4,7 @@ namespace Backend.Movie.Domain;
 
 public class Rating
 {
-    public float AverageRating  { get; set; }
+    public double AverageRating  { get; set; }
     public int Votes { get; set; }
     private const int MaxRating = 10;
     private const int MinRating = 1;
