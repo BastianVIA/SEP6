@@ -1,16 +1,17 @@
 ﻿@namespace Frontend.Components
-
+@implements IDisposable
 @using Blazorise
 @using Frontend.Events
 @using Frontend.Model.Firebase
 @using Alert = Frontend.Entities.Alert
-@inject IFirebaseModel FirebaseModel;
+@inject IFirebaseModel FirebaseModel
+@inject IAlertAggregator AlertAggregator
 
 @if(Alert != null){
     <div class="alert-container">
         <Alert Color="@(Alert!.Success? Color.Success : Color.Warning)" @bind-Visible="@_visibility" Margin="Margin.Is0">
-            <AlertMessage>@Alert.Message</AlertMessage>
-            <AlertDescription>@Alert.Description</AlertDescription>
+            <AlertMessage>@Alert.Header</AlertMessage>
+            <AlertDescription>@Alert.Message</AlertDescription>
         </Alert>
     </div>
 }
@@ -22,16 +23,23 @@
     private int _alertTimeSeconds = 5;
     private AlertBoxHelper _helper;
 
+    private CancellationTokenSource? _cancelAlert;
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
         _helper = new AlertBoxHelper();
-        FirebaseModel.OnNotifyAlert += HandleAlertEvent;
+        AlertAggregator.OnNotifyAlert += HandleAlertEvent;
+    }
+    
+    public void Dispose()
+    {
+        AlertAggregator.OnNotifyAlert -= HandleAlertEvent;
     }
 
     private void HandleAlertEvent(object? sender, AlertEventArgs args)
     {
-        Alert = _helper.GetAlert(args.Type, args.Reason);
+        Alert = _helper.GetAlert(args.Type, args.Message);
         if (Alert == null) return;
         
         _visibility = true;
@@ -41,11 +49,18 @@
 
     private void HideAlertTimer()
     {
-        Task.Delay(_alertTimeSeconds * 1000).ContinueWith(task =>
+        _cancelAlert?.Cancel();
+        _cancelAlert = new CancellationTokenSource();
+        var cancelToken = _cancelAlert.Token;
+        Task.Delay(_alertTimeSeconds * 1000, cancelToken).ContinueWith(task =>
         {
-            _visibility = false;
-            InvokeAsync(StateHasChanged);
+            if (!cancelToken.IsCancellationRequested)
+            {
+                _visibility = false;
+                InvokeAsync(StateHasChanged);
+            }
         });
     }
+
 
 }

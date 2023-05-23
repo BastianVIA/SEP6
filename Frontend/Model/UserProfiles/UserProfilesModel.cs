@@ -7,9 +7,9 @@ public class UserProfilesModel: IUserProfilesModel
     private IUserProfileClient _client;
     public double AverageRating { get; set; }
    
-    public UserProfilesModel(IUserProfileClient client)
+    public UserProfilesModel()
     {
-        _client = client;
+        _client = new UserProfileClient();
     }
 
     public async Task UpdateUserProfile(Entities.User user)

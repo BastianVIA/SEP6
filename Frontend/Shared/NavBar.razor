@@ -5,6 +5,7 @@
 @using Frontend.Service
 @using Microsoft.OpenApi.Services
 @inject IFirebaseModel FirebaseModel
+@inject IAlertAggregator AlertAggregator
 @inject NavigationManager NavManager
 @inject CustomAuthenticationStateProvider AuthStateProvider
 
@@ -86,10 +87,14 @@
 
     protected override void OnInitialized()
     {
-        FirebaseModel.OnNotifyAlert += SetDisplayName;
+        AlertAggregator.OnNotifyAlert += SetDisplayName;
         searchOptionName = "Search Movie";
 
         
+    }
+    public void Dispose()
+    {
+        AlertAggregator.OnNotifyAlert -= SetDisplayName;
     }
     private void HandleKeyDown(KeyboardEventArgs e)
     {
@@ -121,10 +126,7 @@
         searchUsers = isSearchUsers;
     }
     
-    public void Dispose()
-    {
-        FirebaseModel.OnNotifyAlert -= SetDisplayName;
-    }
+    
 
     private void Logout()
     {

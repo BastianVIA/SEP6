@@ -8,9 +8,9 @@ public class PersonSearchModel : NSwagBaseClient, IPersonSearchModel
 {
     private IPersonSearchClient _client;
     
-    public PersonSearchModel(IPersonSearchClient client)
+    public PersonSearchModel()
     {
-        _client = client;
+        _client = new PersonSearchClient();
     }
     
     public async Task<List<Entities.Person>> SearchForPersonAsync(string name, int? pageNumber = null)
