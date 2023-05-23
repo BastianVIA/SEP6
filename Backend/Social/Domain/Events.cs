@@ -11,3 +11,13 @@ public class SocialUserCreatedEvent : INotification
         Id = id;
     }
 }
+
+public class PostCreatedEvent : INotification
+{
+    public Guid Id { get; }
+
+    public PostCreatedEvent(Guid id)
+    {
+        Id = id;
+    }
+}

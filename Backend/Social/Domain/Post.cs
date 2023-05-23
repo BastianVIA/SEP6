@@ -1,4 +1,5 @@
-﻿using Backend.Foundation;
+﻿using System.ComponentModel.DataAnnotations;
+using Backend.Foundation;
 
 namespace Backend.SocialFeed.Domain;
 
@@ -12,26 +13,34 @@ public enum Activity
     UnFavoriteMovie,
     CreatedReview,
 }
+public enum TypeOfReaction
+{
+    LIKE
+}
+
 
 public class Post : BaseDomain
 {
     public Guid Id;
-    public string UserId  { get; set; }
+    public string UserId { get; set; }
     public Activity Topic { get; set; }
     public ActivityData? ActivityData { get; set; }
     public DateTime TimeOfActivity { get; set; }
     public List<Comment>? Comments { get; set; }
-    public List<Reaction>? Reactions { get; set; }
+    public Dictionary<string, TypeOfReaction>? Reactions { get; set; }
 
-    public Post() { }
-    
-    public Post(string userId, Activity topic, ActivityData? activityData = null)
+    public Post()
     {
+    }
+
+    public Post(string userId, Activity topic, ActivityData? activityData = null)
+    {   
         Id = Guid.NewGuid();
         UserId = userId;
         Topic = topic;
         ActivityData = activityData;
         TimeOfActivity = DateTime.Now;
+        AddDomainEvent(new PostCreatedEvent(Id));
     }
 
     public void AddComment(string userId, string Content)
@@ -48,17 +57,53 @@ public class Post : BaseDomain
         });
     }
 
-    public void AddReaction(string userId, TypeOfReaction typeOfReaction)
+    public void PutReaction(string userId, TypeOfReaction typeOfReaction)
     {
         if (Reactions == null)
         {
-            Reactions = new List<Reaction>();
+            Reactions = new Dictionary<string, TypeOfReaction>();
         }
-        Reactions.Add(new Reaction
+
+        if (Reactions.ContainsKey(userId))
         {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            TypeOfReaction = typeOfReaction
-        });
+            updateExistingReaction(userId, typeOfReaction);
+        }
+        else
+        {
+            Reactions.Add(userId, typeOfReaction);
+        }
+    }
+
+    private void updateExistingReaction(string userId, TypeOfReaction typeOfReaction)
+    {
+        if (Reactions == null)
+        {
+            throw new ValidationException("Tried to update users reaction, but could not find any reactions");
+        }
+        
+        if (Reactions[userId] != typeOfReaction)
+        {
+            Reactions[userId] = typeOfReaction;
+        }
+        else
+        {
+            removeReaction(userId);
+        }
+    }
+
+    private void removeReaction(string userId)
+    {
+
+        Reactions.Remove(userId);
+    }
+
+    public bool UserHasAlreadyReacted(string userId)
+    {
+        if (Reactions == null)
+        {
+            return false;
+        }
+
+        return Reactions.ContainsKey(userId);
     }
 }

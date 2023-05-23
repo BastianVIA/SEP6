@@ -26,7 +26,7 @@ public class CommandHandler : IRequestHandler<Command>
         try
         {
             var post = await _repository.ReadPostFromId(request.PostId, transaction, includeReactions:true);
-            post.AddReaction(request.UserId, request.Reaction);
+            post.PutReaction(request.UserId, request.Reaction);
             await _repository.UpdateAsync(post, transaction);
         }
         catch (Exception e)
