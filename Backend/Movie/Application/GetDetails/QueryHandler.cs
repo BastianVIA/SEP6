@@ -42,7 +42,7 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
     private readonly IMediator _mediator;
     private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
 
-    public QueryHandler(IMovieRepository repository, IImageService imageService, IResumeService resumeService,
+    public QueryHandler(IMovieRepository repository, IImageService imageService, IResumeService resumeService, ITrailerService trailerService,
         IMediator mediator, IDatabaseTransactionFactory databaseTransactionFactory)
     {
         _repository = repository;
@@ -82,10 +82,10 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
             directors = await _mediator.Send(new People.Application.GetPeopleFromId.Query(movie.Directors));
         }
 
-        return new MovieDetailsResponse(ToDto(movie, await pathForPoster, await resume, isFavorite, actors, directors, userRating));
+        return new MovieDetailsResponse(ToDto(movie, await pathForPoster, trailerPath, await resume, isFavorite, actors, directors, userRating));
     }
 
-    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? trailerPath string? resume, bool isFavorite, PersonResponse? actors, PersonResponse? directors, int? userRating)
+    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? trailerPath, string? resume, bool isFavorite, PersonResponse? actors, PersonResponse? directors, int? userRating)
     {
         var dtoMovie = new MovieDetailsDto
         {
