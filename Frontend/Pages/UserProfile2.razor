@@ -111,8 +111,9 @@
     private async Task LoadUserData()
     {
         user = await UserProfilesModel.GetUserProfile(UID);
-        // user.ProfilePicture = UserProfilePictureModel.GetProfilePicture(FirebaseModel.CurrentUser.UID).Result;
-        // profilePicture = Convert.ToBase64String(user.ProfilePicture, 0, user.ProfilePicture.Length);
+        user.ProfilePicture = await UserProfilePictureModel.GetProfilePicture(FirebaseModel.CurrentUser.UID);
+        string base64String = Convert.ToBase64String(user.ProfilePicture, 0, user.ProfilePicture.Length);
+        profilePicture = $"data:image/jpg;base64,{base64String}";
         favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, UID);
         if (favoriteMovies.Any())
         {
