@@ -22,6 +22,9 @@
                 <BarItem>
                     <BarLink To="">Home</BarLink>
                 </BarItem>
+                <BarItem>
+                    <BarLink To="/Top100">Top 100 Movies</BarLink>
+                </BarItem>
                 <AuthorizeView>
                     <Authorized>
                         <BarItem>
@@ -29,9 +32,6 @@
                         </BarItem>
                     </Authorized>
                 </AuthorizeView>
-                <BarItem>
-                    <BarLink To="/Top100">Top 100 Movies</BarLink>
-                </BarItem>
             </BarStart>
             <BarEnd>
                 <BarItem>
@@ -89,13 +89,13 @@
     {
         AlertAggregator.OnNotifyAlert += SetDisplayName;
         searchOptionName = "Search Movie";
-
-        
     }
+    
     public void Dispose()
     {
         AlertAggregator.OnNotifyAlert -= SetDisplayName;
     }
+    
     private void HandleKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
@@ -110,7 +110,6 @@
         NavManager.NavigateTo($"SearchResult/{searchTerm}");
     }
     
-
     private void SetDisplayName(object? sender, AlertEventArgs args)
     {
         if (args.Type != AlertBoxHelper.AlertType.LoginSuccess &&
@@ -126,15 +125,13 @@
         searchUsers = isSearchUsers;
     }
     
-    
-
     private void Logout()
     {
         FirebaseModel.Logout();
         AuthStateProvider.SignOut();
+        NavManager.NavigateTo("/");
     }
-
-
+    
     private void MyProfile()
     {
         NavManager.NavigateTo($"/userprofile2/{FirebaseModel.CurrentUser.UID}");
