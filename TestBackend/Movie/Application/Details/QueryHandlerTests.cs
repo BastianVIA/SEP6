@@ -24,12 +24,13 @@ public class QueryHandlerTests
     private readonly IMovieRepository _repository = Substitute.For<IMovieRepository>();
     private readonly IImageService _imageService = Substitute.For<IImageService>();
     private readonly IResumeService _resumeService = Substitute.For<IResumeService>();
+    private readonly ITrailerService _trailerService = Substitute.For<ITrailerService>();
     private readonly IDatabaseTransactionFactory _transactionFactory = Substitute.For<IDatabaseTransactionFactory>();
     private readonly IMediator _mediator = Substitute.For<IMediator>();
 
     public QueryHandlerTests()
     {
-        _handler = new QueryHandler(_repository, _imageService, _resumeService, _mediator, _transactionFactory);
+        _handler = new QueryHandler(_repository, _imageService, _resumeService, _trailerService, _mediator, _transactionFactory);
     }
 
     [Fact]
