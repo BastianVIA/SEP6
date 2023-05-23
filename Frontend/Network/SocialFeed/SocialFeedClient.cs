@@ -42,7 +42,8 @@ public class SocialFeedClient : NSwagBaseClient, ISocialFeedClient
                     Id = comment.Id,
                     UserId = comment.UserId,
                     DisplayNameOfUser = comment.DisplayNameOfUser,
-                    Content = comment.Content
+                    Content = comment.Content,
+                    TimeStamp = comment.TimeStamp
                 });
             }
 
@@ -58,7 +59,6 @@ public class SocialFeedClient : NSwagBaseClient, ISocialFeedClient
                 NumberOfReactions = userFeed.NumberOfReactions
             });
         }
-
         return userFeeds;
     }
 

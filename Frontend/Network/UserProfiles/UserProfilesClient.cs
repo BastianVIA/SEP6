@@ -66,5 +66,18 @@ namespace Frontend.Network.UserProfiles
             //     }
             //
         }
+
+        public async Task FollowUser(string userToken, string userId)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+            await _api.FollowUserAsync(userId);
+        }
+
+        public async Task<ICollection<string>> IsFollowingUser(string userToken, string userId)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+            var response = await _api.FollowsAsync(userId);
+            return response.FollowingUserDtos;
+        }
     }
 }
