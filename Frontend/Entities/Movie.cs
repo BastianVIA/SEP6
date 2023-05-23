@@ -9,6 +9,8 @@ public class Movie
     public bool? IsFavorite { get; set;}
     public int? UserRating { get; set; }
     public Uri? PosterUrl { get; set; }
+    
+    public string? MovieTrailer { get; set; }
     public List<Person>? Actors { get; set; }
     public List<Director>? Directors { get; set; }
     public Rating? Rating { get; set; }

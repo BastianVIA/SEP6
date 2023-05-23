@@ -19,6 +19,8 @@ public class MovieDetailsDto
     public bool IsFavorite { get; set; }
     public int? UserRating { get; set; }
     public Uri? PathToPoster { get; set; }
+    
+    public string? MovieTrailer { get; set; }
 
     public DetailsRatingDto? Ratings { get; set; }
     public List<DetailsPersonsDto>? Actors { get; set; }
@@ -36,15 +38,17 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
     private IMovieRepository _repository;
     private readonly IImageService _imageService;
     private readonly IResumeService _resumeService;
+    private readonly ITrailerService _trailerService;
     private readonly IMediator _mediator;
     private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
 
-    public QueryHandler(IMovieRepository repository, IImageService imageService, IResumeService resumeService,
+    public QueryHandler(IMovieRepository repository, IImageService imageService, IResumeService resumeService, ITrailerService trailerService,
         IMediator mediator, IDatabaseTransactionFactory databaseTransactionFactory)
     {
         _repository = repository;
         _imageService = imageService;
         _resumeService = resumeService;
+        _trailerService = trailerService;
         _mediator = mediator;
         _databaseTransactionFactory = databaseTransactionFactory;
     }
@@ -54,6 +58,7 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
         var movie = await _repository.ReadMovieFromId(request.Id, transaction,includeRatings:true,includeActors:true,includeDirectors:true);
         var pathForPoster = _imageService.GetPathForPoster(request.Id);
+        var trailerPath = await _trailerService.GetMovieTrailer(request.Id);
         var resume = _resumeService.GetResume(request.Id);
         var isFavorite = false;
         int? userRating = null;
@@ -77,10 +82,10 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
             directors = await _mediator.Send(new People.Application.GetPeopleFromId.Query(movie.Directors));
         }
 
-        return new MovieDetailsResponse(ToDto(movie, await pathForPoster, await resume, isFavorite, actors, directors, userRating));
+        return new MovieDetailsResponse(ToDto(movie, await pathForPoster, trailerPath, await resume, isFavorite, actors, directors, userRating));
     }
 
-    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? resume, bool isFavorite, PersonResponse? actors, PersonResponse? directors, int? userRating)
+    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? trailerPath, string? resume, bool isFavorite, PersonResponse? actors, PersonResponse? directors, int? userRating)
     {
         var dtoMovie = new MovieDetailsDto
         {
@@ -88,6 +93,7 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
             Title = movie.Title,
             ReleaseYear = movie.ReleaseYear,
             PathToPoster = pathToPoser,
+            MovieTrailer = trailerPath,
             Actors = ToPersonDto(actors),
             Directors = ToPersonDto(directors),
             Resume = resume,
