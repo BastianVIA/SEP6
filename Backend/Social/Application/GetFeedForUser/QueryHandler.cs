@@ -18,7 +18,8 @@ public class FeedPostDto
     public ActivityDataDto? ActivityDataDto;
     public int numberOfReactions;
     public List<FeedCommentDto>? Comments;
-    public DateTime TimeOfActivity { get; set; }
+    public DateTime TimeOfActivity;
+    public TypeOfReaction? UsersReaction;
 }
 
 public class ActivityDataDto
@@ -64,21 +65,21 @@ public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
             return new GetFeedForUserResponse(new List<FeedPostDto>());
         }
         var feedForUser = await _postRepository.GetFeedWithPostsFromUsers(user.Following, request.pageNumber, transaction, includeComments:true, includeReactions:true);
-        return await toDto(feedForUser);
+        return await toDto(feedForUser, request.userId);
     }
 
-    private async Task<GetFeedForUserResponse> toDto(IList<Post> listOfPosts)
+    private async Task<GetFeedForUserResponse> toDto(IList<Post> listOfPosts, string requestingUser)
     {
         List<FeedPostDto> dtoPosts = new List<FeedPostDto>();
         foreach (var post in listOfPosts)
         {
-            dtoPosts.Add(await toDto(post));
+            dtoPosts.Add(await toDto(post, requestingUser));
         }
 
         return new GetFeedForUserResponse(dtoPosts);
     }
 
-    private async Task<FeedPostDto> toDto(Post post)
+    private async Task<FeedPostDto> toDto(Post post, string requestingUser)
     {
         var noOfReactions = 0;
         if (post.Reactions != null)
@@ -96,7 +97,8 @@ public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
             ActivityDataDto = await toDto(post.ActivityData),
             TimeOfActivity = post.TimeOfActivity,
             Comments = await toDto(post.Comments),
-            numberOfReactions = noOfReactions
+            numberOfReactions = noOfReactions,
+            UsersReaction = post.GetUsersReaction(requestingUser)
         };
     }
 

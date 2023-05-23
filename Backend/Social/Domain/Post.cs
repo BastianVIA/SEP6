@@ -75,6 +75,21 @@ public class Post : BaseDomain
         }
     }
 
+    public TypeOfReaction? GetUsersReaction(string userId)
+    {
+        if (Reactions == null)
+        {
+            return null;
+        }
+    
+        if (Reactions.TryGetValue(userId, out TypeOfReaction reaction))
+        {
+            return reaction;
+        }
+    
+        return null;
+    }
+
     private void updateExistingReaction(string userId, TypeOfReaction typeOfReaction)
     {
         if (Reactions == null)
@@ -91,20 +106,12 @@ public class Post : BaseDomain
             removeReaction(userId);
         }
     }
-
+    
     private void removeReaction(string userId)
     {
 
         Reactions.Remove(userId);
     }
 
-    public bool UserHasAlreadyReacted(string userId)
-    {
-        if (Reactions == null)
-        {
-            return false;
-        }
-
-        return Reactions.ContainsKey(userId);
-    }
+    
 }
