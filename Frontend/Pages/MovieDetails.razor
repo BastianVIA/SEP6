@@ -13,6 +13,7 @@
 @using Frontend.Model.User
 @inject NavigationManager NavManager
 
+
 @if (movieLoaded)
 {
     <div class="movie-container">
@@ -126,13 +127,17 @@
                 </ModalFooter>
             </ModalContent>
         </Modal>
-        
+        <iframe width="560" height="315" src=@movie.MovieTrailer frameborder="0" allow="encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
+    
+    
 }
 else
 {
     <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
 }
+
+
 
 @code {
 

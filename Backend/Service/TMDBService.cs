@@ -1,12 +1,13 @@
 ﻿using System.Text.Json.Serialization;
 using TMDbLib.Client;
 using TMDbLib.Objects.General;
+using TMDbLib.Objects.Movies;
 using TMDbLib.Objects.People;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Backend.Service;
 
-public class TMDBService : IImageService, IResumeService, IPersonService
+public class TMDBService : IImageService, IResumeService, IPersonService, ITrailerService
 {
     private const string DefaultImageSize = "w500";
     private string _apiKey;
@@ -40,6 +41,27 @@ public class TMDBService : IImageService, IResumeService, IPersonService
         }
         
         return _client.GetImageUrl(DefaultImageSize, movie.PosterPath);
+    }
+
+    public async Task<string?> GetMovieTrailer(string movieId)
+    {
+        var movie = await _client.GetMovieAsync(movieId, MovieMethods.Videos);
+        var movies = movie.Videos.Results;
+        return FindTrailer(movies);
+    }
+
+    private string? FindTrailer(List<Video> movies)
+    {
+        foreach (var movie in movies)
+        {
+            if (movie.Type.Equals("Trailer") && movie.Site.Equals("YouTube"))
+            {
+                var key = movie.Key;
+                return $"https://www.youtube.com/embed/{key}";
+            }
+        }
+
+        return null;
     }
 
     public async Task<string?> GetResume(string id)
