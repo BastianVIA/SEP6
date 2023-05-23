@@ -46,7 +46,7 @@ public class CommandHandler : IRequestHandler<Command>
 
                 user.AddRating(request.movieId, (int)request.rating);
             }
-            await _repository.Update(user, transaction);
+            await _repository.UpdateAsync(user, transaction);
         }
         catch (Exception e)
         {

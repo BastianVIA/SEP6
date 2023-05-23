@@ -22,7 +22,7 @@ public class CommandHandler : IRequestHandler<Command>
         await using var transaction = await _transactionFactory.BeginTransactionAsync();
         try
         {
-            var post = await _repository.ReadPostFromId(request.PostId, transaction, includeComments:true);
+            var post = await _repository.ReadPostFromIdAsync(request.PostId, transaction, includeComments:true);
             post.AddComment(request.UserId, request.Comment);
             await _repository.UpdateAsync(post, transaction);
         }

@@ -2,5 +2,5 @@
 
 public interface ITrailerService
 {
-    public Task<string?>  GetMovieTrailer(string moveId);
+    public Task<string?>  GetMovieTrailerAsync(string moveId);
 }

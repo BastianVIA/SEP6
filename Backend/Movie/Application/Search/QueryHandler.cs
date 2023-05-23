@@ -40,12 +40,12 @@ public class QueryHandler : IRequestHandler<Query, MovieSearchResponse>
     public async Task<MovieSearchResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var foundMovies = await _repository.SearchForMovie(request.Title, request.sortingKey, request.sortingDirection,
+        var foundMovies = await _repository.SearchForMovieAsync(request.Title, request.sortingKey, request.sortingDirection,
             request.pageNumber, transaction);
         var moviesToDto = new List<MovieDto>();
         foreach (var foundMovie in foundMovies)
         {
-            var posterPath = _imageService.GetPathForPoster(foundMovie.Id);
+            var posterPath = _imageService.GetPathForPosterAsync(foundMovie.Id);
             var movieToAdd = new MovieDto
             {
                 Id = foundMovie.Id,

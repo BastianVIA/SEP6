@@ -9,7 +9,7 @@ public class PostRepository : IPostRepository
 {
     private const int numberOfPostPerPage = 10;
 
-    public async Task<Post> ReadPostFromId(string id, DbTransaction tx, bool includeComments = false,
+    public async Task<Post> ReadPostFromIdAsync(string id, DbTransaction tx, bool includeComments = false,
         bool includeReactions = false)
     {
         var query = tx.DataContext.Posts
@@ -92,6 +92,31 @@ public class PostRepository : IPostRepository
         tx.DataContext.Posts.Update(postDao);
     }
 
+    public async Task<List<Post>> GetFeedWithPostsFromUsersAsync(List<string> userIds, int requestedPageNumber, DbReadOnlyTransaction tx, bool includeComments = false, bool includeReactions = false)
+    {
+        var query = tx.DataContext.Posts
+            .Include(p => p.ActivityData)
+            .Where(p => userIds.Contains(p.UserId));
+
+        if (includeComments)
+        {
+            query = query.Include(p => p.Comments);
+        }
+
+        if (includeReactions)
+        {
+            query = query.Include(p => p.Reactions);
+
+        }
+        
+        var posts = await query
+            .OrderByDescending(p => p.TimeOfActivity)
+            .Skip(numberOfPostPerPage * (requestedPageNumber - 1))
+            .Take(numberOfPostPerPage).ToListAsync();     
+        
+        return ToDomain(posts);
+    }
+
     private void FromDomain(List<CommentDAO> postDaoComments, List<Comment> domainPostComments)
     {
         var commentIds = domainPostComments.Select(c => c.Id.ToString()).ToList();
@@ -145,32 +170,7 @@ public class PostRepository : IPostRepository
             }
         }
     }
-
-    public async Task<List<Post>> GetFeedWithPostsFromUsers(List<string> userIds, int requestedPageNumber, DbReadOnlyTransaction tx, bool includeComments = false, bool includeReactions = false)
-    {
-        var query = tx.DataContext.Posts
-            .Include(p => p.ActivityData)
-            .Where(p => userIds.Contains(p.UserId));
-
-        if (includeComments)
-        {
-            query = query.Include(p => p.Comments);
-        }
-
-        if (includeReactions)
-        {
-            query = query.Include(p => p.Reactions);
-
-        }
-        
-        var posts = await query
-            .OrderByDescending(p => p.TimeOfActivity)
-            .Skip(numberOfPostPerPage * (requestedPageNumber - 1))
-            .Take(numberOfPostPerPage).ToListAsync();     
-        
-        return ToDomain(posts);
-    }
-
+    
     private List<Domain.Post> ToDomain(List<PostDAO>? daos)
     {
         if (daos == null || !daos.Any())

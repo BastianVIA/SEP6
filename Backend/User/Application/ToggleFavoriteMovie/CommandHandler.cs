@@ -36,7 +36,7 @@ public class CommandHandler : IRequestHandler<Command>
             {
                 user.AddFavoriteMovie(request.movieId);
             }
-            await _repository.Update(user, transaction);
+            await _repository.UpdateAsync(user, transaction);
         }
         catch (Exception e)
         {

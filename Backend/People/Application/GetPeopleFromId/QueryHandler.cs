@@ -25,7 +25,7 @@ public class QueryHandler : IRequestHandler<Query, PersonResponse>
     public async Task<PersonResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var requestedPeople = await _repository.FindPersons(request.personIds, transaction);
+        var requestedPeople = await _repository.FindPersonsAsync(request.personIds, transaction);
         return ToDto(requestedPeople);
     }
 

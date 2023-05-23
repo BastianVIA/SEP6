@@ -9,7 +9,7 @@ public class UserImageService : IUserImageService
         _imageFolder = Path.Combine(root, "Images");
     }
     
-    public async Task<byte[]?> GetImageData(string userId)
+    public async Task<byte[]?> GetImageDataAsync(string userId)
     {
         var path = Path.Combine(_imageFolder, $"{userId}.jpg");
 
@@ -29,7 +29,7 @@ public class UserImageService : IUserImageService
         }
     }
 
-    public async Task UploadImage(string userId, byte[] data)
+    public async Task UploadImageAsync(string userId, byte[] data)
     {
         string filePath = Path.Combine(_imageFolder, $"{userId}.jpg");
 

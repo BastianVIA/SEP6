@@ -23,7 +23,7 @@ public class QueryHandler : IRequestHandler<Query, UserImageResponse>
 
     public async Task<UserImageResponse> Handle(Query request, CancellationToken cancellationToken)
     {
-        var imageData = await _userImageService.GetImageData(request.userId);
+        var imageData = await _userImageService.GetImageDataAsync(request.userId);
 
         return new UserImageResponse(new UserImageDto(){ImageData = imageData});
     }

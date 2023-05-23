@@ -26,7 +26,7 @@ public class CommandHandler : IRequestHandler<Command>
             var user = await _repository.ReadUserFromIdAsync(request.userId, transaction, includeReviews: true);
             user.AddReview(request.movieId, request.reviewBody);
 
-            await _repository.Update(user, transaction);
+            await _repository.UpdateAsync(user, transaction);
         }
         catch (Exception e)
         {

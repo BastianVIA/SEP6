@@ -40,7 +40,7 @@ public class DbTransaction : DbReadOnlyTransaction, IAsyncDisposable
             {
                 // Having the loop like this could cause problems if we have circular events so added debug to find it in case something goes wrong
                 LogManager.GetCurrentClassLogger().Debug("Events published"); 
-                await pulishDomainEvents(); 
+                await pulishDomainEventsAsync(); 
 
             }
             await DataContext.SaveChangesAsync();
@@ -87,7 +87,7 @@ public class DbTransaction : DbReadOnlyTransaction, IAsyncDisposable
         _transactionSemaphore.Release();
     }
 
-    private async Task pulishDomainEvents()
+    private async Task pulishDomainEventsAsync()
     {
         var copiedEvents = _domainEvents.ToList();
         _domainEvents.Clear();

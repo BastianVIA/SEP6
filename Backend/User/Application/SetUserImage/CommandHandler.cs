@@ -16,6 +16,6 @@ public class CommandHandler : IRequestHandler<Command>
 
     public async Task Handle(Command request, CancellationToken cancellationToken)
     {
-        await _userImageService.UploadImage(request.userId, request.data);
+        await _userImageService.UploadImageAsync(request.userId, request.data);
     }
 }
