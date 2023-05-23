@@ -65,13 +65,22 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
             userRating = result.NumberOfStars;
         }
 
-        var actors = await _mediator.Send(new People.Application.GetPeopleFromId.Query(movie.Actors));
-        var directors = await _mediator.Send(new People.Application.GetPeopleFromId.Query(movie.Directors));
+        PersonResponse? actors = null;
+        PersonResponse? directors = null;
+        if (movie.Actors != null)
+        {
+            actors = await _mediator.Send(new People.Application.GetPeopleFromId.Query(movie.Actors));
+        }
+
+        if (movie.Directors != null)
+        {
+            directors = await _mediator.Send(new People.Application.GetPeopleFromId.Query(movie.Directors));
+        }
 
         return new MovieDetailsResponse(ToDto(movie, await pathForPoster, await resume, isFavorite, actors, directors, userRating));
     }
 
-    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? resume, bool isFavorite, PersonResponse actors, PersonResponse directors, int? userRating)
+    private MovieDetailsDto ToDto(Domain.Movie movie, Uri? pathToPoser, string? resume, bool isFavorite, PersonResponse? actors, PersonResponse? directors, int? userRating)
     {
         var dtoMovie = new MovieDetailsDto
         {
@@ -94,9 +103,9 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
         return dtoMovie;
     }
 
-    private List<DetailsPersonsDto>? ToPersonDto(PersonResponse persons)
+    private List<DetailsPersonsDto>? ToPersonDto(PersonResponse? persons)
     {
-        if (persons.PersonDtos == null || persons.PersonDtos.Count == 0)
+        if (persons == null || !persons.PersonDtos.Any())
         {
             return null;
         }

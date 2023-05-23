@@ -31,10 +31,10 @@ public class QueryHandlerTest
         var expectedUser = new Backend.User.Domain.User
         {
             Id = "realId",
-            FavoriteMovies = new List<string>()
+            FavoriteMovies = _fixture.Create<List<string>>()
         };
         var expectedMovies = new MoviesInfoResponse(new List<MovieInfoDto>());
-        _userRepository.ReadUserFromIdAsync(Arg.Any<string>(),Arg.Any<DbReadOnlyTransaction>()).Returns(expectedUser);
+        _userRepository.ReadUserFromIdAsync(Arg.Any<string>(),Arg.Any<DbReadOnlyTransaction>(), includeFavoriteMovies:true).Returns(expectedUser);
         _mediator.Send(Arg.Any<Backend.Movie.Application.GetInfoFromMovies.Query>()).Returns(expectedMovies);
         //Act
         var result = await _handler.Handle(request, CancellationToken.None);
@@ -56,7 +56,7 @@ public class QueryHandlerTest
             Id = "realId",
             FavoriteMovies = listOfFavoriteMovies
         };
-        _userRepository.ReadUserFromIdAsync(Arg.Any<string>(), Arg.Any<DbReadOnlyTransaction>()).Returns(expectedUser);
+        _userRepository.ReadUserFromIdAsync(Arg.Any<string>(), Arg.Any<DbReadOnlyTransaction>(), includeFavoriteMovies:true).Returns(expectedUser);
         _mediator.Send(Arg.Any<Backend.Movie.Application.GetInfoFromMovies.Query>()).Returns(expectedResponse);
         //Act
         var result = await _handler.Handle(request, CancellationToken.None);

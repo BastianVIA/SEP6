@@ -128,9 +128,12 @@ public class User : Foundation.BaseDomain
 
     public void UpdateRating(string requestMovieId, int rating)
     {
+        var couldNotFindException = new KeyNotFoundException(
+            $"Tried to update rating from movie with id: {requestMovieId}, from user with id: {Id}, but could not find the rating"); 
+        
         if (Ratings == null)
         {
-            throw new ValidationException("Tried to update ratings, but no ratings found");
+            throw couldNotFindException;
         }
 
         foreach (var userRating in Ratings)
@@ -144,15 +147,17 @@ public class User : Foundation.BaseDomain
             }
         }
 
-        throw new KeyNotFoundException(
-            $"Tried to update rating from movie with id: {requestMovieId}, from user with id: {Id}, but could not find the rating");
+        throw couldNotFindException;
     }
 
     public int GetRatingForMovie(string movieId)
     {
+        var couldNotFindException =  new KeyNotFoundException(
+            $"Tried to get rating from movie with id: {movieId}, from user with id: {Id}, but could not find the rating");
+        
         if (Ratings == null)
         {
-            throw new ValidationException("No Ratings found");
+            throw couldNotFindException;
         }
 
         foreach (var rating in Ratings)
@@ -163,14 +168,13 @@ public class User : Foundation.BaseDomain
             }
         }
 
-        throw new KeyNotFoundException(
-            $"Tried to get rating from movie with id: {movieId}, from user with id: {Id}, but could not find the rating");
+        throw couldNotFindException;
     }
     
     public void SetRatingAvg()
     {
         var count = 0.0f;
-        if (Ratings.Count == 0)
+        if (Ratings == null || !Ratings.Any())
         {
             AverageOfUserRatings = count;
             return;

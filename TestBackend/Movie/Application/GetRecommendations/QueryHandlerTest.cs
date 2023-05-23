@@ -6,6 +6,7 @@ using Backend.Movie.Infrastructure;
 using Backend.Service;
 using Microsoft.Extensions.Configuration;
 using NSubstitute;
+using TestBackend.Util;
 
 namespace TestBackend.Movie.Application.GetRecommendations;
 
@@ -13,7 +14,7 @@ public class QueryHandlerTest
 {
     private QueryHandler _handler;
     private Fixture _fixture = new();
-    private readonly IConfiguration _configuration = Substitute.For<IConfiguration>();
+    private readonly IConfiguration _configuration; 
     private readonly IMovieRepository _repository = Substitute.For<IMovieRepository>();
     private readonly IImageService _imageService = Substitute.For<IImageService>();
     private readonly IDatabaseTransactionFactory _transactionFactory = Substitute.For<IDatabaseTransactionFactory>();
@@ -21,7 +22,7 @@ public class QueryHandlerTest
     
     public QueryHandlerTest()
     {
-        _handler = new QueryHandler(_configuration,_repository, _imageService, _transactionFactory);
+        _handler = new QueryHandler(GetConfig.GetTestConfig(),_repository, _imageService, _transactionFactory);
     }
     
     [Fact]
