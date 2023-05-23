@@ -37,13 +37,15 @@ public class QueryHandler : IRequestHandler<Query, FavoriteMovesResponse>
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
         var userRequested = await _repository.ReadUserFromIdAsync(request.userId,transaction, includeFavoriteMovies:true);
-        var moviesInfoResponse =await _mediator.Send(new Movie.Application.GetInfoFromMovies.Query(userRequested.FavoriteMovies));
         var movieDtos = new List<FavoriteMovieDto>();
-        foreach (var movieInfo in  moviesInfoResponse.MovieInfoDtos)
+        if (userRequested.FavoriteMovies != null)
         {
-            movieDtos.Add(toDto(movieInfo));
+            var moviesInfoResponse =await _mediator.Send(new Movie.Application.GetInfoFromMovies.Query(userRequested.FavoriteMovies));
+            foreach (var movieInfo in  moviesInfoResponse.MovieInfoDtos)
+            {
+                movieDtos.Add(toDto(movieInfo));
+            }
         }
-
         return new FavoriteMovesResponse(movieDtos);
     }
 
