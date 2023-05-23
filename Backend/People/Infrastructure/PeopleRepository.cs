@@ -8,7 +8,12 @@ namespace Backend.People.Infrastructure;
 
 public class PeopleRepository : IPeopleRepository
 {
-    private const int NumberOfResultsPerPage = 20;
+    private int NumberOfResultsPerPage;
+
+    public PeopleRepository(IConfiguration configuration)
+    {
+        NumberOfResultsPerPage = configuration.GetSection("QueryConstants").GetValue<int>("PeoplePerPage");
+    }
 
     public async Task<Person> ReadPersonFromIdAsync(string id, DbReadOnlyTransaction tx, bool includeActed = false,
         bool includeDirected = false)

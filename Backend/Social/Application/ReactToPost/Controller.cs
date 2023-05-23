@@ -19,6 +19,12 @@ public class Controller : ControllerBase
         _mediator = mediator;
     }
     
+    /// <summary>
+    /// React to post
+    /// </summary>
+    /// <param name="request">Reaction</param>
+    /// <returns></returns>
+    /// <remarks>This method requires authorization. Make sure to provide authorization when calling this method.</remarks>
     [HttpPut]
     [Route("reactToPost")]
     [Tags("Social")]

@@ -15,11 +15,15 @@ public class Controller : ControllerBase
     }
 
 
+    /// <summary>
+    /// Get the recommended movies. The recommendation is based on the movies rating
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     [Route("/recommendations")]
     [Tags("MovieApi")]
     [ProducesResponseType(typeof(MovieRecommendationsResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetDetailsOfMoveFromId()
+    public async Task<IActionResult> Get()
     {
         var query = new Query();
         var result = _mediator.Send(query);

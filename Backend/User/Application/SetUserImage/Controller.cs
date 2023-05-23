@@ -15,13 +15,21 @@ public class Controller : ControllerBase
         _mediator = mediator;
     }
     
+    /// <summary>
+    /// Specifies what image to use for a user.
+    /// After this the image can be retrieved using the "/userImage/{userId} endpoint
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    /// <remarks>This method requires authorization. Make sure to provide authorization when calling this method.</remarks>
+
     [HttpPut]
     [Route("userImage")]
     [Tags("UserApi")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize]
-    public async Task<IActionResult> UpdateUserImage([FromBody] SetUserImageRequest request)
+    public async Task<IActionResult> Put([FromBody] SetUserImageRequest request)
     {
         var userid = (string?)HttpContext.Items[HttpContextKeys.UserId];
         if (userid == null)
