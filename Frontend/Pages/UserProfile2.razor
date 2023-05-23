@@ -103,11 +103,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("Start");
         await LoadUserData();
         isUserLoaded = true;
         await InvokeAsync(StateHasChanged);
-        Console.WriteLine("Stop");
     }
 
     private async Task LoadUserData()

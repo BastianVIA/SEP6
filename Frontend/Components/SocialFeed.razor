@@ -25,9 +25,9 @@
         {
             foreach (var post in posts)
             {
-                <Div Border="Border.Is2.Rounded.Secondary" Padding="Padding.Is4" Margin="Margin.Is4">
+                <div class="post-container">
                     <Row Margin="Margin.Is2.FromBottom">
-                        <Column ColumnSize="ColumnSize.Is1" Margin="Margin.Is4.FromEnd">
+                        <Column ColumnSize="ColumnSize.Is2" Margin="Margin.Is4.FromEnd">
                             <img src="@post.ProfilePicture" alt="profile pic">
                         </Column>
                         <Column ColumnSize="ColumnSize.Is3">
@@ -68,8 +68,7 @@
                             </Accordion>
                         </Column>
                     </Row>
-                    
-                </Div>
+                </div>
             }
         }
     }

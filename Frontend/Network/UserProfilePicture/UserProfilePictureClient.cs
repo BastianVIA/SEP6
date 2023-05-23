@@ -17,7 +17,9 @@ public class UserProfilePictureClient : NSwagBaseClient, IUserProfilePictureClie
     {
         try
         {
+            Console.WriteLine("Start");
             var response = await _api.UserImageGETAsync(userId);
+            Console.WriteLine("Stop");
             return response.UserImageDto.ImageData;
         }
         catch (Exception e)
