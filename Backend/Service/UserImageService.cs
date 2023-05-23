@@ -1,4 +1,6 @@
-﻿namespace Backend.Service;
+﻿using NLog;
+
+namespace Backend.Service;
 
 public class UserImageService : IUserImageService
 {
@@ -19,12 +21,11 @@ public class UserImageService : IUserImageService
         }
         catch (FileNotFoundException e)
         {
-            Console.WriteLine(e);
+            LogManager.GetCurrentClassLogger().Info($"Tried to GetImageDataAsync for {userId}, but got FileNotFoundException");
             return null;
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
             return null;
         }
     }

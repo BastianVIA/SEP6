@@ -21,9 +21,7 @@ public class SocialUserRepository : ISocialUserRepository
         {
             throw new KeyNotFoundException($"Could not find user with id: {id}");
         }
-
-  
-
+        
         return ToDomain(user);
     }
 
@@ -34,7 +32,6 @@ public class SocialUserRepository : ISocialUserRepository
         {
             Id = user.Id
         });
-        
     }
 
 
