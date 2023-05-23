@@ -28,7 +28,7 @@ public class QueryHandler : IRequestHandler<Query, PersonSearchResponse>
     public async Task<PersonSearchResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var foundPersons = await _repository.SearchForPerson(request.name, request.pageNumber, transaction);
+        var foundPersons = await _repository.SearchForPersonAsync(request.name, request.pageNumber, transaction);
         var personsToDto = new List<PersonDto>();
         foreach (var foundPerson in foundPersons)
         {

@@ -29,7 +29,7 @@ public class CommandHandler : IRequestHandler<Command>
                 throw new ValidationException($"User already follows {request.userIdToFollow}");
             }
             user.StartFollowing(request.userIdToFollow);
-            await _repository.UpdateSocialUser(user, transaction);
+            await _repository.UpdateSocialUserAsync(user, transaction);
         }
         catch (Exception e)
         {

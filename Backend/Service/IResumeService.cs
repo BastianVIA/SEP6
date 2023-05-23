@@ -2,5 +2,5 @@
 
 public interface IResumeService
 {
-    Task<string?> GetResume(string id);
+    Task<string?> GetResumeAsync(string id);
 }

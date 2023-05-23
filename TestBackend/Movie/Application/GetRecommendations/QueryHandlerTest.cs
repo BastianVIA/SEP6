@@ -33,7 +33,7 @@ public class QueryHandlerTest
         var numberOfMoviesGenerated = 3;
         var expectedMovies = _fixture.CreateMany<Backend.Movie.Domain.Movie>(numberOfMoviesGenerated).ToList();
 
-        _repository.GetRecommendedMovies(Arg.Any<int>(), Arg.Any<float>(), Arg.Any<DbReadOnlyTransaction>())
+        _repository.GetRecommendedMoviesAsync(Arg.Any<int>(), Arg.Any<float>(), Arg.Any<DbReadOnlyTransaction>())
             .Returns(expectedMovies);
         //Act
         var result = await _handler.Handle(query, CancellationToken.None);

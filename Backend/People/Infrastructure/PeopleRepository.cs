@@ -10,7 +10,7 @@ public class PeopleRepository : IPeopleRepository
 {
     private const int NumberOfResultsPerPage = 20;
 
-    public async Task<Person> ReadPersonFromId(string id, DbReadOnlyTransaction tx, bool includeActed = false,
+    public async Task<Person> ReadPersonFromIdAsync(string id, DbReadOnlyTransaction tx, bool includeActed = false,
         bool includeDirected = false)
     {
         var result = await tx.DataContext.People
@@ -39,7 +39,7 @@ public class PeopleRepository : IPeopleRepository
         return ToDomain(result);
     }
 
-    public async Task<List<Person>> SearchForPerson(string name, int requestPageNumber, DbReadOnlyTransaction tx)
+    public async Task<List<Person>> SearchForPersonAsync(string name, int requestPageNumber, DbReadOnlyTransaction tx)
     {
         var query = tx.DataContext.People.Where(p => EF.Functions.Like(p.Name, $"%{name}%"));
 
@@ -51,7 +51,7 @@ public class PeopleRepository : IPeopleRepository
         return ToDomain(await foundPersons);
     }
 
-    public async Task<List<Person>> FindPersons(List<string> personIds, DbReadOnlyTransaction tx)
+    public async Task<List<Person>> FindPersonsAsync(List<string> personIds, DbReadOnlyTransaction tx)
     {
         var query = tx.DataContext.People.Where(p => personIds.Contains(p.Id)).ToList();
 

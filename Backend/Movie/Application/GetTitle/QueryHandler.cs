@@ -20,7 +20,7 @@ public class QueryHandler : IRequestHandler<Query, string>
     public async Task<string> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _transactionFactory.BeginReadOnlyTransaction();
-        var movie = await _repository.ReadMovieFromId(request.MovieId, transaction);
+        var movie = await _repository.ReadMovieFromIdAsync(request.MovieId, transaction);
         return movie.Title;
     }
 }

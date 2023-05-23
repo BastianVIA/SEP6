@@ -35,12 +35,12 @@ public class QueryHandler : IRequestHandler<Query, GetTopMoviesForPersonResponse
     {
         var transaction = _transactionFactory.BeginReadOnlyTransaction();
         Stopwatch stopwatchAct = Stopwatch.StartNew();
-        var actedMovies =  await _repository.GetActedMoviesForPerson(request.PersonId, transaction);
+        var actedMovies =  await _repository.GetActedMoviesForPersonAsync(request.PersonId, transaction);
         stopwatchAct.Stop();
         Console.WriteLine("--------- ACT "+ stopwatchAct.Elapsed);
 
         Stopwatch stopwatchDirect = Stopwatch.StartNew();
-        var directedMovies =  await _repository.GetDirectedMoviesForPerson(request.PersonId, transaction);
+        var directedMovies =  await _repository.GetDirectedMoviesForPersonAsync(request.PersonId, transaction);
         
         stopwatchDirect.Stop();
         Console.WriteLine("--------- DIRECT "+ stopwatchDirect.Elapsed);
@@ -67,7 +67,7 @@ public class QueryHandler : IRequestHandler<Query, GetTopMoviesForPersonResponse
         var movieList = new List<TopMoviesDto>();
         foreach (var m in movies)
         {
-            var pathToPoster = _imageService.GetPathForPoster(m.Id);
+            var pathToPoster = _imageService.GetPathForPosterAsync(m.Id);
             movieList.Add(new TopMoviesDto
             {
                 MovieId = m.Id,

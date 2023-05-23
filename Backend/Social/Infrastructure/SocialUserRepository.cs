@@ -39,7 +39,7 @@ public class SocialUserRepository : ISocialUserRepository
 
 
 
-    public async Task UpdateSocialUser(SocialUser socialUser, DbTransaction tx)
+    public async Task UpdateSocialUserAsync(SocialUser socialUser, DbTransaction tx)
     {
         tx.AddDomainEvents(socialUser.ReadAllDomainEvents());
         var userDao = await tx.DataContext.SocialUsers

@@ -49,7 +49,7 @@ public class UserRepository : IUserRepository
 
  
     
-    public async Task Update(Domain.User domainUser , DbTransaction tx)
+    public async Task UpdateAsync(Domain.User domainUser , DbTransaction tx)
     {
         tx.AddDomainEvents(domainUser.ReadAllDomainEvents());
         var user = await tx.DataContext.Users
@@ -89,7 +89,7 @@ public class UserRepository : IUserRepository
         tx.DataContext.Users.Update(user);
     }
 
-    public async Task<List<Domain.User>> SearchForUser(string displayName, UserSortingKey userSortingKey, SortingDirection sortingDirection, int requestPageNumber,
+    public async Task<List<Domain.User>> SearchForUserAsync(string displayName, UserSortingKey userSortingKey, SortingDirection sortingDirection, int requestPageNumber,
         DbReadOnlyTransaction tx)
     {
         var query = tx.DataContext.Users.Include(u=> u.FavoriteMovies)

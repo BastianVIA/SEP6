@@ -32,7 +32,7 @@ public class UserDto
         public async Task<UserSearchResponse> Handle(Query request, CancellationToken cancellationToken)
         {
             var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-            var foundUsers = await _repository.SearchForUser(request.userName, request.UserSortingKey,
+            var foundUsers = await _repository.SearchForUserAsync(request.userName, request.UserSortingKey,
                 request.sortingDirection,
                 request.pageNumber, transaction);
             var userToDto = new List<UserDto>();

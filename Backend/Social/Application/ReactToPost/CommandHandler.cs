@@ -25,7 +25,7 @@ public class CommandHandler : IRequestHandler<Command>
         await using var transaction = await _transactionFactory.BeginTransactionAsync();
         try
         {
-            var post = await _repository.ReadPostFromId(request.PostId, transaction, includeReactions:true);
+            var post = await _repository.ReadPostFromIdAsync(request.PostId, transaction, includeReactions:true);
             post.PutReaction(request.UserId, request.Reaction);
             await _repository.UpdateAsync(post, transaction);
         }

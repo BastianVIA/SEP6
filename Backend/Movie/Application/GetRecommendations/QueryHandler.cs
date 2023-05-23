@@ -41,14 +41,14 @@ public class QueryHandler : IRequestHandler<Query, MovieRecommendationsResponse>
     public async Task<MovieRecommendationsResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var movies = await _repository.GetRecommendedMovies(
+        var movies = await _repository.GetRecommendedMoviesAsync(
             MinVotesBeforeRecommending, 
             MinRatingBeforeRecommending, 
             transaction);
         var dtoMovies = new List<MovieRecommendationDto>();
         foreach (var domainMovie in movies)
         {
-            var posterForMovie = _imageService.GetPathForPoster(domainMovie.Id);
+            var posterForMovie = _imageService.GetPathForPosterAsync(domainMovie.Id);
             var dtoMovie = new MovieRecommendationDto
             {
                 Id = domainMovie.Id,

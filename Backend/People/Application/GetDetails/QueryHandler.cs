@@ -42,7 +42,7 @@ public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
     {
         var transaction = _transactionFactory.BeginReadOnlyTransaction();
         var person =
-            await _repository.ReadPersonFromId(request.PersonId, transaction, includeActed: true,
+            await _repository.ReadPersonFromIdAsync(request.PersonId, transaction, includeActed: true,
                 includeDirected: true);
         var personDetails = _personService.GetPersonAsync(person.ImdbId);
         var movies = _mediator.Send(new Movie.GetTopMoviesForPerson.Query(request.PersonId));

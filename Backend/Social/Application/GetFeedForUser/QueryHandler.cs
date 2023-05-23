@@ -64,7 +64,7 @@ public class QueryHandler : IRequestHandler<Query, GetFeedForUserResponse>
         {
             return new GetFeedForUserResponse(new List<FeedPostDto>());
         }
-        var feedForUser = await _postRepository.GetFeedWithPostsFromUsers(user.Following, request.pageNumber, transaction, includeComments:true, includeReactions:true);
+        var feedForUser = await _postRepository.GetFeedWithPostsFromUsersAsync(user.Following, request.pageNumber, transaction, includeComments:true, includeReactions:true);
         return await toDto(feedForUser, request.userId);
     }
 

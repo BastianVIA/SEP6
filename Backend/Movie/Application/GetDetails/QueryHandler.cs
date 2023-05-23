@@ -56,10 +56,10 @@ public class QueryHandler : IRequestHandler<Query, MovieDetailsResponse>
     public async Task<MovieDetailsResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var movie = await _repository.ReadMovieFromId(request.Id, transaction,includeRatings:true,includeActors:true,includeDirectors:true);
-        var pathForPoster = _imageService.GetPathForPoster(request.Id);
-        var trailerPath = await _trailerService.GetMovieTrailer(request.Id);
-        var resume = _resumeService.GetResume(request.Id);
+        var movie = await _repository.ReadMovieFromIdAsync(request.Id, transaction,includeRatings:true,includeActors:true,includeDirectors:true);
+        var pathForPoster = _imageService.GetPathForPosterAsync(request.Id);
+        var trailerPath = await _trailerService.GetMovieTrailerAsync(request.Id);
+        var resume = _resumeService.GetResumeAsync(request.Id);
         var isFavorite = false;
         int? userRating = null;
         if (request.userId != null)
