@@ -124,7 +124,7 @@
     private async Task LoadUserData()
     {
         user = await UserProfilesModel.GetUserProfile(UID);
-        var imageDataURL = await GetProfilePicture(UID);
+        imageDataURL = await GetProfilePicture(UID);
 
         isFollowing = await UserProfilesModel.IsFollowingUser(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID, UID);
         favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, UID);
@@ -195,6 +195,7 @@
         }
         finally
         {
+            imageDataURL = await GetProfilePicture(UID);
             this.StateHasChanged();
         }
     }
