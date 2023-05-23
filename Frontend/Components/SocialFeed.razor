@@ -14,6 +14,7 @@
 @inject IUserProfilesModel UserProfilesModel
 @inject IMovieDetailModel MovieDetailModel
 @inject IUserProfilePictureModel UserProfilePictureModel
+@inject NavigationManager NavManager
 
 <div class="card-deck-container">
     
@@ -28,7 +29,7 @@
                 <div class="post-container">
                     <Row Margin="Margin.Is2.FromBottom">
                         <Column ColumnSize="ColumnSize.Is2" Margin="Margin.Is4.FromEnd">
-                            <img src="@post.ProfilePicture" alt="profile pic">
+                            <img @onclick="() => OnUserClick(post.UserId)" src="@post.ProfilePicture" alt="profile pic">
                         </Column>
                         <Column ColumnSize="ColumnSize.Is3">
                             <h4>@post.DisplayName</h4>
@@ -53,15 +54,29 @@
                                 <Collapse Visible="@showComments">
                                     <CollapseHeader>
                                         <Heading Size="HeadingSize.Is5">
-                                            <AccordionToggle>Comments</AccordionToggle>
+                                            <AccordionToggle Width="Width.Is100">@post.Comments.Count Comments</AccordionToggle>
                                         </Heading>
                                     </CollapseHeader>
                                     <CollapseBody>
                                         @foreach (Comment comment in post.Comments)
                                         {
-                                            <Div Border="Border.Is1.Dark">
-                                                @comment.DisplayNameOfUser: @comment.Content
-                                            </Div>
+                                            <div class="comment-container">
+                                                <Row Margin="Margin.Is2.FromBottom">
+                                                    <Column ColumnSize="ColumnSize.Is2" Margin="Margin.Is4.FromEnd">
+                                                        <img @onclick="() => OnUserClick(comment.UserId)" src="@comment.ProfilePicture" alt="profile pic">
+                                                    </Column>
+                                                    <Column ColumnSize="ColumnSize.Is3">
+                                                        <h4>@comment.DisplayNameOfUser</h4>
+                                                        <p>@GetTimeSincePost(comment.TimeStamp)</p>
+                                                    </Column>
+                                                </Row>
+                                                <Divider/>
+                                                <Row>
+                                                    <Column ColumnSize="ColumnSize.Is12">
+                                                        @comment.Content
+                                                    </Column>
+                                                </Row>
+                                            </div>
                                         }
                                     </CollapseBody>
                                 </Collapse>
@@ -111,38 +126,52 @@
 
     private async Task LoadUserFeeds()
     {
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
-        
         await LoadUserInfo();
         userFeedsLoaded = true;
         StateHasChanged();
-        
-        stopwatch.Stop();
-        Console.WriteLine(stopwatch.Elapsed);
     }
 
     private async Task LoadUserInfo()
     {
         feedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue, pageNumber);
+        posts.Clear();
         foreach (var userFeed in feedPosts)
         {
             string postText = GetTextBasedOnTopic(userFeed);
-            // var profilePicture = UserProfilePictureModel.GetProfilePicture(FirebaseModel.CurrentUser.UID).Result;
-            // var profilePictureString = Convert.ToBase64String(profilePicture, 0, profilePicture.Length);
+            var imageDataURL = await GetProfilePicture(userFeed.UserId);
             var timeSincePostText = GetTimeSincePost(userFeed.TimeOfActivity);
+            var comments = await LoadCommentData(userFeed.Comments);
             posts.Add(new Post
             {
                 Id = userFeed.Id,
+                UserId = userFeed.UserId,
                 ActivityData = userFeed.ActivityData,
                 TimeSincePostText = timeSincePostText,
                 PostText = postText,
                 DisplayName = userFeed.DisplayName,
-                ProfilePicture = "/Images/NotFoundImage.jpg",
-                Comments = userFeed.Comments,
-                NumberOfReactions = userFeed.NumberOfReactions
+                ProfilePicture = imageDataURL,
+                NumberOfReactions = userFeed.NumberOfReactions,
+                Comments = comments
             });
         }
+    }
+
+    private async Task<List<Comment>> LoadCommentData(List<Comment> userFeedComments)
+    {
+        List<Comment> comments = new List<Comment>();
+        foreach (var comment in userFeedComments)
+        {
+            comments.Add(new Comment
+            {
+                Id = comment.Id,
+                UserId = comment.UserId,
+                DisplayNameOfUser = comment.DisplayNameOfUser,
+                Content = comment.Content,
+                TimeStamp = comment.TimeStamp,
+                ProfilePicture = await GetProfilePicture(comment.UserId)
+            });
+        }
+        return comments;
     }
 
     private string GetTextBasedOnTopic(UserFeed userFeed)
@@ -213,8 +242,7 @@
         try
         {
             await SocialFeedModel.ReactToSocialFeed(FirebaseModel.CurrentUser.TokenValue, post.Id.ToString());
-            post.NumberOfReactions++;
-            StateHasChanged();
+            await LoadUserFeeds();
         }
         catch (Exception e)
         {
@@ -229,12 +257,12 @@
         return modalRef.Show();
     }
 
-
     private async Task UploadComment()
     {
         await SocialFeedModel.CommentOnPost(FirebaseModel.CurrentUser.TokenValue, postIdToCommentOn, commentToUpload);
         postIdToCommentOn = "";
         commentToUpload = "";
+        await LoadUserFeeds();
         await modalRef.Hide();
     }
 
@@ -243,6 +271,27 @@
         postIdToCommentOn = "";
         commentToUpload = "";
         return modalRef.Hide();
+    }
+
+    private async Task<string> GetProfilePicture(string userId)
+    {
+        var profilePicture = await UserProfilePictureModel.GetProfilePicture(userId);
+        string imageDataURL;
+        if (profilePicture != null && profilePicture.Any())
+        {
+            var profilePictureString = Convert.ToBase64String(profilePicture, 0, profilePicture.Length);
+            imageDataURL = string.Format("data:image/svg+xml;base64,{0}", profilePictureString);
+        }
+        else
+        {
+            imageDataURL = "/Images/NotFoundImage.jpg";
+        }
+        return imageDataURL;
+    }
+
+    private void OnUserClick(string userId)
+    {
+        NavManager.NavigateTo($"/UserProfile2/{userId}");
     }
 
 }
