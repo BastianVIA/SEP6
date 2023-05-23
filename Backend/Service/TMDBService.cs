@@ -60,7 +60,6 @@ public class TMDBService : IImageService, IResumeService, IPersonService, ITrail
                 return $"https://www.youtube.com/embed/{key}";
             }
         }
-
         return null;
     }
 
