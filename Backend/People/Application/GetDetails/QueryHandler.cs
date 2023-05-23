@@ -51,7 +51,7 @@ public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
         return toDto(person, await personDetails, await movies);
     }
 
-    public GetPersonDetailsResponse toDto(Person person, PersonDto? personDetails,
+    public GetPersonDetailsResponse toDto(Person person, PersonServiceDto? personDetails,
         GetTopMoviesForPersonResponse personsMovies)
     {
         var actedMovies = toDto(personsMovies.ActedMovies);

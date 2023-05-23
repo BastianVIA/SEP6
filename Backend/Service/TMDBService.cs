@@ -55,7 +55,7 @@ public class TMDBService : IImageService, IResumeService, IPersonService
     }
 
   
-    public async Task<PersonDto?> GetPersonAsync(string id)
+    public async Task<PersonServiceDto?> GetPersonAsync(string id)
     {
         var tmdbId = await GetIdOfPersonAsync(id);
         if (tmdbId == null)
@@ -70,10 +70,10 @@ public class TMDBService : IImageService, IResumeService, IPersonService
         return toDto(person);
     }
 
-    private PersonDto toDto(Person person)
+    private PersonServiceDto toDto(Person person)
     {
         var pathToProfilePic = _client.GetImageUrl(DefaultImageSize, person.ProfilePath);
-        return new PersonDto
+        return new PersonServiceDto
         {
             KnownFor = person.KnownForDepartment,
             Bio = person.Biography,
