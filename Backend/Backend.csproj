@@ -5,6 +5,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <NoWarn>$(NoWarn);8618</NoWarn>
 
     </PropertyGroup>
 
@@ -14,6 +16,7 @@
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <DocumentationFile>bin\Release\Backend.xml</DocumentationFile>
+
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,6 +25,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.5" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.4" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0-preview1.23109.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
 
@@ -29,6 +33,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.5" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="NLog" Version="5.1.4" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />

@@ -225,8 +225,11 @@ builder.Services
         };
     });
 
+// builder.Services.AddDbContext<DataContext>(options =>
+//     options.UseSqlite(builder.Configuration.GetConnectionString("WebApiDatabase")));
+// var transactionSemaphore = new SemaphoreSlim(1, 1);
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("WebApiDatabase")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("WebApiDatabase")));
 var transactionSemaphore = new SemaphoreSlim(1, 1);
 
 builder.Services.AddScoped<IDatabaseTransactionFactory>(sp =>

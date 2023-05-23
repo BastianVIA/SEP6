@@ -19,15 +19,24 @@ public class DataContext : DbContext
     
     public DbSet<SocialUserDAO> SocialUsers { get; set; }
 
+    private readonly IConfiguration _configuration;
+
     public DataContext(IConfiguration configuration, DbContextOptions options) : base(options)
     {
-        Configuration = configuration;
+        _configuration = configuration;
     }
 
+    // protected override void OnConfiguring(DbContextOptionsBuilder options)
+    // {
+    //     // connect to sqlite database
+    //     // options.UseSqlite(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
+    //     options.UseSqlServer(Configuration.GetConnectionString("WebApiDatabase"));
+    // }
+    
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        // connect to sqlite database
-        options.UseSqlite(Configuration.GetConnectionString("WebApiDatabase"));
+        options.UseSqlServer(_configuration.GetConnectionString("WebApiDatabase"));
+        Console.WriteLine(_configuration.GetConnectionString("WebApiDatabase"));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
