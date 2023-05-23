@@ -14,6 +14,11 @@ public class Controller: ControllerBase
         _mediator = mediator;
     }
     
+    /// <summary>
+    /// Gets the Id of all users the specified user follows
+    /// </summary>
+    /// <param name="userId">Id to specify user</param>
+    /// <returns></returns>
     [HttpGet]
     [Route("follows/{userId}")]
     [Tags("Social")]

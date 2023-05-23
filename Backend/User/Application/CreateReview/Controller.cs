@@ -15,6 +15,12 @@ public class Controller : ControllerBase
     }
     
     
+    /// <summary>
+    /// Post review of movie
+    /// </summary>
+    /// <param name="reviewRequest">Review to post</param>
+    /// <returns></returns>
+    /// <remarks>This method requires authorization. Make sure to provide authorization when calling this method.</remarks>
     [HttpPost]
     [Route("review")]
     [Tags("UserApi")]
@@ -22,7 +28,6 @@ public class Controller : ControllerBase
     [Authorize]
     public IActionResult Post([FromBody] CreateReviewRequest reviewRequest)
     {
-        Console.WriteLine("CREATE REVIEW ________________________________");
         var userid = (string?)HttpContext.Items[HttpContextKeys.UserId];
         if (userid == null)
         {

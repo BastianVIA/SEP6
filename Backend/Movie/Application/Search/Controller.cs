@@ -20,6 +20,15 @@ public class Controller: ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Search for movie on the movies title
+    /// </summary>
+    /// <param name="title"></param>
+    /// <param name="movieSortingKey"></param>
+    /// <param name="sortingDirection"></param>
+    /// <param name="pageNumber">The number of movies per. page can be set in the
+    /// configuration with "MoviesPerPage"</param>
+    /// /// <returns></returns>
     [HttpGet]
     [Route("search")]
     [Tags("MovieApi")]

@@ -19,6 +19,11 @@ public class Controller : ControllerBase
     }
 
 
+    /// <summary>
+    /// Get the specified users favorite movies
+    /// </summary>
+    /// <param name="userId">Id to specify user</param>
+    /// <returns></returns>
     [HttpGet]
     [Route("favorite/{userId}")]
     [Tags("UserApi")]

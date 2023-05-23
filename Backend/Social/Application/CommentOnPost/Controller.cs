@@ -18,6 +18,12 @@ public class Controller : ControllerBase
         _mediator = mediator;
     }
     
+    /// <summary>
+    /// Leave a comment of the post
+    /// </summary>
+    /// <param name="request">Comment to post</param>
+    /// <returns></returns>
+    /// <remarks>This method requires authorization. Make sure to provide authorization when calling this method.</remarks>
     [HttpPut]
     [Route("commentOnPost")]
     [Tags("Social")]
