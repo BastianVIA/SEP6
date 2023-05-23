@@ -3,6 +3,7 @@ using System;
 using Backend.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230523081226_addingDictinaryToDb")]
+    partial class addingDictinaryToDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -140,9 +143,6 @@ namespace Backend.Migrations
                     b.Property<string>("PostDAOId")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -182,12 +182,15 @@ namespace Backend.Migrations
                     b.Property<string>("PostId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PostDAOId")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("TypeOfReaction")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("UserId", "PostId");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("PostDAOId");
 
                     b.ToTable("ReactionEntryDAO");
                 });
@@ -379,13 +382,9 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.SocialFeed.Infrastructure.ReactionEntryDAO", b =>
                 {
-                    b.HasOne("Backend.SocialFeed.Infrastructure.PostDAO", "Post")
+                    b.HasOne("Backend.SocialFeed.Infrastructure.PostDAO", null)
                         .WithMany("Reactions")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Post");
+                        .HasForeignKey("PostDAOId");
                 });
 
             modelBuilder.Entity("Backend.User.Infrastructure.UserMovieDAO", b =>

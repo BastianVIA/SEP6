@@ -107,6 +107,8 @@ public class DataContext : DbContext
                     x.HasIndex("FollowerId");
                 });
 
+        modelBuilder.Entity<ReactionEntryDAO>()
+            .HasKey(r => new { r.UserId, r.PostId });
     }
     
 }

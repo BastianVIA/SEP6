@@ -12,5 +12,5 @@ public class PostDAO
     public ActivityDAO? ActivityData { get; set; }
     public DateTime TimeOfActivity { get; set; }
     public List<CommentDAO>? Comments { get; set; }
-    public List<ReactionDAO>? Reactions { get; set; }
+    public List<ReactionEntryDAO>? Reactions { get; set; }
 }

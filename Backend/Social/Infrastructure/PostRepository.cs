@@ -83,10 +83,10 @@ public class PostRepository : IPostRepository
         {
             if (postDao.Reactions == null)
             {
-                postDao.Reactions = new List<ReactionDAO>();
+                postDao.Reactions = new List<ReactionEntryDAO>();
             }
             
-            FromDomain(postDao.Reactions, domainPost.Reactions);
+            FromDomain(postDao.Reactions, domainPost.Reactions, domainPost.Id);
         }
 
         tx.DataContext.Posts.Update(postDao);
@@ -107,7 +107,8 @@ public class PostRepository : IPostRepository
                 {
                     Id = comment.Id.ToString(),
                     UserId = comment.UserId,
-                    Contents = comment.Contents
+                    Contents = comment.Contents,
+                    TimeStamp = comment.TimeStamp,
                 });
             }
             else
@@ -117,27 +118,30 @@ public class PostRepository : IPostRepository
         }
     }
 
-    private void FromDomain(List<ReactionDAO> postDaoReaction, List<Reaction> domainPostReaction)
+    private void FromDomain(List<ReactionEntryDAO> postDaoReactions, Dictionary<string, TypeOfReaction> domainPostReactions, Guid postId)
     {
-        var commentIds = domainPostReaction.Select(c => c.Id.ToString()).ToList();
-        postDaoReaction.RemoveAll(pc => !commentIds.Contains(pc.Id));
+        var reactionIds = domainPostReactions.Keys.ToList();
+        postDaoReactions.RemoveAll(r => !reactionIds.Contains(r.UserId));
 
-        foreach (var reaction in domainPostReaction)
+        foreach (var kvp in domainPostReactions)
         {
-            var existingReaction = postDaoReaction.FirstOrDefault(c => c.Id == reaction.Id.ToString());
+            var reactionIdString = kvp.Key;
+            var typeOfReaction = kvp.Value;
+
+            var existingReaction = postDaoReactions.FirstOrDefault(r => r.UserId == reactionIdString);
 
             if (existingReaction == null)
             {
-                postDaoReaction.Add(new ReactionDAO
+                postDaoReactions.Add(new ReactionEntryDAO
                 {
-                    Id = reaction.Id.ToString(),
-                    UserId = reaction.UserId,
-                    TypeOfReaction = reaction.TypeOfReaction
+                    PostId = postId.ToString(),
+                    UserId = reactionIdString,
+                    TypeOfReaction = typeOfReaction
                 });
             }
             else
             {
-                existingReaction.TypeOfReaction = reaction.TypeOfReaction;
+                existingReaction.TypeOfReaction = typeOfReaction;
             }
         }
     }
@@ -211,29 +215,25 @@ public class PostRepository : IPostRepository
             {
                 Id = new Guid(commentDao.Id),
                 UserId = commentDao.UserId,
-                Contents = commentDao.Contents
+                Contents = commentDao.Contents,
+                TimeStamp = commentDao.TimeStamp,
             });
         }
 
         return domainComments;
     }
 
-    private List<Reaction>? ToDomain(List<ReactionDAO>? reactionDaos)
+    private Dictionary<string, TypeOfReaction>? ToDomain(List<ReactionEntryDAO>? reactionDaos)
     {
         if (reactionDaos == null)
         {
             return null;
         }
 
-        var domainReactions = new List<Reaction>();
+        var domainReactions = new Dictionary<string, TypeOfReaction>();
         foreach (var reactionDao in reactionDaos)
         {
-            domainReactions.Add(new Reaction
-            {
-                Id = new Guid(reactionDao.Id),
-                UserId = reactionDao.UserId,
-                TypeOfReaction = reactionDao.TypeOfReaction
-            });
+            domainReactions.Add(reactionDao.UserId, reactionDao.TypeOfReaction);
         }
 
         return domainReactions;
