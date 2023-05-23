@@ -7,6 +7,19 @@
     box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
 }
 
+.person-image{
+    width: 100%;
+    height: auto;
+    border-radius: 15px;
+    object-fit: cover;
+}
+
+.person-biography{
+    height: 35vh;
+    overflow-y: auto;
+    
+}
+
 * {
     cursor: pointer;
 }
