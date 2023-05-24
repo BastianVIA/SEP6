@@ -17,7 +17,7 @@
 @inject NavigationManager NavManager
 
 <div class="card-deck-container">
-    
+
     <h3>Social Feed</h3>
 
     @if (userFeedsLoaded)
@@ -44,7 +44,9 @@
                     </Row>
                     <Row Margin="Margin.Is2.FromTop">
                         <Column ColumnSize="ColumnSize.Is12">
-                            <Button Color="Color.Primary" Clicked="() => OnLikePost(post)">@post.NumberOfReactions <Icon Name="IconName.ThumbsUp" TextColor="TextColor.Light"/></Button>
+                            <Button Color="Color.Primary" Clicked="() => OnLikePost(post)">
+                                @post.NumberOfReactions <Icon Name="IconName.ThumbsUp" TextColor="TextColor.Light"/>
+                            </Button>
                             <Button Color="Color.Primary" Clicked="() => OnCommentClicked(post)">Comment</Button>
                         </Column>
                     </Row>
@@ -93,7 +95,7 @@
     <ModalContent Centered>
         <ModalHeader>
             <ModalTitle>Comment on post</ModalTitle>
-            <CloseButton />
+            <CloseButton/>
         </ModalHeader>
         <ModalBody>
             <Field>
@@ -109,8 +111,10 @@
 </Modal>
 
 @code {
+
     [Parameter]
     public List<UserFeed> FeedPosts { get; set; }
+
     private List<Post> posts = new List<Post>();
     private bool userFeedsLoaded = false;
     private int pageNumber = 1;
@@ -119,7 +123,7 @@
     private Modal modalRef;
     private string postIdToCommentOn;
     private string commentToUpload;
-    
+
     protected override async Task OnInitializedAsync()
     {
         await LoadUserFeeds();
@@ -134,7 +138,7 @@
 
     private async Task LoadUserInfo()
     {
-        //FeedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue, pageNumber);
+    //FeedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue, pageNumber);
         posts.Clear();
         foreach (var userFeed in FeedPosts)
         {
@@ -187,7 +191,8 @@
                 textToReturn = $"{userFeed.DisplayName} just rated {userFeed.ActivityData.MovieTitle} {userFeed.ActivityData.NewRating}⭐";
                 break;
             case FeedPostDtoTopic.UpdatedRating:
-                textToReturn = $"{userFeed.DisplayName} just updated their rating on {userFeed.ActivityData.MovieTitle} from {userFeed.ActivityData.OldRating}⭐ to {userFeed.ActivityData.NewRating}⭐";;
+                textToReturn = $"{userFeed.DisplayName} just updated their rating on {userFeed.ActivityData.MovieTitle} from {userFeed.ActivityData.OldRating}⭐ to {userFeed.ActivityData.NewRating}⭐";
+                ;
                 break;
             case FeedPostDtoTopic.RemovedRating:
                 textToReturn = $"{userFeed.DisplayName} just removed their rating from {userFeed.ActivityData.MovieTitle}";
@@ -198,6 +203,9 @@
             case FeedPostDtoTopic.UnFavoriteMovie:
                 textToReturn = $"{userFeed.DisplayName} just removed {userFeed.ActivityData.MovieTitle} from their favorite movies";
                 break;
+            case FeedPostDtoTopic.CreatedReview:
+                textToReturn = $"{userFeed.DisplayName} added a review for {userFeed.ActivityData.MovieTitle} saying: '{userFeed.ActivityData.ReviewBody}'";
+                    break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(userFeed.Topic), userFeed.Topic, null);
         }
@@ -209,7 +217,7 @@
         var timeSpan = DateTimeOffset.Now - timeOfActivity;
 
         var timeSincePost = "";
-        
+
         if (timeSpan.Days > 1)
         {
             timeSincePost = $"{timeSpan.Days} days ago";

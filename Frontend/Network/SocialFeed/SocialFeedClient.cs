@@ -21,7 +21,8 @@ public class SocialFeedClient : NSwagBaseClient, ISocialFeedClient
                     MovieId = userFeed.ActivityDataDto.MovieId,
                     MovieTitle = userFeed.ActivityDataDto.MovieTitle,
                     NewRating = userFeed.ActivityDataDto.NewRating,
-                    OldRating = userFeed.ActivityDataDto.OldRating
+                    OldRating = userFeed.ActivityDataDto.OldRating,
+                    ReviewBody = userFeed.ActivityDataDto.ReviewBody
                 };
             }
 
@@ -89,7 +90,8 @@ public class SocialFeedClient : NSwagBaseClient, ISocialFeedClient
                     MovieId = userFeed.ActivityDataDto.MovieId,
                     MovieTitle = userFeed.ActivityDataDto.MovieTitle,
                     NewRating = userFeed.ActivityDataDto.NewRating,
-                    OldRating = userFeed.ActivityDataDto.OldRating
+                    OldRating = userFeed.ActivityDataDto.OldRating,
+                    ReviewBody = userFeed.ActivityDataDto.ReviewBody
                 };
             }
 
