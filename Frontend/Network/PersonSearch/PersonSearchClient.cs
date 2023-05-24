@@ -20,4 +20,8 @@ public class PersonSearchClient : NSwagBaseClient, IPersonSearchClient
 
         return persons;
     }
+
+    public PersonSearchClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    {
+    }
 }

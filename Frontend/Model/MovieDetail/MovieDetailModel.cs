@@ -6,14 +6,15 @@ using Frontend.Service;
 
 namespace Frontend.Model.MovieDetail;
 
-public class MovieDetailModel :NSwagBaseClient, IMovieDetailModel, IAlertNotifier
+public class MovieDetailModel :IMovieDetailModel, IAlertNotifier
 
 {
     private IMovieDetailClient _client;
     private IAlertAggregator _alertAggregator;
-    public MovieDetailModel(IAlertAggregator alertAggregator)
+    
+    public MovieDetailModel(IMovieDetailClient client,IAlertAggregator alertAggregator)
     {
-        _client = new MovieDetailClient();
+        _client = client;
         _alertAggregator = alertAggregator;
     }
 

@@ -26,4 +26,8 @@ public class UserProfilePictureClient : NSwagBaseClient, IUserProfilePictureClie
             throw;
         }
     }
+
+    public UserProfilePictureClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    {
+    }
 }

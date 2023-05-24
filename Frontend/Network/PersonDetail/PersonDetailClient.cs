@@ -39,4 +39,8 @@ public class PersonDetailClient : NSwagBaseClient, IPersonDetailClient
         };
         return person;
     }
+
+    public PersonDetailClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    {
+    }
 }

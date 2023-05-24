@@ -16,4 +16,8 @@ public class UserClient : NSwagBaseClient, IUserClient
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
         await _api.ReviewAsync(new CreateReviewRequest { MovieId = movieId, ReviewBody = review});
     }
+
+    public UserClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    {
+    }
 }

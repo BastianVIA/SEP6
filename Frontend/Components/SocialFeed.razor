@@ -205,7 +205,7 @@
                 break;
             case FeedPostDtoTopic.CreatedReview:
                 textToReturn = $"{userFeed.DisplayName} added a review for {userFeed.ActivityData.MovieTitle} saying: '{userFeed.ActivityData.ReviewBody}'";
-                    break;
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(userFeed.Topic), userFeed.Topic, null);
         }
@@ -251,7 +251,8 @@
         try
         {
             await SocialFeedModel.ReactToSocialFeed(FirebaseModel.CurrentUser.TokenValue, post.Id.ToString());
-            await LoadUserFeeds();
+            await LoadUserInfo();
+            await InvokeAsync(StateHasChanged);
         }
         catch (Exception e)
         {
@@ -271,8 +272,9 @@
         await SocialFeedModel.CommentOnPost(FirebaseModel.CurrentUser.TokenValue, postIdToCommentOn, commentToUpload);
         postIdToCommentOn = "";
         commentToUpload = "";
-        await LoadUserFeeds();
+        await LoadUserInfo();
         await modalRef.Hide();
+        await InvokeAsync(StateHasChanged);
     }
 
     private Task HideModal()
@@ -289,7 +291,7 @@
         if (profilePicture != null && profilePicture.Any())
         {
             var profilePictureString = Convert.ToBase64String(profilePicture, 0, profilePicture.Length);
-            imageDataURL = string.Format("data:image/svg+xml;base64,{0}", profilePictureString);
+            imageDataURL = $"data:image/jpg;base64,{profilePictureString}";
         }
         else
         {

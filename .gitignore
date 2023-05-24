@@ -29,7 +29,18 @@
 _UpgradeReport_Files/
 [Pp]ackages/
 
+appsettings.Development.json
 *.db*
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+/publish
+
+/.nuke/temp
+
+
+
+/output
+
+/.nuke/temp

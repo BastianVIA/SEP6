@@ -1,4 +1,5 @@
-﻿using Frontend.Network.UserProfiles;
+﻿using Frontend.Network;
+using Frontend.Network.UserProfiles;
 
 namespace Frontend.Model.UserProfiles;
 
@@ -7,9 +8,9 @@ public class UserProfilesModel: IUserProfilesModel
     private IUserProfileClient _client;
     public double AverageRating { get; set; }
    
-    public UserProfilesModel()
+    public UserProfilesModel(IUserProfileClient client)
     {
-        _client = new UserProfileClient();
+        _client = client;
     }
 
     public async Task UpdateUserProfile(Entities.User user)

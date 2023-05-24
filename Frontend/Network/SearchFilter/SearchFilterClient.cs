@@ -12,4 +12,8 @@ public class SearchFilterClient : NSwagBaseClient, ISearchFilterClient
             numberOfMovies = response.MovieResults
         };
     }
+
+    public SearchFilterClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    {
+    }
 }

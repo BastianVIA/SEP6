@@ -6,9 +6,9 @@ public class PersonModel : IPersonModel
 {
     private IPersonDetailClient _client;
 
-    public PersonModel()
+    public PersonModel(IPersonDetailClient client)
     {
-        _client = new PersonDetailClient();
+        _client = client;
     }
 
 

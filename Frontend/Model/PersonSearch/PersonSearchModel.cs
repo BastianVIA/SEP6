@@ -4,13 +4,13 @@ using Frontend.Network.PersonSearch;
 
 namespace Frontend.Model.PersonSearch;
 
-public class PersonSearchModel : NSwagBaseClient, IPersonSearchModel
+public class PersonSearchModel : IPersonSearchModel
 {
     private IPersonSearchClient _client;
     
-    public PersonSearchModel()
+    public PersonSearchModel(IPersonSearchClient client)
     {
-        _client = new PersonSearchClient();
+        _client = client;
     }
     
     public async Task<List<Entities.Person>> SearchForPersonAsync(string name, int? pageNumber = null)

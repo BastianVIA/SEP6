@@ -47,15 +47,13 @@ public class QueryHandler : IRequestHandler<Query,GetPostsForUsersResponse >
 {
     private readonly IDatabaseTransactionFactory _transactionFactory;
     private readonly IPostRepository _postRepository;
-    private readonly ISocialUserRepository _userRepository;
     private readonly IMediator _mediator;
 
 
-    public QueryHandler(IDatabaseTransactionFactory transactionFactory, IPostRepository postRepository, ISocialUserRepository userRepository, IMediator mediator)
+    public QueryHandler(IDatabaseTransactionFactory transactionFactory, IPostRepository postRepository,  IMediator mediator)
     {
         _transactionFactory = transactionFactory;
         _postRepository = postRepository;
-        _userRepository = userRepository;
         _mediator = mediator;
     }
 

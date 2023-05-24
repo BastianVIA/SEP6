@@ -84,5 +84,9 @@ namespace Frontend.Network.UserProfiles
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
             return await _api.FollowsAsync(userId);
         }
+
+        public UserProfileClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+        {
+        }
     }
 }
