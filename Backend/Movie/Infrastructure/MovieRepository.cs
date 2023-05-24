@@ -48,7 +48,7 @@ public class MovieRepository : IMovieRepository
         return ToDomain(result);
     }
 
-    public async Task<List<Domain.Movie>> SearchForMovieAsync(string title, MovieSortingKey movieSortingKey,
+    public async Task<(List<Domain.Movie> Movies, int NumberOfPages)> SearchForMovieAsync(string title, MovieSortingKey movieSortingKey,
         SortingDirection sortingDirection, int requestPageNumber, DbReadOnlyTransaction tx)
     {
         var query = tx.DataContext.Movies.Include(m => m.Rating)
@@ -69,13 +69,16 @@ public class MovieRepository : IMovieRepository
                 throw new KeyNotFoundException($"{movieSortingKey} not a valid movie sorting key ");
         }
 
+        var totalMoviesCount = await query.CountAsync();
+        var totalPages = (int)Math.Ceiling((double)totalMoviesCount / NumberOfResultsPerPage);
+
         Task<List<MovieDAO>> foundMovies = query
             .Skip(NumberOfResultsPerPage * (requestPageNumber - 1))
             .Take(NumberOfResultsPerPage)
             .ToListAsync();
 
 
-        return ToDomain(await foundMovies);
+        return (Movies: ToDomain(await foundMovies), NumberOfPages: totalPages) ;
     }
     
     public async Task<List<Domain.Movie>> ReadMoviesFromListAsync(List<string> movieIds, int requestedPageNumber,
@@ -182,7 +185,14 @@ public class MovieRepository : IMovieRepository
         
         return ToDomain(orderedMovies);
     }
-    
+
+    public async Task<int> NumberOfResultsForSearch(string title, DbReadOnlyTransaction tx)
+    {
+        var query = tx.DataContext.Movies
+            .Where(m => EF.Functions.Like(m.Title, $"%{title}%"));
+        return await query.CountAsync();
+    }
+
     public async Task<List<Domain.Movie>> GetTopMoviesAsync(int minVotes,int pageNumber, DbReadOnlyTransaction tx)
     {
         var movies = tx.DataContext.Movies
