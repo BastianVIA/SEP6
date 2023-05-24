@@ -18,7 +18,7 @@ using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Git.GitTasks;
 using static Nuke.Common.IO.FileSystemTasks;
-
+using Nuke.Common.Tools.Xunit;
 
 
 
@@ -40,7 +40,7 @@ class Build : NukeBuild
     Version Version => new Version(1,0 , 0, BuildId);
     
     Target CiBuild => _ => _
-        .DependsOn(Clean, Restore, Compile,VerifyOutput,PublishBackend,ZipBackend,PublishFrontend,ZipFrontend,CleanPublishFolder);
+        .DependsOn(Clean, Restore, Compile,PublishBackend,ZipBackend,PublishFrontend,ZipFrontend,CleanPublishFolder);
     Target LocalBuild => _ => _
         .DependsOn(Clean, Restore, Compile,VerifyOutput,PublishBackend,PublishFrontend,ZipBackend,ZipFrontend);
     
@@ -81,6 +81,7 @@ class Build : NukeBuild
         {
             var projectsToCompile = Solution.AllProjects.Where(project => project.Name != "TestBackend");
 
+            // var projectsToCompile = Solution.AllProjects;
             foreach (var project in projectsToCompile)
             {
                 DotNetBuild(s => s
@@ -91,6 +92,18 @@ class Build : NukeBuild
         });
     
     
+    // Target Test => _ => _
+    //     .DependsOn(Compile)
+    //     .After(Compile)
+    //     .Before(PublishBackend,PublishFrontend)
+    //     .Executes(() =>
+    //     {
+    //         DotNetTest(_ => _
+    //             .SetProjectFile(Solution.GetProject("TestBackend"))
+    //             .SetConfiguration(Configuration)
+    //             .EnableNoBuild());
+    //     });
+    //
     public void CreateInfoFile(Version version, GitRepository gitRepository, string versionInfoPath)
     {
         StringBuilder stringBuilder = new StringBuilder();
@@ -103,6 +116,7 @@ class Build : NukeBuild
         File.WriteAllText(versionInfoPath, stringBuilder.ToString());
     }
     
+    
     Target VerifyOutput => _ => _
         .DependsOn(Compile)
         .Executes(() =>
@@ -111,16 +125,7 @@ class Build : NukeBuild
             // TODO check if i can set the movie.db with the backend or not
         });
     
-    // Target UnitTests => _ => _
-    //     .DependsOn(Compile)
-    //     .Executes(() =>
-    //     {
-    //         Xunit2(settings => settings
-    //             .AddTargetAssemblies(RootDirectory / "UnitTests" / "bin" / "Debug" / "UnitTests.dll")
-    //             .SetFramework("net452")
-    //             .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "TestResults" / "UnitTests-TestResults.xml")
-    //             .SetParallel(Xunit2ParallelOption.collections));
-    //     });
+   
     
     Target PublishBackend => _ => _
         .DependsOn(Compile)
@@ -136,6 +141,9 @@ class Build : NukeBuild
 
         });
     
+
+    
+
     Target ZipBackend => _ => _
         .DependsOn(PublishBackend)
         .After(PublishBackend)
@@ -185,7 +193,7 @@ class Build : NukeBuild
         });
     
     Target CleanPublishFolder => _ => _
-        .DependsOn(PublishBackend,PublishFrontend).Executes(() =>
+        .After(ZipBackend,ZipFrontend).Executes(() =>
         {
             if (Directory.Exists(PublishDirectory / "Backend"))
             {
