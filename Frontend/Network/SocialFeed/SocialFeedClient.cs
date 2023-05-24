@@ -83,4 +83,9 @@ public class SocialFeedClient : NSwagBaseClient, ISocialFeedClient
         };
         await _api.CommentOnPostAsync(body);
     }
+
+    public async Task<List<UserFeed>> GetOwnSocialFeed(string userToken, int? pageNumber = null)
+    {
+        return new List<UserFeed>();
+    }
 }

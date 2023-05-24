@@ -6,6 +6,10 @@
 @inject IRecommendationsModel RecommendationsModel
 @using Blazorise.LottieAnimation
 @using Frontend.Components
+@using Frontend.Model.Firebase
+@using Frontend.Model.SocialFeed
+@inject IFirebaseModel FirebaseModel
+@inject ISocialFeedModel SocialFeedModel
 
 @if (recommendationsLoaded)
 {
@@ -73,7 +77,7 @@
 
     <AuthorizeView>
         <Authorized>
-            <SocialFeed/>
+            <SocialFeed FeedPosts="@feedPosts"/>
         </Authorized>
     </AuthorizeView>
     
@@ -90,17 +94,22 @@ else
     private int amountOfMoviesToShow = 8;
     private int counter = 0;
     private int selectedSlide = 1;
+    private List<UserFeed> feedPosts;
 
 
-    private async Task LoadRecommendedMovies()
+    private async Task LoadHomePage()
     {
         recommendations = await RecommendationsModel.GetRecommendations();
+        if (FirebaseModel.IsLoggedIn())
+        {
+            feedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue);
+        }
         recommendationsLoaded = true;
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadRecommendedMovies();
+        await LoadHomePage();
     }
 
     private void OnMovieClick(string movieId)
@@ -111,7 +120,7 @@ else
     private async Task NextSlide()
     {
         selectedSlide++;
-        await LoadRecommendedMovies();
+        await LoadHomePage();
     }
 
 }

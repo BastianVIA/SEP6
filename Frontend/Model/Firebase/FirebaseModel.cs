@@ -60,6 +60,11 @@ public class FirebaseModel : IFirebaseModel, IAlertNotifier
             "Successfully signed out.");
     }
 
+    public bool IsLoggedIn()
+    {
+        return (CurrentUser != null);
+    }
+
     public void FireAlertEvent(AlertBoxHelper.AlertType type, string message)
     {
         _alertAggregator.BroadCast(new AlertEventArgs

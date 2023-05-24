@@ -6,11 +6,13 @@
 @using Frontend.Model.UserProfilePicture
 @using Frontend.Model.UserProfiles
 @using Frontend.Components
+@using Frontend.Model.SocialFeed
 @inject NavigationManager NavManager
 @inject IUserProfilesModel UserProfilesModel
 @inject IFirebaseModel FirebaseModel
 @inject IFavoriteMoviesModel FavoriteMoviesModel
 @inject IUserProfilePictureModel UserProfilePictureModel
+@inject ISocialFeedModel SocialFeedModel
 
 <div class="user-profile-container">
     
@@ -88,7 +90,7 @@
         <Divider Margin="Margin.Is5.FromBottom.Is5.FromTop"/>
     }
     
-    <div class="chart-container">
+    <div class="chart-container" hidden="@hideChart">
         <Row>
             <h4>Users Assessment summary on Movies</h4>
             <Chart @ref="barChart" TItem="double" Type="ChartType.Bar">
@@ -99,6 +101,12 @@
         </Row>
     </div>
 </div>
+
+@if (user != null)
+{
+    <SocialFeed FeedPosts="@feedPosts"/>
+}
+
 
 <Modal @ref="modalRef">
     <ModalContent Centered>
@@ -159,6 +167,8 @@
     private bool isFollowing;
     private Modal modalRef;
     private IList<User> followingUserList = new List<User>();
+    private List<UserFeed> feedPosts;
+    private bool hideChart = true;
     
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -173,11 +183,16 @@
     {
         await LoadUserData();
         isUserLoaded = true;
+        hideChart = false;
         await InvokeAsync(StateHasChanged);
     }
 
     private async Task LoadUserData()
     {
+        if (FirebaseModel.IsLoggedIn())
+        {
+            feedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue);
+        }
         user = await UserProfilesModel.GetUserProfile(UID);
         imageDataURL = await GetProfilePicture(UID);
 

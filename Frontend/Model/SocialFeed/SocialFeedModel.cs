@@ -26,4 +26,9 @@ public class SocialFeedModel : ISocialFeedModel
     {
         await _client.CommentOnPost(userToken, postId, comment);
     }
+
+    public async Task<List<UserFeed>> GetOwnSocialFeed(string userToken, int? pageNumber = null)
+    {
+        return await _client.GetOwnSocialFeed(userToken, pageNumber);
+    }
 }
