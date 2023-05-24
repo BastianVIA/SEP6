@@ -188,10 +188,7 @@
 
     private async Task LoadUserData()
     {
-        if (FirebaseModel.IsLoggedIn())
-        {
-            feedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue);
-        }
+        feedPosts = await SocialFeedModel.GetOwnSocialFeed(UID, pageNumber);
         user = await UserProfilesModel.GetUserProfile(UID);
         imageDataURL = await GetProfilePicture(UID);
 
