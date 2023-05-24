@@ -34,21 +34,9 @@ public class QueryHandler : IRequestHandler<Query, GetTopMoviesForPersonResponse
     public async Task<GetTopMoviesForPersonResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _transactionFactory.BeginReadOnlyTransaction();
-        Stopwatch stopwatchAct = Stopwatch.StartNew();
         var actedMovies =  await _repository.GetActedMoviesForPersonAsync(request.PersonId, transaction);
-        stopwatchAct.Stop();
-        Console.WriteLine("--------- ACT "+ stopwatchAct.Elapsed);
-
-        Stopwatch stopwatchDirect = Stopwatch.StartNew();
         var directedMovies =  await _repository.GetDirectedMoviesForPersonAsync(request.PersonId, transaction);
-        
-        stopwatchDirect.Stop();
-        Console.WriteLine("--------- DIRECT "+ stopwatchDirect.Elapsed);
-        
-        Stopwatch stopwatchDto = Stopwatch.StartNew();
         var dto = await toDto(actedMovies, directedMovies);
-        stopwatchDto.Stop();
-        Console.WriteLine("--------- DTO "+ stopwatchDto.Elapsed);
         return dto;
     }
 

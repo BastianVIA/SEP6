@@ -13,16 +13,12 @@ public record GetPostsForUserResponse(GetPostsForUsersResponse GetPostsForUsersR
 
 public class QueryHandler : IRequestHandler<Query, GetPostsForUserResponse>
 {
-    private readonly IDatabaseTransactionFactory _transactionFactory;
-    private readonly IPostRepository _postRepository;
-    private readonly ISocialUserRepository _userRepository;
+
     private readonly IMediator _mediator;
 
-    public QueryHandler(IDatabaseTransactionFactory transactionFactory, IPostRepository postRepository, ISocialUserRepository userRepository, IMediator mediator)
+    public QueryHandler(IMediator mediator)
     {
-        _transactionFactory = transactionFactory;
-        _postRepository = postRepository;
-        _userRepository = userRepository;
+
         _mediator = mediator;
     }
 

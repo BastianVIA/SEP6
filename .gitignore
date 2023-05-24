@@ -29,6 +29,7 @@
 _UpgradeReport_Files/
 [Pp]ackages/
 
+appsettings.Development.json
 *.db*
 Thumbs.db
 Desktop.ini

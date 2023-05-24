@@ -18,12 +18,12 @@ public class QueryHandler : IRequestHandler<Query, SearchFilterResponse>
     public async Task<SearchFilterResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var movieResults =
-            _mediator.Send(new Movie.Application.NumberOfResultsForSearch.Query(request.SearchTerm));
+            await _mediator.Send(new Movie.Application.NumberOfResultsForSearch.Query(request.SearchTerm));
         var userResults = 
-            _mediator.Send(new User.Application.NumberOfResultsForSearch.Query(request.SearchTerm));
+            await  _mediator.Send(new User.Application.NumberOfResultsForSearch.Query(request.SearchTerm));
         var peopleResults = 
-            _mediator.Send(new People.Application.NumberOfResultsForSearch.Query(request.SearchTerm));
+            await  _mediator.Send(new People.Application.NumberOfResultsForSearch.Query(request.SearchTerm));
 
-        return new SearchFilterResponse(await movieResults, await userResults, await peopleResults);
+        return new SearchFilterResponse(movieResults, userResults, peopleResults);
     }
 }

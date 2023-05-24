@@ -171,6 +171,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using NLog;
 using LogLevel = NLog.LogLevel;
 
@@ -191,6 +192,7 @@ builder.Services.AddScoped<ITrailerService, TMDBService>();
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.Converters.Add(new StringEnumConverter());
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
 
 builder.Services.AddCors(options =>
@@ -231,8 +233,18 @@ builder.Services
 // builder.Services.AddDbContext<DataContext>(options =>
 //     options.UseSqlite(builder.Configuration.GetConnectionString("WebApiDatabase")));
 // var transactionSemaphore = new SemaphoreSlim(1, 1);
+/*
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("WebApiDatabase")));
+    {
+        options.UseSqlServer(builder.Configuration.GetConnectionString("WebApiDatabase"));
+        
+    }
+    );
+*/
+builder.Services.AddDbContext<DataContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("ContextConn")),
+    ServiceLifetime.Transient);
+
 var transactionSemaphore = new SemaphoreSlim(1, 1);
 
 builder.Services.AddScoped<IDatabaseTransactionFactory>(sp =>
