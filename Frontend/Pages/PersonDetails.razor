@@ -1,6 +1,7 @@
 ﻿@page "/PersonDetails/{personId}"
 @using Blazorise
 @using Frontend.Entities
+@using Frontend.Components
 @using Frontend.Model.Person
 @inject IPersonModel PersonModel
 @inject NavigationManager NavManager
@@ -31,56 +32,16 @@
         {
             <Column>
                 <Row Margin="Margin.Is2.FromTop"><Heading Size="HeadingSize.Is5">Acted in movies</Heading></Row>
-                <Table Hoverable Striped>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHeaderCell>Poster</TableHeaderCell>
-                            <TableHeaderCell>Title</TableHeaderCell>
-                            <TableHeaderCell>Release Year</TableHeaderCell>
-                            <TableHeaderCell>Rating</TableHeaderCell>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        @foreach (Movie movie in _person.ActedInList)
-                        {
-                            <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
-                                <TableRowCell><img src="@movie.PosterUrl" height="100px"/></TableRowCell>
-                                <TableRowCell>@movie.Title</TableRowCell>
-                                <TableRowCell>@movie.ReleaseYear</TableRowCell>
-                                <TableRowCell>@movie.Rating?.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/></TableRowCell>
-                            </TableRow>
-                        }
-                    </TableBody>
-                </Table>
+                <MovieTable MovieList="_person.ActedInList" PosterSize="100" OnMovieClicked="OnMovieClick"/>
             </Column>
         }
         @if (_person.DirectedList != null && _person.DirectedList.Any())
-                {
-                    <Column>
-                        <Row Margin="Margin.Is2.FromTop"><Heading Size="HeadingSize.Is5">Directed Movies</Heading></Row>
-                        <Table Hoverable Striped>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHeaderCell>Poster</TableHeaderCell>
-                                    <TableHeaderCell>Title</TableHeaderCell>
-                                    <TableHeaderCell>Release Year</TableHeaderCell>
-                                    <TableHeaderCell>Rating</TableHeaderCell>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                @foreach (Movie movie in _person.DirectedList)
-                                {
-                                    <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
-                                        <TableRowCell><img src="@movie.PosterUrl" height="100px"/></TableRowCell>
-                                        <TableRowCell>@movie.Title</TableRowCell>
-                                        <TableRowCell>@movie.ReleaseYear</TableRowCell>
-                                        <TableRowCell>@movie.Rating?.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/></TableRowCell>
-                                    </TableRow>
-                                }
-                            </TableBody>
-                        </Table>
-                    </Column>
-                }
+            {
+                <Column>
+                    <Row Margin="Margin.Is2.FromTop"><Heading Size="HeadingSize.Is5">Directed Movies</Heading></Row>
+                    <MovieTable MovieList="@_person.DirectedList" PosterSize="100" OnMovieClicked="OnMovieClick"/>
+                </Column>
+            }
     </Row>
 </div>
 
