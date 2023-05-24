@@ -8,5 +8,6 @@ public interface IUserProfileClient
 
     Task UpdateUserProfile(Entities.User user);
     public Task FollowUser(string userToken, string userId);
+    public Task UnFollowUser(string userToken, string userId);
     public Task<GetFollowingResponse> GetFollowingUsers(string userToken, string ownUserId);
 }

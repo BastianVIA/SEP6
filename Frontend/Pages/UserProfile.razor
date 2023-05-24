@@ -282,9 +282,10 @@
         return imageDataURL;
     }
 
-    private void UnFollow()
+    private async Task UnFollow()
     {
-        Console.WriteLine("Can't unfollow yet");
+        await UserProfilesModel.UnFollowUser(FirebaseModel.CurrentUser.TokenValue, UID);
+        isFollowing = await UserProfilesModel.IsFollowingUser(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID, UID);
     }
 
     private async Task<Task> OnFollowList()

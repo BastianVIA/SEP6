@@ -135,6 +135,7 @@
     
     private void MyProfile()
     {
+        NavManager.NavigateTo("/");
         NavManager.NavigateTo($"/userprofile/{FirebaseModel.CurrentUser.UID}");
     }
 

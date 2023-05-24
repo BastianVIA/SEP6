@@ -73,6 +73,12 @@ namespace Frontend.Network.UserProfiles
             await _api.FollowUserAsync(userId);
         }
 
+        public async Task UnFollowUser(string userToken, string userId)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+            await _api.UnFollowUserAsync(userId);
+        }
+
         public async Task<GetFollowingResponse> GetFollowingUsers(string userToken, string userId)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
