@@ -23,7 +23,7 @@ public class Controller : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("{Id}")]
-    [Tags("PersonApi")]
+    [Tags("Person")]
     [ProducesResponseType(typeof(GetPersonDetailsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get([Required] string Id)

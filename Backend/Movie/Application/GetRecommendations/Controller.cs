@@ -21,7 +21,7 @@ public class Controller : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("/recommendations")]
-    [Tags("MovieApi")]
+    [Tags("Movie")]
     [ProducesResponseType(typeof(MovieRecommendationsResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get()
     {

@@ -28,7 +28,7 @@ public class Controller : ControllerBase
     /// <remarks>This method requires authorization. Make sure to provide authorization when calling this method.</remarks>
     [HttpPut]
     [Route("rateMovie")]
-    [Tags("UserApi")]
+    [Tags("User")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

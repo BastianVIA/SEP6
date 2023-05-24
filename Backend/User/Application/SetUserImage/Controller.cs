@@ -25,7 +25,7 @@ public class Controller : ControllerBase
 
     [HttpPut]
     [Route("userImage")]
-    [Tags("UserApi")]
+    [Tags("User")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize]
