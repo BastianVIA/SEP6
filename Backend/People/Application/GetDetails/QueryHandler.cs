@@ -1,4 +1,5 @@
-﻿using Backend.Database.TransactionManager;
+﻿using System.Diagnostics;
+using Backend.Database.TransactionManager;
 using Backend.Movie.Application.GetTopMoviesForPerson;
 using Backend.People.Domain;
 using Backend.People.Infrastructure;
@@ -41,9 +42,11 @@ public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
     public async Task<GetPersonDetailsResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _transactionFactory.BeginReadOnlyTransaction();
+        Stopwatch stopwatch = Stopwatch.StartNew();
         var person =
-            await _repository.ReadPersonFromIdAsync(request.PersonId, transaction, includeActed: true,
-                includeDirected: true);
+            await _repository.ReadPersonFromIdAsync(request.PersonId, transaction);
+        stopwatch.Stop();
+        Console.WriteLine("STOOOOOOOOPPPPEED: " + stopwatch.Elapsed);
         var personDetails = _personService.GetPersonAsync(person.ImdbId);
         var movies = _mediator.Send(new Movie.Application.GetTopMoviesForPerson.Query(request.PersonId));
 
@@ -56,12 +59,12 @@ public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
     {
         var actedMovies = toDto(personsMovies.ActedMovies);
         var directedMovies = toDto(personsMovies.DirectedMovies);
-        
+
         if (personDetails == null)
         {
-            return new GetPersonDetailsResponse( person.Id, person.Name,actedMovies,directedMovies , person.BirthYear);
+            return new GetPersonDetailsResponse(person.Id, person.Name, actedMovies, directedMovies, person.BirthYear);
         }
-        
+
         return new GetPersonDetailsResponse(person.Id, person.Name, actedMovies, directedMovies, person.BirthYear,
             personDetails.KnownFor, personDetails.PathToProfilePic, personDetails.Bio);
     }

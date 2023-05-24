@@ -291,7 +291,7 @@
         if (profilePicture != null && profilePicture.Any())
         {
             var profilePictureString = Convert.ToBase64String(profilePicture, 0, profilePicture.Length);
-            imageDataURL = string.Format("data:image/svg+xml;base64,{0}", profilePictureString);
+            imageDataURL = $"data:image/jpg;base64,{profilePictureString}";
         }
         else
         {

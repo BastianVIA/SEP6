@@ -10,7 +10,7 @@ public class UserProfilesModel: IUserProfilesModel
    
     public UserProfilesModel(IUserProfileClient client)
     {
-        _client = _client;
+        _client = client;
     }
 
     public async Task UpdateUserProfile(Entities.User user)
