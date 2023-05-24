@@ -8,7 +8,12 @@ namespace Backend.User.Infrastructure;
 
 public class UserRepository : IUserRepository
 {
-    private const int NrOfResultsEachPage = 10;
+    private int NrOfResultsEachPage;
+
+    public UserRepository(IConfiguration configuration)
+    {
+        NrOfResultsEachPage = configuration.GetSection("QueryConstants").GetValue<int>("UsersPerPage");
+    }
     public async Task<Domain.User> ReadUserFromIdAsync(string userId, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeFavoriteMovies =false, bool includeReviews = false)
     {
         var query = tx.DataContext.Users.Where(u => u.Id == userId);
@@ -165,7 +170,7 @@ public class UserRepository : IUserRepository
 
             foreach (var rating in userDao.UserRatings)
             {
-                userRatings.Add(new UserRating(rating.MovieId, rating.NumberOfStars));
+                userRatings.Add(new UserRating { MovieId = rating.MovieId, NumberOfStars = rating.NumberOfStars });
             }
         }
 
@@ -176,7 +181,7 @@ public class UserRepository : IUserRepository
 
             foreach (var review in userDao.UserReviews)
             {
-                userReviews.Add(new UserReview(review.MovieId, review.Body));
+                userReviews.Add(new UserReview{MovieId = review.MovieId, ReviewBody = review.Body});
             }
         }
 

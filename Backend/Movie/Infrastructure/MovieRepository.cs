@@ -10,10 +10,12 @@ namespace Backend.Movie.Infrastructure;
 public class MovieRepository : IMovieRepository
 {
     private int NumberOfResultsPerPage;
+    private int NumberOfMoviesForPerson;
 
     public MovieRepository(IConfiguration configuration)
     {
         NumberOfResultsPerPage = configuration.GetSection("QueryConstants").GetValue<int>("MoviesPerPage");
+        NumberOfMoviesForPerson = configuration.GetSection("QueryConstants").GetValue<int>("NumberOfMoviesForPerson");
     }
 
     public async Task<Domain.Movie> ReadMovieFromIdAsync(string id, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeActors = false, bool includeDirectors = false)
@@ -108,8 +110,7 @@ public class MovieRepository : IMovieRepository
         var movieDao = await tx.DataContext.Movies
             .Include(m => m.Rating)
             .SingleAsync(m => m.Id == movie.Id);
-
-
+        
         excludeActorsAndDirectorsFromupdate(tx, movieDao);
 
         movieDao.Title = movie.Title;
@@ -147,7 +148,7 @@ public class MovieRepository : IMovieRepository
             .LoadAsync();
 
         orderedMovies = orderedMovies.OrderByDescending(movie => movie.Rating?.Votes ?? 0)
-            .Take(5).ToList();
+            .Take(NumberOfMoviesForPerson).ToList();
         
         return ToDomain(orderedMovies);
     }
@@ -177,7 +178,7 @@ public class MovieRepository : IMovieRepository
             .LoadAsync();
 
         orderedMovies = orderedMovies.OrderByDescending(movie => movie.Rating?.Votes ?? 0)
-            .Take(5).ToList();
+            .Take(NumberOfMoviesForPerson).ToList();
         
         return ToDomain(orderedMovies);
     }

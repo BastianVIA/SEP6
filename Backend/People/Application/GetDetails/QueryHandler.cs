@@ -1,5 +1,5 @@
 ﻿using Backend.Database.TransactionManager;
-using Backend.Movie.GetTopMoviesForPerson;
+using Backend.Movie.Application.GetTopMoviesForPerson;
 using Backend.People.Domain;
 using Backend.People.Infrastructure;
 using Backend.Service;
@@ -45,7 +45,7 @@ public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
             await _repository.ReadPersonFromIdAsync(request.PersonId, transaction, includeActed: true,
                 includeDirected: true);
         var personDetails = _personService.GetPersonAsync(person.ImdbId);
-        var movies = _mediator.Send(new Movie.GetTopMoviesForPerson.Query(request.PersonId));
+        var movies = _mediator.Send(new Movie.Application.GetTopMoviesForPerson.Query(request.PersonId));
 
 
         return toDto(person, await personDetails, await movies);
