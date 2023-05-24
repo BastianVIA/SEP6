@@ -16,8 +16,13 @@ public class User
     public List<Movie>? FavoriteMovies { get; set; }
     
     public int? RatedMovies { get; set; }
-    
-    public double? AverageOfUserRatings { get; set; }
+
+    private double _averageOfUserRatings;
+    public double? AverageOfUserRatings
+    {
+        get { return Math.Round(_averageOfUserRatings, 1); }
+        set { _averageOfUserRatings = value; }
+    }
     
     public ICollection<Int32Int32ValueTuple>? RatingDataPoints { get; set; }
     

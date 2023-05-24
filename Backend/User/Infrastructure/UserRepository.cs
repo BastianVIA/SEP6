@@ -8,7 +8,12 @@ namespace Backend.User.Infrastructure;
 
 public class UserRepository : IUserRepository
 {
-    private const int NrOfResultsEachPage = 10;
+    private int NrOfResultsEachPage;
+
+    public UserRepository(IConfiguration configuration)
+    {
+        NrOfResultsEachPage = configuration.GetSection("QueryConstants").GetValue<int>("UsersPerPage");
+    }
     public async Task<Domain.User> ReadUserFromIdAsync(string userId, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeFavoriteMovies =false, bool includeReviews = false)
     {
         var query = tx.DataContext.Users.Where(u => u.Id == userId);
@@ -19,7 +24,7 @@ public class UserRepository : IUserRepository
 
         if (includeFavoriteMovies)
         {
-            query = query.Include(u => u.FavoriteMovies);
+            query = query.Include(u => u.FavoriteMovies.OrderByDescending(m => m.TimeMovieWasAdded ));
         }
 
         if (includeReviews)
@@ -165,7 +170,7 @@ public class UserRepository : IUserRepository
 
             foreach (var rating in userDao.UserRatings)
             {
-                userRatings.Add(new UserRating(rating.MovieId, rating.NumberOfStars));
+                userRatings.Add(new UserRating { MovieId = rating.MovieId, NumberOfStars = rating.NumberOfStars });
             }
         }
 
@@ -176,17 +181,26 @@ public class UserRepository : IUserRepository
 
             foreach (var review in userDao.UserReviews)
             {
-                userReviews.Add(new UserReview(review.MovieId, review.Body));
+                userReviews.Add(new UserReview{MovieId = review.MovieId, ReviewBody = review.Body});
             }
         }
 
+        List<UserFavoriteMovie>? userFavoriteMovies = null;
+        if (userDao.FavoriteMovies != null)
+        {
+            userFavoriteMovies = new List<UserFavoriteMovie>();
+            foreach (var favoriteMovie in userDao.FavoriteMovies)
+            {
+                userFavoriteMovies.Add(new UserFavoriteMovie{MovieId = favoriteMovie.Id, TimeMovieWasAdded = favoriteMovie.TimeMovieWasAdded});
+            }
+        }
         return new Domain.User
         {
             Id = userDao.Id,
             DisplayName = userDao.DisplayName,
             Email = userDao.Email,
             Bio = userDao.Bio,
-            FavoriteMovies = favMovies,
+            FavoriteMovies = userFavoriteMovies,
             Ratings = userRatings,
             Reviews = userReviews
         };
@@ -214,15 +228,16 @@ public class UserRepository : IUserRepository
     }
    
 
-    private void FromDomain(List<UserMovieDAO> userDaoMovies, List<string> movieIds)
+    private void FromDomain(List<UserMovieDAO> userDaoMovies, List<UserFavoriteMovie> favoriteMovies)
     {
+        var movieIds = favoriteMovies.Select(f => f.MovieId);
         userDaoMovies.RemoveAll(daoMovie => !movieIds.Contains(daoMovie.Id));
-        foreach (var movieId in movieIds)
+        foreach (var movie in favoriteMovies)
         {
-            var movieExists = userDaoMovies.Any(daoMovie => daoMovie.Id == movieId);
+            var movieExists = userDaoMovies.Any(daoMovie => daoMovie.Id == movie.MovieId);
             if (!movieExists)
             {
-                userDaoMovies.Add(new UserMovieDAO { Id = movieId });
+                userDaoMovies.Add(new UserMovieDAO { Id = movie.MovieId, TimeMovieWasAdded = movie.TimeMovieWasAdded});
             }
         }
     }

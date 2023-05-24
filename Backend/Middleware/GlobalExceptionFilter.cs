@@ -10,13 +10,7 @@ namespace Backend.Middleware;
 
 public class GlobalExceptionFilter : IAsyncExceptionFilter
 {
-    private readonly IDatabaseTransactionFactory _transactionFactory;
-
-    public GlobalExceptionFilter(IDatabaseTransactionFactory transactionFactory)
-    {
-        _transactionFactory = transactionFactory;
-    }
-
+    
     public async Task OnExceptionAsync(ExceptionContext context)
     {
         LogManager.GetCurrentClassLogger().Error($"An Exception occurred of type: {context.Exception.GetType()}, with message: {context.Exception.Message}");

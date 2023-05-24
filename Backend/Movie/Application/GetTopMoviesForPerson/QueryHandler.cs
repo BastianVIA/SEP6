@@ -4,7 +4,7 @@ using Backend.Movie.Infrastructure;
 using Backend.Service;
 using MediatR;
 
-namespace Backend.Movie.GetTopMoviesForPerson;
+namespace Backend.Movie.Application.GetTopMoviesForPerson;
 
 public record Query(string PersonId):IRequest<GetTopMoviesForPersonResponse>;
 

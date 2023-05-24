@@ -3,15 +3,15 @@ using Backend.Database.TransactionManager;
 using Backend.SocialFeed.Infrastructure;
 using MediatR;
 
-namespace Backend.SocialFeed.Application.FollowUser;
+namespace Backend.Social.Application.UnFollowUser;
 
-
-public record Command(string userId, string userIdToFollow) : IRequest;
+public record Command(string UserId, string UserToUnFollow) : IRequest;
 
 public class CommandHandler : IRequestHandler<Command>
 {
     private readonly ISocialUserRepository _repository;
     private readonly IDatabaseTransactionFactory _transactionFactory;
+
     public CommandHandler(ISocialUserRepository repository, IDatabaseTransactionFactory transactionFactory)
     {
         _repository = repository;
@@ -23,8 +23,8 @@ public class CommandHandler : IRequestHandler<Command>
         await using var transaction = await _transactionFactory.BeginTransactionAsync();
         try
         {
-            var user = await _repository.ReadSocialUserAsync(request.userId, transaction, includeFollowing:true);
-            user.StartFollowing(request.userIdToFollow);
+            var user = await _repository.ReadSocialUserAsync(request.UserId, transaction, includeFollowing:true);
+            user.UnFollow(request.UserToUnFollow);
             await _repository.UpdateSocialUserAsync(user, transaction);
         }
         catch (Exception e)
@@ -32,6 +32,5 @@ public class CommandHandler : IRequestHandler<Command>
             await transaction.RollbackTransactionAsync();
             throw;
         }
-
     }
 }

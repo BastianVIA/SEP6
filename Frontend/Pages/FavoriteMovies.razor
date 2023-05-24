@@ -6,6 +6,7 @@
 @inject IFirebaseModel FirebaseModel
 @inject IFavoriteMoviesModel FavoriteMoviesModel
 @using Blazorise
+@using Frontend.Components
 @using Blazorise.LottieAnimation
 @attribute [Authorize]
 
@@ -14,27 +15,7 @@
     <div class="page-content">
         <h3>Favorite Movies</h3>
 
-        <Table Hoverable Striped>
-            <TableHeader>
-                <TableRow>
-                    <TableHeaderCell>Poster</TableHeaderCell>
-                    <TableHeaderCell>Title</TableHeaderCell>
-                    <TableHeaderCell>Release Year</TableHeaderCell>
-                    <TableHeaderCell>Rating</TableHeaderCell>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                @foreach(Movie movie in favoriteMovies)
-                {
-                    <TableRow @onclick="@(() => OnMovieClick(movie.Id))">
-                        <TableRowCell><img src="@movie.PosterUrl" height="200"/></TableRowCell>
-                        <TableRowCell>@movie.Title</TableRowCell>
-                        <TableRowCell>@movie.ReleaseYear</TableRowCell>
-                        <TableRowCell>@movie.Rating?.AverageRating <Icon TextColor="TextColor.Warning" Name="IconName.Star"/></TableRowCell>
-                    </TableRow> 
-                }
-            </TableBody>
-        </Table>
+        <MovieTable MovieList="@favoriteMovies" PosterSize="200" OnMovieClicked="OnMovieClick"/>
     </div>
 }
 else

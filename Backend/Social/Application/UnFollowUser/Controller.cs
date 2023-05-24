@@ -1,10 +1,9 @@
-﻿using System.Diagnostics.Contracts;
-using Backend.Middleware;
+﻿using Backend.Middleware;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.SocialFeed.Application.FollowUser;
+namespace Backend.Social.Application.UnFollowUser;
 
 [ApiController]
 [Route("Social")]
@@ -17,21 +16,21 @@ public class Controller : ControllerBase
     {
         _mediator = mediator;
     }
-
+    
     /// <summary>
-    /// Follow another user
+    /// UnFollow another user
     /// </summary>
     /// <param name="userIdToFollow"></param>
     /// <returns></returns>
     /// <remarks>This method requires authorization. Make sure to provide authorization when calling this method.</remarks>
     [HttpPut]
-    [Route("followUser")]
+    [Route("unFollowUser")]
     [Tags("Social")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize]
-    public async Task<IActionResult> Put([FromBody] string userIdToFollow)
+    public async Task<IActionResult> Put([FromBody] string userIdToUnFollow)
     {
         var userid = (string?)HttpContext.Items[HttpContextKeys.UserId];
         if (userid == null)
@@ -39,7 +38,7 @@ public class Controller : ControllerBase
             return BadRequest("No token for user provided");
         }
 
-        await _mediator.Send(new Command(userid, userIdToFollow));
+        await _mediator.Send(new Command(userid, userIdToUnFollow));
         return Ok();
 
     }

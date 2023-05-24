@@ -2,11 +2,12 @@
 using Backend.SocialFeed.Domain;
 using Backend.SocialFeed.Infrastructure;
 using Backend.User.Domain;
+using Backend.User.IntegrationEvents;
 using MediatR;
 
 namespace Backend.SocialFeed.EventHandler.IntegrationEvents.UserEvents;
 
-public class CreatedReviewEventHandler : INotificationHandler<CreateReviewEvent>
+public class CreatedReviewEventHandler : INotificationHandler<CreatedReviewIntegrationEvent>
 {
     private readonly IDatabaseTransactionFactory _transactionFactory;
     private readonly IPostRepository _repository;
@@ -17,7 +18,7 @@ public class CreatedReviewEventHandler : INotificationHandler<CreateReviewEvent>
         _repository = repository;
     }
     
-    public async Task Handle(CreateReviewEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(CreatedReviewIntegrationEvent notification, CancellationToken cancellationToken)
     {
 
         var transaction = _transactionFactory.GetCurrentTransaction();
@@ -26,8 +27,8 @@ public class CreatedReviewEventHandler : INotificationHandler<CreateReviewEvent>
         {
             var activityData = new ActivityData
             {
-                MovieId = notification.Review.MovieId,
-                ReviewBody = notification.Review.ReviewBody
+                MovieId = notification.MovieId,
+                ReviewBody = notification.ReviewBody
             };
             var newPost = new Post(notification.UserId, Activity.CreatedReview, activityData);
             await _repository.CreatePostAsync(newPost, transaction);

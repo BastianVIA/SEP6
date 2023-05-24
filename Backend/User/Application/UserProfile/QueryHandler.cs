@@ -1,5 +1,6 @@
 ﻿using Backend.Database.TransactionManager;
 using Backend.Movie.Application.GetInfoFromMovies;
+using Backend.Movie.Application.GetMovieInfo;
 using Backend.Movie.Application.GetRecommendations;
 using Backend.User.Domain;
 using Backend.User.Infrastructure;
@@ -23,12 +24,6 @@ public class UserProfileDto
     public double AverageOfFavoriteMovies { get; set; }
 }
 
-public class UserRatingDto
-{
-    public int NumberOfStars { get; set; }
-}
-
-
 public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
 {
     private readonly IUserRepository _repository;
@@ -48,7 +43,7 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
         
         var userRequested = await _repository.ReadUserFromIdAsync(request.userId, transaction, includeRatings: true, includeFavoriteMovies: true);
         userRequested.SetRatingAvg();
-        var moviesInfoResponse =await _mediator.Send(new Movie.Application.GetInfoFromMovies.Query(userRequested.FavoriteMovies));
+        var moviesInfoResponse =await GetMovieInfos(userRequested.FavoriteMovies);
         var favoriteAvg = GetFavoritesAverage(moviesInfoResponse);
         var ratingDataPoints = GetRatingDataPoints(userRequested);
         return new UserProfileResponse(toDto(userRequested, ratingDataPoints, favoriteAvg));
@@ -57,27 +52,37 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
 
     private UserProfileDto toDto(Domain.User user, (int,int)[] ratingDataPoints, double favoriteAvg)
     {
+        List<string> favMovieIds = new List<string>();
+        if (user.FavoriteMovies != null)
+        {
+            favMovieIds = user.FavoriteMovies.Select(m => m.MovieId).ToList();
+        }
         return new UserProfileDto
         {
             DisplayName = user.DisplayName,
             Email = user.Email,
             Bio = user.Bio,
-            FavoriteMovies = user.FavoriteMovies,
+            FavoriteMovies = favMovieIds,
             RatingsDataPoints = ratingDataPoints,
             AverageOfUserRatings = user.AverageOfUserRatings,
             AverageOfFavoriteMovies = favoriteAvg
         };
     }
 
-    private double GetFavoritesAverage(MoviesInfoResponse movieInfo)
+    private double GetFavoritesAverage(List<GetMovieInfoResponse> movieInfos)
     {
         var count = 0.0d;
-        foreach (var movie in movieInfo.MovieInfoDtos)
+        var numberOfFavoritesWithRating = 0;
+        foreach (var movie in movieInfos)
         {
-            count += movie.Rating.AverageRating;
+            if (movie.Rating != null)
+            {
+                count += movie.Rating.AverageRating;
+                numberOfFavoritesWithRating++;
+            }
         }
 
-        return count / movieInfo.MovieInfoDtos.Count;
+        return count / numberOfFavoritesWithRating;
     }
 
     private (int,int)[] GetRatingDataPoints(Domain.User user)
@@ -92,15 +97,20 @@ public class QueryHandler : IRequestHandler<Query, UserProfileResponse>
         return dataPoints;
     }
 
-
-    private List<UserRatingDto> GetRatingDtos(Domain.User user)
+    private async Task<List<GetMovieInfoResponse>> GetMovieInfos(List<UserFavoriteMovie>? favoriteMovies)
     {
-        var list = new List<UserRatingDto>();
-        foreach (var rating in user.Ratings)
+        var favoriteMovieInfo = new List<GetMovieInfoResponse>();
+        if (favoriteMovies == null)
         {
-            list.Add(new UserRatingDto{NumberOfStars = rating.NumberOfStars});
+            return favoriteMovieInfo;
         }
 
-        return list;
+        foreach (var favoriteMovie in favoriteMovies)
+        {
+            var movieInfo = _mediator.Send(new Movie.Application.GetMovieInfo.Query(favoriteMovie.MovieId));
+            favoriteMovieInfo.Add(await movieInfo);
+        }
+
+        return favoriteMovieInfo;
     }
 }

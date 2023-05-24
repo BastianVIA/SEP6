@@ -1,4 +1,5 @@
-﻿using Backend.SocialFeed.Domain;
+﻿using System.ComponentModel.DataAnnotations;
+using Backend.SocialFeed.Domain;
 
 namespace TestBackend.Social.Domain;
 
@@ -18,6 +19,15 @@ public class SocialUserTests
         Assert.Single(domainEvents);
         Assert.Equal(typeof(SocialUserCreatedEvent), domainEvents.First().GetType());
         Assert.Equal(userId, ((SocialUserCreatedEvent)domainEvents.First()).Id);
+    }
+    [Fact]
+    public void Constructor_WithId_ThrowsValidationExceptionForEmptyUserId()
+    {
+        // Arrange
+        string userId = "";
+
+        // Act-Assert
+        Assert.Throws<ValidationException>(() => new SocialUser(userId));
     }
 
     [Fact]

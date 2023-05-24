@@ -13,11 +13,14 @@ public enum Activity
     UnFavoriteMovie,
     CreatedReview,
 }
+
 public enum TypeOfReaction
 {
-    LIKE
+    LIKE,
+    LOVE,
+    HAHA,
+    WOW
 }
-
 
 public class Post : BaseDomain
 {
@@ -34,7 +37,18 @@ public class Post : BaseDomain
     }
 
     public Post(string userId, Activity topic, ActivityData? activityData = null)
-    {   
+    {
+        if (userId == "")
+        {
+            throw new ValidationException(
+                $"Trying to add a post with empty userId, this is not allowed, a post has to have a user");
+        }
+        if (!System.Enum.IsDefined(typeof(Activity), topic))
+        {
+            throw new ValidationException(
+                $"Invalid topic value {topic} provided. Only values from the Activity enum are allowed to be used as topic.");
+        }
+
         Id = Guid.NewGuid();
         UserId = userId;
         Topic = topic;
@@ -49,17 +63,17 @@ public class Post : BaseDomain
         {
             Comments = new List<Comment>();
         }
-        Comments.Add(new Comment
-        {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            Contents = Content,
-            TimeStamp = DateTime.Now
-        });
+
+        Comments.Add(new Comment(userId, Content));
     }
 
     public void PutReaction(string userId, TypeOfReaction typeOfReaction)
     {
+        if (userId == "")
+        {
+            throw new ValidationException(
+                $"Trying to add a Reaction to a post with empty userId, this is not allowed, a Reaction has to have a user");
+        }
         if (Reactions == null)
         {
             Reactions = new Dictionary<string, TypeOfReaction>();
@@ -81,12 +95,12 @@ public class Post : BaseDomain
         {
             return null;
         }
-    
+
         if (Reactions.TryGetValue(userId, out TypeOfReaction reaction))
         {
             return reaction;
         }
-    
+
         return null;
     }
 
@@ -96,7 +110,7 @@ public class Post : BaseDomain
         {
             throw new ValidationException("Tried to update users reaction, but could not find any reactions");
         }
-        
+
         if (Reactions[userId] != typeOfReaction)
         {
             Reactions[userId] = typeOfReaction;
@@ -106,12 +120,9 @@ public class Post : BaseDomain
             removeReaction(userId);
         }
     }
-    
+
     private void removeReaction(string userId)
     {
-
         Reactions.Remove(userId);
     }
-
-    
 }
