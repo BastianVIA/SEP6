@@ -19,7 +19,7 @@ public class UserRepository : IUserRepository
 
         if (includeFavoriteMovies)
         {
-            query = query.Include(u => u.FavoriteMovies);
+            query = query.Include(u => u.FavoriteMovies.OrderByDescending(m => m.TimeMovieWasAdded ));
         }
 
         if (includeReviews)
@@ -180,13 +180,22 @@ public class UserRepository : IUserRepository
             }
         }
 
+        List<UserFavoriteMovie>? userFavoriteMovies = null;
+        if (userDao.FavoriteMovies != null)
+        {
+            userFavoriteMovies = new List<UserFavoriteMovie>();
+            foreach (var favoriteMovie in userDao.FavoriteMovies)
+            {
+                userFavoriteMovies.Add(new UserFavoriteMovie{MovieId = favoriteMovie.Id, TimeMovieWasAdded = favoriteMovie.TimeMovieWasAdded});
+            }
+        }
         return new Domain.User
         {
             Id = userDao.Id,
             DisplayName = userDao.DisplayName,
             Email = userDao.Email,
             Bio = userDao.Bio,
-            FavoriteMovies = favMovies,
+            FavoriteMovies = userFavoriteMovies,
             Ratings = userRatings,
             Reviews = userReviews
         };
@@ -214,15 +223,16 @@ public class UserRepository : IUserRepository
     }
    
 
-    private void FromDomain(List<UserMovieDAO> userDaoMovies, List<string> movieIds)
+    private void FromDomain(List<UserMovieDAO> userDaoMovies, List<UserFavoriteMovie> favoriteMovies)
     {
+        var movieIds = favoriteMovies.Select(f => f.MovieId);
         userDaoMovies.RemoveAll(daoMovie => !movieIds.Contains(daoMovie.Id));
-        foreach (var movieId in movieIds)
+        foreach (var movie in favoriteMovies)
         {
-            var movieExists = userDaoMovies.Any(daoMovie => daoMovie.Id == movieId);
+            var movieExists = userDaoMovies.Any(daoMovie => daoMovie.Id == movie.MovieId);
             if (!movieExists)
             {
-                userDaoMovies.Add(new UserMovieDAO { Id = movieId });
+                userDaoMovies.Add(new UserMovieDAO { Id = movie.MovieId, TimeMovieWasAdded = movie.TimeMovieWasAdded});
             }
         }
     }

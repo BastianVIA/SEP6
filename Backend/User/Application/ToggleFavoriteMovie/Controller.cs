@@ -32,7 +32,6 @@ public class Controller : ControllerBase
     /// If the user has the movie on their favorite list they will no longer after this is called.
     /// If they do not have the movie on their favorite list it will be added
     /// </remarks>
-
     [HttpPut]
     [Route("favorite/{movieId}")]
     [Tags("UserApi")]
