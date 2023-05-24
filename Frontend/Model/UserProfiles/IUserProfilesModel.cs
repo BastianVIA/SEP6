@@ -1,4 +1,6 @@
-﻿namespace Frontend.Model.UserProfiles;
+﻿using Frontend.Components;
+
+namespace Frontend.Model.UserProfiles;
 
 public interface IUserProfilesModel
 {
@@ -9,5 +11,5 @@ public interface IUserProfilesModel
     
     public Task FollowUser(string userToken, string userId);
     public Task<bool> IsFollowingUser(string userToken, string ownUserId, string profileUserId);
-    public Task<List<Entities.User>> GetFollowingUsers(string userToken, string ownUserId);
+    public Task<List<string>> GetFollowingUserIds(string userToken, string ownUserId);
 }

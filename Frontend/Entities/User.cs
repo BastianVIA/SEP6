@@ -12,13 +12,13 @@ public class User
     
     public List<UserRating>? UserRatings { get; set; }
     
-    public byte[]? ProfilePicture { get; set;}
+    public string? ProfilePicture { get; set;}
     public List<Movie>? FavoriteMovies { get; set; }
     
     public int? RatedMovies { get; set; }
 
     private double _averageOfUserRatings;
-    public double? AverageOfUserRatings
+    public double AverageOfUserRatings
     {
         get { return Math.Round(_averageOfUserRatings, 1); }
         set { _averageOfUserRatings = value; }

@@ -1,6 +1,7 @@
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
 using Blazorise;
+using Frontend.Authentication;
 using Frontend.Events;
 using Frontend.Model.FavoriteMovies;
 using Frontend.Model.Firebase;
@@ -17,6 +18,7 @@ using Frontend.Model.UserProfiles;
 using Frontend.Model.UserSearch;
 using Frontend.Service;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +39,7 @@ builder.Services.AddScoped<ISocialFeedModel, SocialFeedModel>();
 builder.Services.AddScoped<ITop100Model, Top100Model>();
 builder.Services.AddScoped<IUserProfilePictureModel, UserProfilePictureModel>();
 builder.Services.AddScoped<IUserSearchModel, UserSearchModel>();
+builder.Services.AddScoped<ProtectedSessionStorage>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();

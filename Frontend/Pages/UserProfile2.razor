@@ -7,6 +7,7 @@
 @using Frontend.Model.UserProfilePicture
 @using Frontend.Model.UserProfiles
 @using Frontend.Components
+@using Frontend.Service
 @inject NavigationManager NavManager
 @inject IUserProfilesModel UserProfilesModel
 @inject IFirebaseModel FirebaseModel
@@ -36,13 +37,20 @@
             </Column>
             <Column ColumnSize="ColumnSize.Is5">
                 <Div Width="Width.Is100" Flex="Flex.JustifyContent.End">
-                    @if (isFollowing)
+                    @if (IsOwnProfile())
                     {
-                        <Button Color="Color.Secondary" Clicked="UnFollow">Unfollow</Button>
+                        <Button Color="Color.Primary" Clicked="OnFollowList">Follow List</Button>
                     }
                     else
                     {
-                        <Button Color="Color.Primary" Clicked="Follow">Follow</Button>
+                        @if (isFollowing)
+                        {
+                            <Button Color="Color.Secondary" Clicked="UnFollow">Unfollow</Button>
+                        }
+                        else
+                        {
+                            <Button Color="Color.Primary" Clicked="Follow">Follow</Button>
+                        }
                     }
                 </Div>
             </Column>
@@ -69,7 +77,7 @@
                 <h5>Total Movies Reviewed: <b>@totalMoviesReviewed</b></h5>
             </Column>
             <Column ColumnSize="ColumnSize.Is4" Flex="Flex.AlignItems.Start">
-                <h5>User's Average Rating on Movies: <b>@averageRating</b> ⭐</h5>
+                <h5>User's Average Rating on Movies: <b>@averageRating.ToString("0.00")</b> ⭐</h5>
             </Column>
             <Column ColumnSize="ColumnSize.Is4" Flex="Flex.AlignItems.Start">
                 <h5>Favorited Movies Average: <b>@averageRatingFavMovies.ToString("0.00")</b> ⭐</h5>
@@ -91,6 +99,49 @@
     </div>
 </div>
 
+<Modal @ref="modalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Following</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Table Hoverable Striped>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHeaderCell>Profile Picture</TableHeaderCell>
+                                <TableHeaderCell>
+                                    <div>
+                                        Username
+                                    </div>
+                                </TableHeaderCell>
+                                <TableHeaderCell>
+                                    <div>
+                                        Number Rated Movies
+                                    </div>
+                                </TableHeaderCell>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            @foreach (User user in followingUserList)
+                            {
+                                <TableRow @onclick="@(() => OnUserClick(user.Id))">
+                                    <TableRowCell>
+                                        <img src="@user.ProfilePicture" height="150"/>
+                                    </TableRowCell>
+                                    <TableRowCell>@user.Username</TableRowCell>
+                                    <TableRowCell>@user.RatedMovies</TableRowCell>
+                                </TableRow>
+                            }
+                        </TableBody>
+                    </Table>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
 @code {
     [Parameter]
     public string UID { get; set; }
@@ -105,6 +156,9 @@
     private string imageDataURL;
     private int pageNumber { get; set; }
     private bool isFollowing;
+    private Modal modalRef;
+    private IList<User> followingUserList = new List<User>();
+    
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -143,6 +197,11 @@
 
             await HandleRedraw();
         }
+    }
+
+    private bool IsOwnProfile()
+    {
+        return (FirebaseModel.CurrentUser.UID == UID);
     }
 
     async Task HandleRedraw()
@@ -225,6 +284,31 @@
     private void UnFollow()
     {
         Console.WriteLine("Can't unfollow yet");
+    }
+
+    private async Task<Task> OnFollowList()
+    {
+        var followingUserIdsList = await UserProfilesModel.GetFollowingUserIds(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID);
+        followingUserList.Clear();
+        foreach (var id in followingUserIdsList)
+        {
+            var userToAdd = await UserProfilesModel.GetUserProfile(id);
+            userToAdd.ProfilePicture = await GetProfilePicture(id);
+            userToAdd.Id = id;
+            followingUserList.Add(userToAdd);
+        }
+        return modalRef.Show();
+    }
+
+    private Task HideModal()
+    {
+        return modalRef.Hide();
+    }
+    
+    private void OnUserClick(string userId)
+    {
+        NavManager.NavigateTo("/");
+        NavManager.NavigateTo($"UserProfile2/{userId}");
     }
 
 }
