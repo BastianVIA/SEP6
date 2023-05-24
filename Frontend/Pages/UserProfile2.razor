@@ -1,13 +1,11 @@
 ﻿@page "/UserProfile2/{UID}"
 @using Frontend.Entities
 @using Blazorise
-@using Blazorise.Charts
 @using Frontend.Model.FavoriteMovies
 @using Frontend.Model.Firebase
 @using Frontend.Model.UserProfilePicture
 @using Frontend.Model.UserProfiles
 @using Frontend.Components
-@using Frontend.Service
 @inject NavigationManager NavManager
 @inject IUserProfilesModel UserProfilesModel
 @inject IFirebaseModel FirebaseModel
@@ -288,14 +286,16 @@
 
     private async Task<Task> OnFollowList()
     {
-        var followingUserIdsList = await UserProfilesModel.GetFollowingUserIds(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID);
+        var followingUserIdsList = await UserProfilesModel.GetFollowingUsers(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID);
         followingUserList.Clear();
-        foreach (var id in followingUserIdsList)
+        foreach (var followingUser in followingUserIdsList)
         {
-            var userToAdd = await UserProfilesModel.GetUserProfile(id);
-            userToAdd.ProfilePicture = await GetProfilePicture(id);
-            userToAdd.Id = id;
-            followingUserList.Add(userToAdd);
+            followingUserList.Add(new User
+            {
+                Id = followingUser.Id,
+                Username = followingUser.Username,
+                ProfilePicture = await GetProfilePicture(followingUser.Id)
+            });
         }
         return modalRef.Show();
     }
