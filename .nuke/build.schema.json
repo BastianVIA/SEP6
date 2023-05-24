@@ -6,6 +6,10 @@
     "build": {
       "type": "object",
       "properties": {
+        "BuildId": {
+          "type": "integer",
+          "description": "The build id used as the 4. number in the .Net version number"
+        },
         "Configuration": {
           "type": "string",
           "description": "Configuration to build - Default is 'Debug' (local) or 'Release' (server)",
@@ -76,9 +80,6 @@
               "Clean",
               "CleanPublishFolder",
               "Compile",
-              "Deploy",
-              "DeployBackend",
-              "DeployFrontend",
               "LocalBuild",
               "PublishBackend",
               "PublishFrontend",
@@ -103,9 +104,6 @@
               "Clean",
               "CleanPublishFolder",
               "Compile",
-              "Deploy",
-              "DeployBackend",
-              "DeployFrontend",
               "LocalBuild",
               "PublishBackend",
               "PublishFrontend",

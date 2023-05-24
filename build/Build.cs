@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.Execution;
@@ -32,25 +33,25 @@ class Build : NukeBuild
 
     [Solution] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
-    [GitVersion] readonly GitVersion GitVersion;
+    
+    
+    [Parameter("The build id used as the 4. number in the .Net version number")] 
+    readonly int BuildId = 0;
+    Version Version => new Version(1,0 , 0, BuildId);
     
     Target CiBuild => _ => _
         .DependsOn(Clean, Restore, Compile,VerifyOutput,PublishBackend,ZipBackend,PublishFrontend,ZipFrontend,CleanPublishFolder);
     Target LocalBuild => _ => _
-        .DependsOn(Clean, Restore, Compile,VerifyOutput,PublishBackend,ZipBackend,PublishFrontend,ZipFrontend);
+        .DependsOn(Clean, Restore, Compile,VerifyOutput,PublishBackend,PublishFrontend,ZipBackend,ZipFrontend);
     
     AbsolutePath OutputDirectory => RootDirectory / "output";
-
-
     AbsolutePath PublishDirectory => OutputDirectory / "Publish";
-    AbsolutePath ZipFilePath => PublishDirectory / "app.zip";
     
 
 
     Target Clean => _ => _.Before(Restore)
         .Executes(() =>
         {
-            // Ensuring that OutputDirectory exists.
             EnsureExistingDirectory(OutputDirectory);
         
             var projectsToClean = Solution.AllProjects.Where(project => project.Name != "_build");
@@ -62,6 +63,9 @@ class Build : NukeBuild
                 EnsureCleanDirectory(PublishDirectory);
             }
         });
+    
+    
+    
     
     Target Restore => _ => _
         .After(Clean)
@@ -86,6 +90,19 @@ class Build : NukeBuild
             }
         });
     
+    
+    public void CreateInfoFile(Version version, GitRepository gitRepository, string versionInfoPath)
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.Append("Git repository " + gitRepository.HttpsUrl + "\n");
+        stringBuilder.Append("Git sha key " + gitRepository.Commit + "\n");
+        stringBuilder.Append("Build version " + version + "\n");
+        stringBuilder.Append("Date and Time " + DateTime.Now);
+
+        File.WriteAllText(versionInfoPath, stringBuilder.ToString());
+    }
+    
     Target VerifyOutput => _ => _
         .DependsOn(Compile)
         .Executes(() =>
@@ -94,15 +111,29 @@ class Build : NukeBuild
             // TODO check if i can set the movie.db with the backend or not
         });
     
+    // Target UnitTests => _ => _
+    //     .DependsOn(Compile)
+    //     .Executes(() =>
+    //     {
+    //         Xunit2(settings => settings
+    //             .AddTargetAssemblies(RootDirectory / "UnitTests" / "bin" / "Debug" / "UnitTests.dll")
+    //             .SetFramework("net452")
+    //             .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "TestResults" / "UnitTests-TestResults.xml")
+    //             .SetParallel(Xunit2ParallelOption.collections));
+    //     });
+    
     Target PublishBackend => _ => _
         .DependsOn(Compile)
         .Executes(() =>
-        {
+        { 
+            CreateInfoFile(Version, GitRepository, PublishDirectory / "VersionInfo.txt");
+
             AbsolutePath backendPublishDirectory = OutputDirectory / "Publish" / "Backend";
             DotNetPublish(s => s.SetProject(Solution.GetProject("Backend"))
                 .SetConfiguration(Configuration)
                 .SetOutput(backendPublishDirectory)
                 .EnableNoBuild());
+
         });
     
     Target ZipBackend => _ => _
@@ -122,20 +153,6 @@ class Build : NukeBuild
                 includeBaseDirectory: false);
         });
     
-    Target DeployBackend => _ => _
-        .DependsOn(ZipBackend)
-        .Executes(() =>
-        {
-            var backendPublishDirectory = OutputDirectory / "Publish" / "Backend";
-    
-            var zipFilePath = backendPublishDirectory / "backend.zip";
-    
-            ProcessTasks.StartProcess("az",
-                $"webapp deployment source config-zip --src \"{zipFilePath}\" --name {AzureAppServiceBackendName} --resource-group {AzureResourceGroupName} --subscription {AzureSubscriptionId}",
-                workingDirectory: backendPublishDirectory);
-        });
-    
-    
     
     Target PublishFrontend => _ => _
         .DependsOn(Compile)
@@ -146,6 +163,7 @@ class Build : NukeBuild
                 .SetConfiguration(Configuration)
                 .SetOutput(frontendPublishDirectory)
                 .EnableNoBuild());
+
         });
     
  
@@ -171,58 +189,16 @@ class Build : NukeBuild
         {
             if (Directory.Exists(PublishDirectory / "Backend"))
             {
-                // DeleteDirectory(PublishDirectory / "Backend");
                 (PublishDirectory / "Backend").DeleteDirectory();
 
             }
             
             if (Directory.Exists(PublishDirectory / "Frontend"))
             {
-                // DeleteDirectory(PublishDirectory / "Frontend");
                 (PublishDirectory / "Frontend").DeleteDirectory();
 
             }
 
         });
-    
-    
-    Target DeployFrontend => _ => _
-        .DependsOn(ZipFrontend)
-        .Executes(() =>
-        {
-            var frontendPublishDirectory = OutputDirectory / "Publish" / "Frontend";
-    
-            var zipFilePath = frontendPublishDirectory / "frontend.zip";
-    
-            ProcessTasks.StartProcess("az",
-                $"webapp deployment source config-zip --src \"{zipFilePath}\" --name {AzureAppServiceFrontendName} --resource-group {AzureResourceGroupName} --subscription {AzureSubscriptionId}",
-                workingDirectory: frontendPublishDirectory);
-        });
-    
-    
-    Target Deploy => _ => _
-        .DependsOn(DeployBackend,DeployFrontend).Executes(() =>
-        {
-            if (Directory.Exists(PublishDirectory / "Backend"))
-            {
-                // DeleteDirectory(PublishDirectory / "Backend");
-                (PublishDirectory / "Backend").DeleteDirectory();
-
-            }
-            
-            if (Directory.Exists(PublishDirectory / "Frontend"))
-            {
-                // DeleteDirectory(PublishDirectory / "Frontend");
-                (PublishDirectory / "Frontend").DeleteDirectory();
-
-            }
-
-        });
-    
-    
-    string AzureSubscriptionId => Environment.GetEnvironmentVariable("AZURE_SUBSCRIPTION_ID");
-    string AzureResourceGroupName => Environment.GetEnvironmentVariable("AZURE_RESOURCE_GROUP_NAME");
-    string AzureAppServiceBackendName => Environment.GetEnvironmentVariable("AZURE_APP_SERVICE_BACKEND_NAME");
-    string AzureAppServiceFrontendName => Environment.GetEnvironmentVariable("AZURE_APP_SERVICE_FRONTEND_NAME");
     
 }
