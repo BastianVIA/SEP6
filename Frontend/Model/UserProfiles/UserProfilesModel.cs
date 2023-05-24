@@ -22,6 +22,11 @@ public class UserProfilesModel: IUserProfilesModel
         await _client.FollowUser(userToken, userId);
     }
 
+    public async Task UnFollowUser(string userToken, string userId)
+    {
+        await _client.UnFollowUser(userToken, userId);
+    }
+
     public async Task<bool> IsFollowingUser(string userToken, string ownUserId, string profileUserId)
     {
         var followingResponse = await _client.GetFollowingUsers(userToken, ownUserId);
