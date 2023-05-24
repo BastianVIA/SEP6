@@ -84,11 +84,6 @@
 
         if (await FirebaseModel.Login(user.Email, user.Password))
         {
-            // await AuthStateProvider.UpdateAuthenticationState(new UserSession
-            // {
-            //     Email = user.Email,
-            //     Role = "user"
-            // });
             AuthStateProvider.SignIn();
             await LoginSuccess.InvokeAsync(true);
         }
