@@ -6,7 +6,7 @@ namespace Backend.People.Application.Search;
 
 public record Query(string name, int pageNumber) : IRequest<PersonSearchResponse>;
 
-public record PersonSearchResponse(List<PersonDto> PersonDtos);
+public record PersonSearchResponse(List<PersonDto> PersonDtos, int NumberOfPagesAvailable);
 
 public class PersonDto
 {
@@ -28,9 +28,9 @@ public class QueryHandler : IRequestHandler<Query, PersonSearchResponse>
     public async Task<PersonSearchResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var foundPersons = await _repository.SearchForPersonAsync(request.name, request.pageNumber, transaction);
+        var searchResponse = await _repository.SearchForPersonAsync(request.name, request.pageNumber, transaction);
         var personsToDto = new List<PersonDto>();
-        foreach (var foundPerson in foundPersons)
+        foreach (var foundPerson in searchResponse.People)
         {
             var personToAdd = new PersonDto
             {
@@ -42,6 +42,6 @@ public class QueryHandler : IRequestHandler<Query, PersonSearchResponse>
             personsToDto.Add(personToAdd);
         }
 
-        return new PersonSearchResponse(personsToDto);
+        return new PersonSearchResponse(personsToDto, searchResponse.NumberOfPages);
     }
 }

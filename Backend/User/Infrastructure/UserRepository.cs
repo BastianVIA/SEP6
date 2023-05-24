@@ -14,6 +14,7 @@ public class UserRepository : IUserRepository
     {
         NrOfResultsEachPage = configuration.GetSection("QueryConstants").GetValue<int>("UsersPerPage");
     }
+
     public async Task<Domain.User> ReadUserFromIdAsync(string userId, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeFavoriteMovies =false, bool includeReviews = false)
     {
         var query = tx.DataContext.Users.Where(u => u.Id == userId);
@@ -39,6 +40,36 @@ public class UserRepository : IUserRepository
         }
 
         return ToDomain(user);
+    }
+        
+    public async Task<(List<Domain.User> Users, int NumberOfPages)> SearchForUserAsync(string displayName, UserSortingKey userSortingKey, SortingDirection sortingDirection, int requestPageNumber,
+        DbReadOnlyTransaction tx)
+    {
+        var query = tx.DataContext.Users.Include(u=> u.FavoriteMovies)
+            .Where(u => EF.Functions.Like(u.DisplayName, $"%{displayName}%"));
+
+        switch (userSortingKey)
+        {
+            case UserSortingKey.DisplayName:
+                query = SearchForUserOrderByUsernameAsync(query, sortingDirection);
+                break;
+            case UserSortingKey.MoviesVoted:
+                query = SearchForUserOrderByVotedMoviesAsync(query, sortingDirection);
+                break; ;
+            default:
+                throw new KeyNotFoundException($"{userSortingKey} not a valid user sorting key ");
+        }
+        
+        var totalUsersCount = await query.CountAsync();
+        var totalPages = (int)Math.Ceiling((double)totalUsersCount / NrOfResultsEachPage);
+
+        
+        List<UserDAO> foundUsers = await query
+            .Skip(NrOfResultsEachPage * (requestPageNumber - 1))
+            .Take(NrOfResultsEachPage)
+            .ToListAsync();
+
+        return (Users:ToDomain(foundUsers), NumberOfPages:totalPages);
     }
 
     public async Task CreateUserAsync(Domain.User user, DbTransaction tx)
@@ -93,34 +124,14 @@ public class UserRepository : IUserRepository
 
         tx.DataContext.Users.Update(user);
     }
-
-    public async Task<List<Domain.User>> SearchForUserAsync(string displayName, UserSortingKey userSortingKey, SortingDirection sortingDirection, int requestPageNumber,
-        DbReadOnlyTransaction tx)
-    {
-        var query = tx.DataContext.Users.Include(u=> u.FavoriteMovies)
-            .Where(u => EF.Functions.Like(u.DisplayName, $"%{displayName}%"));
-
-        switch (userSortingKey)
-        {
-            case UserSortingKey.DisplayName:
-                query = SearchForUserOrderByUsernameAsync(query, sortingDirection);
-                break;
-            case UserSortingKey.MoviesVoted:
-                query = SearchForUserOrderByVotedMoviesAsync(query, sortingDirection);
-                break; ;
-            default:
-                throw new KeyNotFoundException($"{userSortingKey} not a valid user sorting key ");
-        }
-        
-
-        List<UserDAO> foundUsers = await query
-            .Skip(NrOfResultsEachPage * (requestPageNumber - 1))
-            .Take(NrOfResultsEachPage)
-            .ToListAsync();
-
-        return foundUsers.Select(userDao => ToDomain(userDao)).ToList();
-    }
     
+    public async Task<int> NumberOfResultsForSearch(string requestDisplayName, DbReadOnlyTransaction tx)
+    {
+        var query = tx.DataContext.Users
+            .Where(u => EF.Functions.Like(u.DisplayName, $"%{requestDisplayName}%"));
+        return await query.CountAsync();
+    }
+
     private IOrderedQueryable<UserDAO> SearchForUserOrderByUsernameAsync(IQueryable<UserDAO> query,
         SortingDirection sortingDirection)
     {
@@ -150,7 +161,10 @@ public class UserRepository : IUserRepository
         }
     }
 
-
+    private List<Domain.User> ToDomain(List<UserDAO> userDaos)
+    {
+        return userDaos.Select(userDao => ToDomain(userDao)).ToList();
+    }
     private Domain.User ToDomain(UserDAO userDao)
     {
         List<string>? favMovies = null;

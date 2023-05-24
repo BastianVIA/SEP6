@@ -44,16 +44,19 @@ public class PeopleRepository : IPeopleRepository
         return ToDomain(result);
     }
 
-    public async Task<List<Person>> SearchForPersonAsync(string name, int requestPageNumber, DbReadOnlyTransaction tx)
+    public async Task<(List<Domain.Person> People, int NumberOfPages )> SearchForPersonAsync(string name, int requestPageNumber, DbReadOnlyTransaction tx)
     {
         var query = tx.DataContext.People.Where(p => EF.Functions.Like(p.Name, $"%{name}%"));
 
+        var totalPeopleCount = await query.CountAsync();
+        var totalPages = (int)Math.Ceiling((double)totalPeopleCount / NumberOfResultsPerPage);
+        
         Task<List<PeopleDAO>> foundPersons = query
             .Skip(NumberOfResultsPerPage * (requestPageNumber - 1))
             .Take(NumberOfResultsPerPage)
             .ToListAsync();
 
-        return ToDomain(await foundPersons);
+        return (People:ToDomain(await foundPersons), totalPages);
     }
 
     public async Task<List<Person>> FindPersonsAsync(List<string> personIds, DbReadOnlyTransaction tx)
@@ -61,6 +64,12 @@ public class PeopleRepository : IPeopleRepository
         var query = tx.DataContext.People.Where(p => personIds.Contains(p.Id)).ToList();
 
         return ToDomain(query);
+    }
+
+    public async Task<int> NumberOfResultsForSearch(string requestName, DbReadOnlyTransaction tx)
+    {
+        var query = tx.DataContext.People.Where(p => EF.Functions.Like(p.Name, $"%{requestName}%"));
+        return await query.CountAsync();
     }
 
     private List<Domain.Person> ToDomain(List<PeopleDAO> personDaos)
