@@ -6,14 +6,24 @@ namespace Backend.SocialFeed.Domain;
 public class SocialUser : BaseDomain
 {
     public string Id { get; set; }
-    public List<string>? Following { get; set;}
+    public List<string>? Following { get; set; }
 
-    public SocialUser(){}
+    public SocialUser()
+    {
+    }
+
     public SocialUser(string id)
     {
+        if (id == "")
+        {
+            throw new ValidationException(
+                $"Trying to add a SocialUser with empty userId, this is not allowed, a SocialUser has to have a userId");
+        }
+
         Id = id;
         AddDomainEvent(new SocialUserCreatedEvent(Id));
     }
+
     public bool AlreadyFollows(string userToCheckIfFollows)
     {
         if (Following == null)
@@ -31,18 +41,19 @@ public class SocialUser : BaseDomain
 
         return false;
     }
-    
+
     public void StartFollowing(string userToFollowId)
     {
         if (AlreadyFollows(userToFollowId))
         {
             throw new ValidationException($"Tried to follow, but user already follows {userToFollowId}");
         }
+
         if (Following == null)
         {
             Following = new List<string>();
         }
-        
+
         Following.Add(userToFollowId);
     }
 

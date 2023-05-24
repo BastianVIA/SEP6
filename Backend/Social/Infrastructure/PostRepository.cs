@@ -7,7 +7,12 @@ namespace Backend.SocialFeed.Infrastructure;
 
 public class PostRepository : IPostRepository
 {
-    private const int numberOfPostPerPage = 10;
+    private int numberOfPostPerPage;
+
+    public PostRepository(IConfiguration configuration)
+    {
+        numberOfPostPerPage = configuration.GetSection("QueryConstants").GetValue<int>("PostsPerPage");
+    }
 
     public async Task<Post> ReadPostFromIdAsync(string id, DbTransaction tx, bool includeComments = false,
         bool includeReactions = false)

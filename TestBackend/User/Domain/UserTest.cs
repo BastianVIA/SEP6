@@ -150,7 +150,7 @@ public class UserTests
 
         // Assert
         Assert.Single(user.FavoriteMovies);
-        Assert.Equal(movieId, user.FavoriteMovies[0]);
+        Assert.Equal(movieId, user.FavoriteMovies[0].MovieId);
 
         var domainEvents = user.ReadAllDomainEvents();
         Assert.Single(domainEvents);

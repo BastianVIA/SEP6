@@ -113,7 +113,7 @@ public class User : Foundation.BaseDomain
             FavoriteMovies = new List<UserFavoriteMovie>();
         }
 
-        FavoriteMovies.Add(new UserFavoriteMovie{MovieId = movieId, TimeMovieWasAdded = DateTime.Now});
+        FavoriteMovies.Add(new UserFavoriteMovie(movieId));
         AddDomainEvent(new FavoritedMovie(Id, movieId));
     }
 
