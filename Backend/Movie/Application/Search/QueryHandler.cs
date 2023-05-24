@@ -10,7 +10,7 @@ public record Query
 (string Title, MovieSortingKey sortingKey, SortingDirection sortingDirection,
     int pageNumber) : IRequest<MovieSearchResponse>;
 
-public record MovieSearchResponse(List<MovieDto> MovieDtos);
+public record MovieSearchResponse(List<MovieDto> MovieDtos, int NumberOfPagesAvailable);
 
 public class MovieDto
 {
@@ -40,12 +40,12 @@ public class QueryHandler : IRequestHandler<Query, MovieSearchResponse>
     public async Task<MovieSearchResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var foundMovies = await _repository.SearchForMovie(request.Title, request.sortingKey, request.sortingDirection,
+        var searchResponse = await _repository.SearchForMovieAsync(request.Title, request.sortingKey, request.sortingDirection,
             request.pageNumber, transaction);
         var moviesToDto = new List<MovieDto>();
-        foreach (var foundMovie in foundMovies)
+        foreach (var foundMovie in searchResponse.Movies)
         {
-            var posterPath = _imageService.GetPathForPoster(foundMovie.Id);
+            var posterPath = _imageService.GetPathForPosterAsync(foundMovie.Id);
             var movieToAdd = new MovieDto
             {
                 Id = foundMovie.Id,
@@ -61,6 +61,6 @@ public class QueryHandler : IRequestHandler<Query, MovieSearchResponse>
             moviesToDto.Add(movieToAdd);
         }
 
-        return new MovieSearchResponse(moviesToDto);
+        return new MovieSearchResponse(moviesToDto, searchResponse.NumberOfPages);
     }
 }

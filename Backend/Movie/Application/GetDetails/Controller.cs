@@ -16,12 +16,17 @@ public class Controller : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Gets the details of a movie
+    /// </summary>
+    /// <param name="id">Internal Id of movie, Id is the same as it is on IMDB</param>
+    /// <returns></returns>
     [HttpGet]
     [Route("{id}")]
-    [Tags("MovieApi")]
+    [Tags("Movie")]
     [ProducesResponseType(typeof(MovieDetailsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetDetailsOfMoveFromId(string id)
+    public async Task<IActionResult> Get(string id)
     {
         var userid = (string?)HttpContext.Items[HttpContextKeys.UserId];
 

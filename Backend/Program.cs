@@ -185,6 +185,9 @@ builder.Services.AddScoped<GlobalExceptionFilter>();
 
 builder.Services.AddScoped<IImageService, TMDBService>();
 builder.Services.AddScoped<IResumeService, TMDBService>();
+builder.Services.AddScoped<IUserImageService, UserImageService>();
+builder.Services.AddScoped<IPersonService, TMDBService>();
+builder.Services.AddScoped<ITrailerService, TMDBService>();
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.Converters.Add(new StringEnumConverter());

@@ -20,9 +20,18 @@ public class Controller: ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Search for movie on the movies title
+    /// </summary>
+    /// <param name="title"></param>
+    /// <param name="movieSortingKey"></param>
+    /// <param name="sortingDirection"></param>
+    /// <param name="pageNumber">The number of movies per. page can be set in the
+    /// configuration with "MoviesPerPage"</param>
+    /// /// <returns></returns>
     [HttpGet]
     [Route("search")]
-    [Tags("MovieApi")]
+    [Tags("Movie")]
     [ProducesResponseType(typeof(MovieSearchResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get([Required] string title, MovieSortingKey movieSortingKey = MovieSortingKey.Votes, SortingDirection sortingDirection = SortingDirection.DESC, int pageNumber = 1)

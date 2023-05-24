@@ -14,9 +14,7 @@ public class DataContext : DbContext
     public DbSet<PersonDAO> Persons { get; set; }   
     public DbSet<UserDAO> Users { get; set; }
     public DbSet<PeopleDAO> People { get; set; }
-    
     public DbSet<PostDAO> Posts { get; set; }
-    
     public DbSet<SocialUserDAO> SocialUsers { get; set; }
 
     private readonly IConfiguration _configuration;
@@ -72,6 +70,14 @@ public class DataContext : DbContext
             .WithMany(u => u.UserRatings)
             .HasForeignKey(ur => ur.UserId);
 
+        modelBuilder.Entity<UserReviewDAO>()
+            .HasKey(dao => new {dao.MovieId, dao.UserId});
+
+        modelBuilder.Entity<UserReviewDAO>()
+            .HasOne(ur => ur.User)
+            .WithMany(u => u.UserReviews)
+            .HasForeignKey(ur => ur.UserId);
+        
 
         modelBuilder.Entity<PeopleMovieDAO>()
             .HasKey(dao => dao.MovieId);
@@ -110,6 +116,8 @@ public class DataContext : DbContext
                     x.HasIndex("FollowerId");
                 });
 
+        modelBuilder.Entity<ReactionEntryDAO>()
+            .HasKey(r => new { r.UserId, r.PostId });
     }
     
 }

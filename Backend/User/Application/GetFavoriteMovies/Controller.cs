@@ -19,9 +19,14 @@ public class Controller : ControllerBase
     }
 
 
+    /// <summary>
+    /// Get the specified users favorite movies
+    /// </summary>
+    /// <param name="userId">Id to specify user</param>
+    /// <returns></returns>
     [HttpGet]
     [Route("favorite/{userId}")]
-    [Tags("UserApi")]
+    [Tags("User")]
     [ProducesResponseType(typeof(FavoriteMovesResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(string userId)

@@ -5,10 +5,11 @@ using Frontend.Service;
 
 namespace Frontend.Model.MovieSearch
 {
-    public class MovieSearchModel : NSwagBaseClient, IMovieSearchModel
+    public class MovieSearchModel : IMovieSearchModel
     {
             private IMovieSearchClient _client;
-            public MovieSearchModel(IMovieSearchClient client,IConfiguration configuration,IHttpClientFactory clientFactory):base(clientFactory,configuration)
+            
+            public MovieSearchModel(IMovieSearchClient client)
             {
                 _client = client;
             }

@@ -8,10 +8,14 @@ namespace Backend.User.Infrastructure;
 
 public class UserRepository : IUserRepository
 {
-    private const int NrOfResultsEachPage = 10;
+    private int NrOfResultsEachPage;
 
-    
-    public  async Task<Domain.User> ReadUserFromIdAsync(string userId, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeFavoriteMovies =false)
+    public UserRepository(IConfiguration configuration)
+    {
+        NrOfResultsEachPage = configuration.GetSection("QueryConstants").GetValue<int>("UsersPerPage");
+    }
+
+    public async Task<Domain.User> ReadUserFromIdAsync(string userId, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeFavoriteMovies =false, bool includeReviews = false)
     {
         var query = tx.DataContext.Users.Where(u => u.Id == userId);
         if (includeRatings)
@@ -21,7 +25,12 @@ public class UserRepository : IUserRepository
 
         if (includeFavoriteMovies)
         {
-            query = query.Include(u => u.FavoriteMovies);
+            query = query.Include(u => u.FavoriteMovies.OrderByDescending(m => m.TimeMovieWasAdded ));
+        }
+
+        if (includeReviews)
+        {
+            query = query.Include(u => u.UserReviews);
         }
 
         var user = await query.SingleOrDefaultAsync();
@@ -31,6 +40,36 @@ public class UserRepository : IUserRepository
         }
 
         return ToDomain(user);
+    }
+        
+    public async Task<(List<Domain.User> Users, int NumberOfPages)> SearchForUserAsync(string displayName, UserSortingKey userSortingKey, SortingDirection sortingDirection, int requestPageNumber,
+        DbReadOnlyTransaction tx)
+    {
+        var query = tx.DataContext.Users.Include(u=> u.FavoriteMovies)
+            .Where(u => EF.Functions.Like(u.DisplayName, $"%{displayName}%"));
+
+        switch (userSortingKey)
+        {
+            case UserSortingKey.DisplayName:
+                query = SearchForUserOrderByUsernameAsync(query, sortingDirection);
+                break;
+            case UserSortingKey.MoviesVoted:
+                query = SearchForUserOrderByVotedMoviesAsync(query, sortingDirection);
+                break; ;
+            default:
+                throw new KeyNotFoundException($"{userSortingKey} not a valid user sorting key ");
+        }
+        
+        var totalUsersCount = await query.CountAsync();
+        var totalPages = (int)Math.Ceiling((double)totalUsersCount / NrOfResultsEachPage);
+
+        
+        List<UserDAO> foundUsers = await query
+            .Skip(NrOfResultsEachPage * (requestPageNumber - 1))
+            .Take(NrOfResultsEachPage)
+            .ToListAsync();
+
+        return (Users:ToDomain(foundUsers), NumberOfPages:totalPages);
     }
 
     public async Task CreateUserAsync(Domain.User user, DbTransaction tx)
@@ -46,7 +85,7 @@ public class UserRepository : IUserRepository
 
  
     
-    public async Task Update(Domain.User domainUser , DbTransaction tx)
+    public async Task UpdateAsync(Domain.User domainUser , DbTransaction tx)
     {
         tx.AddDomainEvents(domainUser.ReadAllDomainEvents());
         var user = await tx.DataContext.Users
@@ -73,37 +112,26 @@ public class UserRepository : IUserRepository
             }
             FromDomain(user.UserRatings, domainUser.Ratings);
         }
+
+        if (domainUser.Reviews != null)
+        {
+            if (user.UserReviews == null)
+            {
+                user.UserReviews = new List<UserReviewDAO>();
+            }
+            FromDomain(user.UserReviews, domainUser.Reviews);
+        }
+
         tx.DataContext.Users.Update(user);
     }
     
-    
-    public async Task<List<Domain.User>> SearchForUser(string displayName, UserSortingKey userSortingKey, SortingDirection sortingDirection, int requestPageNumber,
-        DbReadOnlyTransaction tx)
+    public async Task<int> NumberOfResultsForSearch(string requestDisplayName, DbReadOnlyTransaction tx)
     {
-        var query = tx.DataContext.Users.Include(u=> u.FavoriteMovies)
-            .Where(u => EF.Functions.Like(u.DisplayName, $"%{displayName}%"));
-
-        switch (userSortingKey)
-        {
-            case UserSortingKey.DisplayName:
-                query = SearchForUserOrderByUsernameAsync(query, sortingDirection);
-                break;
-            case UserSortingKey.MoviesVoted:
-                query = SearchForUserOrderByVotedMoviesAsync(query, sortingDirection);
-                break; ;
-            default:
-                throw new KeyNotFoundException($"{userSortingKey} not a valid user sorting key ");
-        }
-        
-
-        List<UserDAO> foundUsers = await query
-            .Skip(NrOfResultsEachPage * (requestPageNumber - 1))
-            .Take(NrOfResultsEachPage)
-            .ToListAsync();
-
-        return foundUsers.Select(userDao => ToDomain(userDao)).ToList();
+        var query = tx.DataContext.Users
+            .Where(u => EF.Functions.Like(u.DisplayName, $"%{requestDisplayName}%"));
+        return await query.CountAsync();
     }
-    
+
     private IOrderedQueryable<UserDAO> SearchForUserOrderByUsernameAsync(IQueryable<UserDAO> query,
         SortingDirection sortingDirection)
     {
@@ -133,7 +161,10 @@ public class UserRepository : IUserRepository
         }
     }
 
-
+    private List<Domain.User> ToDomain(List<UserDAO> userDaos)
+    {
+        return userDaos.Select(userDao => ToDomain(userDao)).ToList();
+    }
     private Domain.User ToDomain(UserDAO userDao)
     {
         List<string>? favMovies = null;
@@ -153,34 +184,74 @@ public class UserRepository : IUserRepository
 
             foreach (var rating in userDao.UserRatings)
             {
-                userRatings.Add(new UserRating(rating.MovieId, rating.NumberOfStars));
+                userRatings.Add(new UserRating { MovieId = rating.MovieId, NumberOfStars = rating.NumberOfStars });
             }
         }
 
+        List<UserReview>? userReviews = null;
+        if (userDao.UserReviews != null)
+        {
+            userReviews = new List<UserReview>();
+
+            foreach (var review in userDao.UserReviews)
+            {
+                userReviews.Add(new UserReview{MovieId = review.MovieId, ReviewBody = review.Body});
+            }
+        }
+
+        List<UserFavoriteMovie>? userFavoriteMovies = null;
+        if (userDao.FavoriteMovies != null)
+        {
+            userFavoriteMovies = new List<UserFavoriteMovie>();
+            foreach (var favoriteMovie in userDao.FavoriteMovies)
+            {
+                userFavoriteMovies.Add(new UserFavoriteMovie{MovieId = favoriteMovie.Id, TimeMovieWasAdded = favoriteMovie.TimeMovieWasAdded});
+            }
+        }
         return new Domain.User
         {
             Id = userDao.Id,
             DisplayName = userDao.DisplayName,
             Email = userDao.Email,
             Bio = userDao.Bio,
-            FavoriteMovies = favMovies,
-            Ratings = userRatings
+            FavoriteMovies = userFavoriteMovies,
+            Ratings = userRatings,
+            Reviews = userReviews
         };
     }
 
     
+    private void FromDomain(List<UserReviewDAO> userDaoReviews, List<UserReview> domainReviews)
+    {
+        var movieIds = domainReviews.Select(r => r.MovieId).ToList();
+        userDaoReviews.RemoveAll(daoMovie => !movieIds.Contains(daoMovie.MovieId));
+        foreach (var review in domainReviews)
+        {
+            var existingReview = userDaoReviews.FirstOrDefault(daoReview => daoReview.MovieId == review.MovieId);
 
+            if (existingReview == null)
+            {
+                userDaoReviews.Add(new UserReviewDAO{MovieId = review.MovieId, Body = review.ReviewBody});
+            }
+            else
+            {
+                existingReview.Body = review.ReviewBody;
+            }
+            
+        }
+    }
    
 
-    private void FromDomain(List<UserMovieDAO> userDaoMovies, List<string> movieIds)
+    private void FromDomain(List<UserMovieDAO> userDaoMovies, List<UserFavoriteMovie> favoriteMovies)
     {
+        var movieIds = favoriteMovies.Select(f => f.MovieId);
         userDaoMovies.RemoveAll(daoMovie => !movieIds.Contains(daoMovie.Id));
-        foreach (var movieId in movieIds)
+        foreach (var movie in favoriteMovies)
         {
-            var movieExists = userDaoMovies.Any(daoMovie => daoMovie.Id == movieId);
+            var movieExists = userDaoMovies.Any(daoMovie => daoMovie.Id == movie.MovieId);
             if (!movieExists)
             {
-                userDaoMovies.Add(new UserMovieDAO { Id = movieId });
+                userDaoMovies.Add(new UserMovieDAO { Id = movie.MovieId, TimeMovieWasAdded = movie.TimeMovieWasAdded});
             }
         }
     }

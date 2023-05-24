@@ -1,48 +1,81 @@
 ﻿@page "/SearchResult/{SearchText}"
 @using Frontend.Components
 @using Blazorise
+@using Frontend.Entities
+@using Frontend.Model.SearchFilter
+@inject ISearchFilterModel SearchFilterModel
 
-<Row>
-    <Column ColumnSize="ColumnSize.Is2">
-        <Div Margin="Margin.Is2.FromStart.Is2.FromBottom" >
-            <h4>Filter</h4>
-            <RadioGroup Orientation="Orientation.Vertical" TValue="string" Name="searchType" CheckedValue="@checkedValue" Buttons CheckedValueChanged="@OnChange">
-                <Radio Value="@("movies")">Movies</Radio>
-                <Radio Value="@("users")">Users</Radio>
-                <Radio Value="@("persons")">Persons</Radio>
-            </RadioGroup>
-        </Div>
-    </Column>
+@if (pageLoaded)
+{
+    <Row>
+        <Column ColumnSize="ColumnSize.Is2">
+            <Div Margin="Margin.Is2.FromStart.Is2.FromBottom" >
+                <h4>Filter</h4>
+                <RadioGroup Orientation="Orientation.Vertical" TValue="string" Name="searchType" CheckedValue="@checkedValue" Buttons CheckedValueChanged="@OnChange">
+                    <Radio Value="@("movies")">Movies @searchFilter.numberOfMovies</Radio>
+                    <AuthorizeView>
+                        <Authorized>
+                            <Radio Value="@("users")">Users @searchFilter.numberOfUsers</Radio>
+                        </Authorized>
+                    </AuthorizeView>
+                    <Radio Value="@("persons")">Persons @searchFilter.numberOfPersons</Radio>
+                </RadioGroup>
+            </Div>
+        </Column>
     
-    <Column ColumnSize="ColumnSize.Is8">
-        @switch (checkedValue)
-        {
-            case "movies":
-                <MovieSearch MovieTitle="@SearchText"/>
-                break;
-            case "users":
-                <UserSearch DisplayName="@SearchText"/>
-                break;
-            case "persons":
-                <PersonSearch PersonName="@SearchText"/>
-                break;
-            default:
-                <p>Nothing found</p>
-                break;
-        }
+        <Column ColumnSize="ColumnSize.Is8">
+            @switch (checkedValue)
+            {
+                case "movies":
+                    <MovieSearch MovieTitle="@SearchText"/>
+                    break;
+                case "users":
+                    <UserSearch DisplayName="@SearchText"/>
+                    break;
+                case "persons":
+                    <PersonSearch PersonName="@SearchText"/>
+                    break;
+                default:
+                    <p>Nothing found</p>
+                    break;
+            }
         
-    </Column>
-</Row>
+        </Column>
+    </Row>
+}
+
 
 @code {
 
     [Parameter]
     public string SearchText { get; set; }
     private string checkedValue = "movies";
+    private int numberOfMovies;
+    private int numberOfUsers;
+    private int numberOfPersons;
+    private SearchFilter searchFilter;
+    private bool pageLoaded;
     
     private void OnChange(string value)
     {
         checkedValue = value;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFilter();
+    }
+
+    protected override async void OnParametersSet()
+    {
+        await LoadFilter();
+    }
+
+    private async Task LoadFilter()
+    {
+        searchFilter = await SearchFilterModel.GetSearchFilter(SearchText);
+        pageLoaded = true;
+        StateHasChanged();
     }
 
 }

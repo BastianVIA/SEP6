@@ -6,15 +6,22 @@
 @inject IRecommendationsModel RecommendationsModel
 @using Blazorise.LottieAnimation
 @using Frontend.Components
+@using Frontend.Model.Firebase
+@using Frontend.Model.SocialFeed
+@inject IFirebaseModel FirebaseModel
+@inject ISocialFeedModel SocialFeedModel
 
 @if (recommendationsLoaded)
 {
     <div class="card-deck-container">
-        <Carousel SelectedSlideChanged="LoadRecommendedMovies" Crossfade="true" Autoplay="false" ShowControls="false" ShowIndicators="false" SelectedSlide="@selectedSlide.ToString()">
+        <Carousel Crossfade="true" Autoplay="false" ShowControls="false" ShowIndicators="false" SelectedSlide="@selectedSlide.ToString()">
+
             <CarouselSlide Name="1">
                 <Div Display="Display.Flex" Flex="Flex.JustifyContent.Between" Margin="Margin.Is2.FromBottom">
                     <h2>Recommended Movies</h2>
-                    <Button Color="Color.Primary" Clicked="NextSlide" Height="Height.Is75"><Icon Name="IconName.Sync"/></Button>
+                    <Button Color="Color.Primary" Clicked="NextSlide" Height="Height.Is75">
+                        <Icon Name="IconName.Sync"/>
+                    </Button>
                 </Div>
                 <CardDeck>
                     @foreach (Movie movie in recommendations)
@@ -66,13 +73,11 @@
                 </CardDeck>
             </CarouselSlide>
         </Carousel>
-        
     </div>
-    
-    
+
     <AuthorizeView>
         <Authorized>
-            <SocialFeed/>
+            <SocialFeed FeedPosts="@feedPosts"/>
         </Authorized>
     </AuthorizeView>
     
@@ -89,16 +94,22 @@ else
     private int amountOfMoviesToShow = 8;
     private int counter = 0;
     private int selectedSlide = 1;
+    private List<UserFeed> feedPosts;
+
+
+    private async Task LoadHomePage()
+    {
+        recommendations = await RecommendationsModel.GetRecommendations();
+        if (FirebaseModel.IsLoggedIn())
+        {
+            feedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue);
+        }
+        recommendationsLoaded = true;
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadRecommendedMovies();
-    }
-
-    private async Task LoadRecommendedMovies()
-    {
-        recommendations = await RecommendationsModel.GetRecommendations();
-        recommendationsLoaded = true;
+        await LoadHomePage();
     }
 
     private void OnMovieClick(string movieId)
@@ -106,8 +117,10 @@ else
         NavManager.NavigateTo($"movieDetails/{movieId}");
     }
 
-    private void NextSlide()
+    private async Task NextSlide()
     {
         selectedSlide++;
+        await LoadHomePage();
     }
+
 }

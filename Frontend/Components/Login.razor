@@ -1,6 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Components
 @using System.ComponentModel.DataAnnotations
 @using Blazorise
+@using Frontend.Authentication
+@using Frontend.Entities
 @using Frontend.Model.Firebase
 @using Frontend.Service
 @inject IFirebaseModel FirebaseModel;
@@ -17,40 +19,41 @@
                 Please fill out the login form.
             </CardText>
             <div class="divider-line"><Divider/></div>
-            <Validations @ref="@loginValidations" Mode="ValidationMode.Auto" Model="@user">
-                <Validation Validator="ValidationRule.IsEmail">
-                    <Field Horizontal>
-                        <FieldLabel ColumnSize="ColumnSize.Is3">Email</FieldLabel>
-                        <FieldBody ColumnSize="ColumnSize.Is9">
-                            <TextEdit Placeholder="Enter email" @bind-Text="@user.Email">
-                                <Feedback>
-                                    <ValidationError />
-                                </Feedback>
-                            </TextEdit>
-                        </FieldBody>
-                    </Field>
-                </Validation>
-                <Validation>
-                    <Field Horizontal>
-                        <FieldLabel ColumnSize="ColumnSize.Is3">Password</FieldLabel>
-                        <FieldBody ColumnSize="ColumnSize.Is9">
-                            <TextEdit Role="TextRole.Password" Placeholder="Password" @bind-Text="@user.Password">
-                                <Feedback>
-                                    <ValidationError />
-                                </Feedback>
-                            </TextEdit>
-                        </FieldBody>
-                    </Field>
-                </Validation>
-            </Validations>
-            <Field Flex="Flex.JustifyContent.End" Margin="Margin.Is0">
-                <Button Clicked="OnLogin" Color="Color.Secondary" PreventDefaultOnSubmit>Sign Up</Button>
-                <Button Margin="Margin.Is3.FromStart" Clicked="LoginUser" Color="Color.Primary" Type="ButtonType.Submit" PreventDefaultOnSubmit>Login</Button>
-            </Field>
+            <form @onsubmit="LoginUser">
+                <Validations @ref="@loginValidations" Mode="ValidationMode.Auto" Model="@user">
+                    <Validation Validator="ValidationRule.IsEmail">
+                        <Field Horizontal>
+                            <FieldLabel ColumnSize="ColumnSize.Is3">Email</FieldLabel>
+                            <FieldBody ColumnSize="ColumnSize.Is9">
+                                <TextEdit Placeholder="Enter email" @bind-Text="@user.Email">
+                                    <Feedback>
+                                        <ValidationError />
+                                    </Feedback>
+                                </TextEdit>
+                            </FieldBody>
+                        </Field>
+                    </Validation>
+                    <Validation>
+                        <Field Horizontal>
+                            <FieldLabel ColumnSize="ColumnSize.Is3">Password</FieldLabel>
+                            <FieldBody ColumnSize="ColumnSize.Is9">
+                                <TextEdit Role="TextRole.Password" Placeholder="Password" @bind-Text="@user.Password">
+                                    <Feedback>
+                                        <ValidationError />
+                                    </Feedback>
+                                </TextEdit>
+                            </FieldBody>
+                        </Field>
+                    </Validation>
+                </Validations>
+                <Field Flex="Flex.JustifyContent.End" Margin="Margin.Is0">
+                    <Button Clicked="OnLogin" Color="Color.Secondary" PreventDefaultOnSubmit>Sign Up</Button>
+                    <Button Margin="Margin.Is3.FromStart" Color="Color.Primary" Type="ButtonType.Submit">Login</Button>
+                </Field>
+            </form>
         </CardBody>
     </Card>
 </div>
-
 
 
 @code {

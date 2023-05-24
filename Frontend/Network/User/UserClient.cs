@@ -11,6 +11,12 @@ public class UserClient : NSwagBaseClient, IUserClient
         await _api.UserPOSTAsync(new CreateUserRequest{DisplayName = displayName, Email = email});
 }
 
+    public async Task SetReview(string userToken, string movieId, string review)
+    {
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+        await _api.ReviewAsync(new CreateReviewRequest { MovieId = movieId, ReviewBody = review});
+    }
+
     public UserClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
     {
     }

@@ -3,11 +3,11 @@ using Frontend.Network.UserSearch;
 using Frontend.Service;
 namespace Frontend.Model.UserSearch;
 
-public class UserSearchModel:NSwagBaseClient, IUserSearchModel
+public class UserSearchModel: IUserSearchModel
 {
  
     private IUserSearchClient _client;
-    public UserSearchModel(IUserSearchClient client,IConfiguration configuration,IHttpClientFactory clientFactory):base(clientFactory,configuration)
+    public UserSearchModel(IUserSearchClient client)
     {
         _client = client;
     }

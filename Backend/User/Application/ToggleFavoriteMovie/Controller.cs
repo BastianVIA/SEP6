@@ -21,9 +21,20 @@ public class Controller : ControllerBase
     }
 
 
+    /// <summary>
+    /// Toggles the users favorite status of the given movie.
+    /// 
+    /// </summary>
+    /// <param name="movieId"></param>
+    /// <returns></returns>
+    /// <remarks>This method requires authorization. Make sure to provide authorization when calling this method. 
+    /// 
+    /// If the user has the movie on their favorite list they will no longer after this is called.
+    /// If they do not have the movie on their favorite list it will be added
+    /// </remarks>
     [HttpPut]
     [Route("favorite/{movieId}")]
-    [Tags("UserApi")]
+    [Tags("User")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize]

@@ -16,9 +16,16 @@ public class Controller : ControllerBase
         _mediater = mediater;
     }
 
+    /// <summary>
+    /// Searching for person on their name
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="pageNumber">The number of movies per. page can be set in the
+    /// configuration with "PeoplePerPage"</param>
+    /// <returns></returns>
     [HttpGet]
     [Route("search")]
-    [Tags("PersonApi")]
+    [Tags("Person")]
     [ProducesResponseType(typeof(PersonSearchResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
 

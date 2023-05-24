@@ -1,10 +1,12 @@
 ﻿@using Blazorise
+@using Frontend.Authentication
 @using Frontend.Events
 @using Frontend.Model.Firebase
 @using Frontend.Pages
 @using Frontend.Service
 @using Microsoft.OpenApi.Services
 @inject IFirebaseModel FirebaseModel
+@inject IAlertAggregator AlertAggregator
 @inject NavigationManager NavManager
 @inject CustomAuthenticationStateProvider AuthStateProvider
 
@@ -21,6 +23,9 @@
                 <BarItem>
                     <BarLink To="">Home</BarLink>
                 </BarItem>
+                <BarItem>
+                    <BarLink To="/Top100">Top 100 Movies</BarLink>
+                </BarItem>
                 <AuthorizeView>
                     <Authorized>
                         <BarItem>
@@ -28,12 +33,6 @@
                         </BarItem>
                     </Authorized>
                 </AuthorizeView>
-                <BarItem>
-                    <BarLink To="/Top100">Top 100 Movies</BarLink>
-                </BarItem>
-                <BarItem>
-                    <BarLink To="/ActorDetails/{224513}">Actor Page</BarLink>
-                </BarItem>
             </BarStart>
             <BarEnd>
                 <BarItem>
@@ -75,22 +74,43 @@
 </div>
 
 @code {
+    private string movieTitle;
     private string displayName;
+    private string searchOptionName;
     private string searchTerm;
     private bool searchUsers = false;
 
-    protected override void OnInitialized()
+    private void SearchForMovie()
     {
-        FirebaseModel.OnNotifyAlert += SetDisplayName;
+        if (movieTitle == null) return;
+        NavManager.NavigateTo($"searchResult/{movieTitle}");
     }
 
+    protected override void OnInitialized()
+    {
+        AlertAggregator.OnNotifyAlert += SetDisplayName;
+        searchOptionName = "Search Movie";
+    }
+    
+    public void Dispose()
+    {
+        AlertAggregator.OnNotifyAlert -= SetDisplayName;
+    }
+    
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            PerformSearch();
+        }
+    }
 
     private void PerformSearch()
     {
         if (searchTerm == null) return;
         NavManager.NavigateTo($"SearchResult/{searchTerm}");
     }
-
+    
     private void SetDisplayName(object? sender, AlertEventArgs args)
     {
         if (args.Type != AlertBoxHelper.AlertType.LoginSuccess &&
@@ -100,21 +120,23 @@
         StateHasChanged();
     }
 
-    public void Dispose()
-    {
-        FirebaseModel.OnNotifyAlert -= SetDisplayName;
-    }
 
+    private void ToggleSearchUsers(bool isSearchUsers)
+    {
+        searchUsers = isSearchUsers;
+    }
+    
     private void Logout()
     {
         FirebaseModel.Logout();
         AuthStateProvider.SignOut();
+        NavManager.NavigateTo("/");
     }
-
-
+    
     private void MyProfile()
     {
-        NavManager.NavigateTo("/userprofile");
+        NavManager.NavigateTo("/");
+        NavManager.NavigateTo($"/userprofile/{FirebaseModel.CurrentUser.UID}");
     }
 
 }

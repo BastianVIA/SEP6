@@ -1,4 +1,6 @@
 ﻿using AutoFixture;
+using Backend.Database.Transaction;
+using Backend.Database.TransactionManager;
 using Backend.Enum;
 using Backend.Movie.Application.Search;
 using Backend.Movie.Infrastructure;
@@ -12,11 +14,12 @@ public class QueryHandlerTests
     private readonly QueryHandler _handler;
     private readonly IMovieRepository _movieRepository = Substitute.For<IMovieRepository>();
     private readonly IImageService _imageService = Substitute.For<IImageService>();
+    private readonly IDatabaseTransactionFactory _transactionFactory = Substitute.For<IDatabaseTransactionFactory>();
     private readonly Fixture _fixture = new();
     
     public QueryHandlerTests()
     {
-        _handler = new QueryHandler(_movieRepository, _imageService);
+        _handler = new QueryHandler(_movieRepository, _imageService, _transactionFactory);
     }
 
     [Fact]
@@ -25,8 +28,8 @@ public class QueryHandlerTests
         //Arrange
         var request = _fixture.Create<Query>();
         var expected = new List<Backend.Movie.Domain.Movie>();
-        _movieRepository.SearchForMovie(request.Title, request.sortingKey, request.sortingDirection, request.pageNumber)
-            .Returns(expected);
+        _movieRepository.SearchForMovieAsync(request.Title, request.sortingKey, request.sortingDirection, request.pageNumber, Arg.Any<DbReadOnlyTransaction>())
+            .Returns((expected, 2));
         
         //Act
         var result = await _handler.Handle(request, CancellationToken.None);
@@ -43,11 +46,12 @@ public class QueryHandlerTests
         var returnedMovie = _fixture.Create<Backend.Movie.Domain.Movie>();
         var expected = new List<Backend.Movie.Domain.Movie> { returnedMovie };
         var request = _fixture.Create<Query>();
-        _movieRepository.SearchForMovie(request.Title, 
+        _movieRepository.SearchForMovieAsync(request.Title, 
                 Arg.Any<MovieSortingKey>(), 
                 Arg.Any<SortingDirection>(), 
-                Arg.Any<int>())
-            .Returns(expected);
+                Arg.Any<int>(), 
+                Arg.Any<DbReadOnlyTransaction>())
+            .Returns((expected, 2));
 
         //Act
         var result = await _handler.Handle(request, CancellationToken.None);
@@ -66,11 +70,12 @@ public class QueryHandlerTests
         //Arrange 
         var returnedMovies = _fixture.CreateMany<Backend.Movie.Domain.Movie>(3).ToList();
         var request = _fixture.Create<Query>();
-        _movieRepository.SearchForMovie(request.Title, 
+        _movieRepository.SearchForMovieAsync(request.Title, 
                 Arg.Any<MovieSortingKey>(), 
                 Arg.Any<SortingDirection>(), 
-                Arg.Any<int>())
-            .Returns(returnedMovies);
+                Arg.Any<int>(), 
+                Arg.Any<DbReadOnlyTransaction>())
+            .Returns((returnedMovies, 2));
 
         //Act
         var result = await _handler.Handle(request, CancellationToken.None);

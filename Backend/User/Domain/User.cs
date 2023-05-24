@@ -8,8 +8,10 @@ public class User : Foundation.BaseDomain
     public string DisplayName { get; set; }
     public string Email { get; set; }
     public string? Bio { get; set; }
-    public List<string>? FavoriteMovies { get; set; }
+    public List<UserFavoriteMovie>? FavoriteMovies { get; set; }
     public List<UserRating>? Ratings { get; set; }
+    
+    public List<UserReview>? Reviews { get; set; }
     
     public float AverageOfUserRatings { get; set; }
 
@@ -33,7 +35,7 @@ public class User : Foundation.BaseDomain
 
         foreach (var favoriteMovie in FavoriteMovies)
         {
-            if (favoriteMovie == movieId)
+            if (favoriteMovie.MovieId == movieId)
             {
                 return true;
             }
@@ -54,6 +56,18 @@ public class User : Foundation.BaseDomain
         AddDomainEvent(new CreatedRatingEvent(Id, newRating));
     }
 
+    public void AddReview(string movieId, string reviewBody)
+    {
+        if (Reviews == null)
+        {
+            Reviews = new List<UserReview>();
+        }
+    
+        var newReview = new UserReview(movieId, reviewBody);
+        Reviews.Add(newReview);
+        AddDomainEvent(new CreateReviewEvent(Id, newReview));
+    }
+
     public void RemoveFavorite(string movieId)
     {
         if (FavoriteMovies == null)
@@ -65,7 +79,7 @@ public class User : Foundation.BaseDomain
         {
             var movie = FavoriteMovies[i];
 
-            if (movieId == movie)
+            if (movieId == movie.MovieId)
             {
                 FavoriteMovies.RemoveAt(i);
                 AddDomainEvent(new UnFavoritedMovie(Id, movieId));
@@ -96,10 +110,10 @@ public class User : Foundation.BaseDomain
     {
         if (FavoriteMovies == null)
         {
-            FavoriteMovies = new List<string>();
+            FavoriteMovies = new List<UserFavoriteMovie>();
         }
 
-        FavoriteMovies.Add(movieId);
+        FavoriteMovies.Add(new UserFavoriteMovie(movieId));
         AddDomainEvent(new FavoritedMovie(Id, movieId));
     }
 
@@ -128,9 +142,12 @@ public class User : Foundation.BaseDomain
 
     public void UpdateRating(string requestMovieId, int rating)
     {
+        var couldNotFindException = new KeyNotFoundException(
+            $"Tried to update rating from movie with id: {requestMovieId}, from user with id: {Id}, but could not find the rating"); 
+        
         if (Ratings == null)
         {
-            throw new ValidationException("Tried to update ratings, but no ratings found");
+            throw couldNotFindException;
         }
 
         foreach (var userRating in Ratings)
@@ -144,15 +161,17 @@ public class User : Foundation.BaseDomain
             }
         }
 
-        throw new KeyNotFoundException(
-            $"Tried to update rating from movie with id: {requestMovieId}, from user with id: {Id}, but could not find the rating");
+        throw couldNotFindException;
     }
 
     public int GetRatingForMovie(string movieId)
     {
+        var couldNotFindException =  new KeyNotFoundException(
+            $"Tried to get rating from movie with id: {movieId}, from user with id: {Id}, but could not find the rating");
+        
         if (Ratings == null)
         {
-            throw new ValidationException("No Ratings found");
+            throw couldNotFindException;
         }
 
         foreach (var rating in Ratings)
@@ -163,14 +182,13 @@ public class User : Foundation.BaseDomain
             }
         }
 
-        throw new KeyNotFoundException(
-            $"Tried to get rating from movie with id: {movieId}, from user with id: {Id}, but could not find the rating");
+        throw couldNotFindException;
     }
     
     public void SetRatingAvg()
     {
         var count = 0.0f;
-        if (Ratings.Count == 0)
+        if (Ratings == null || !Ratings.Any())
         {
             AverageOfUserRatings = count;
             return;

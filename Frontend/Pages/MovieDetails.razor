@@ -8,7 +8,11 @@
 @inject IMovieDetailModel MovieDetailModel
 @inject IFavoriteMoviesModel FavoriteMoviesModel
 @inject IFirebaseModel FirebaseModel
+@inject IUserModel UserModel
 @using Blazorise.LottieAnimation
+@using Frontend.Model.User
+@inject NavigationManager NavManager
+
 
 @if (movieLoaded)
 {
@@ -29,7 +33,7 @@
                     {
                         foreach (var actor in movie.Actors)
                         {
-                            <li>@actor.Name, @actor.BirthYear</li>
+                            <li  @onclick="@(() => OnPersonClicked(actor.ID))">@actor.Name, @actor.BirthYear</li>
                         }
                     }
                     else
@@ -68,7 +72,7 @@
                     {
                         foreach (var director in movie.Directors)
                         {
-                            <li>@director.Name, @director.BirthYear</li>
+                            <li  @onclick="@(() => OnPersonClicked(director.ID))">@director.Name, @director.BirthYear</li>
                         }
                     }
                     else
@@ -95,23 +99,53 @@
         <Row>
             <AuthorizeView>
                 <Authorized>
-                    <Rating Color="Color.Primary" @onclick="@OnRatingChange" @bind-SelectedValue="UserRating" MaxValue="10"/>
+                    <Column>
+                        <Rating Color="Color.Primary" @onclick="@OnRatingChange" @bind-SelectedValue="UserRating" MaxValue="10"/>
+                    </Column>
+                    <Column TextAlignment="TextAlignment.End">
+                        <Button Color="Color.Primary" @onclick="@OnAddReview">Add Review</Button>
+                    </Column>
                 </Authorized>
             </AuthorizeView>
         </Row>
         
+        <Modal @ref="modalRef">
+            <ModalContent Centered>
+                <ModalHeader>
+                    <ModalTitle>Add Review</ModalTitle>
+                    <CloseButton />
+                </ModalHeader>
+                <ModalBody>
+                    <Field>
+                        <FieldLabel>Review</FieldLabel>
+                        <MemoEdit @ref="@reviewText" Rows="15" Placeholder="Write your review here..."/>
+                    </Field>
+                </ModalBody>
+                <ModalFooter>
+                    <Button Color="Color.Secondary" Clicked="@CancelModal">Close</Button>
+                    <Button Color="Color.Primary" Clicked="@HideModal">Save Changes</Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
+        <iframe width="560" height="315" src=@movie.MovieTrailer frameborder="0" allow="encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
+    
+    
 }
 else
 {
     <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
 }
 
+
+
 @code {
 
     [Parameter]
     public string MovieId { get; set; }
 
+    private Modal modalRef;
+    private MemoEdit reviewText;
     private Movie movie;
     private bool movieLoaded = false;
     public int UserRating;
@@ -137,7 +171,15 @@ else
         try
         {
             movie.IsFavorite = !movie.IsFavorite;
-            await FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.CurrentUser!.TokenValue, MovieId);
+            if (IsOnFavorites())
+            {
+                await FavoriteMoviesModel.AddToFavoriteMovies(FirebaseModel.CurrentUser!.TokenValue, MovieId);
+            }
+            else
+            {
+                await FavoriteMoviesModel.RemoveFromFavoriteMovies(FirebaseModel.CurrentUser!.TokenValue, MovieId);
+            }
+            
              await LoadMovieDetails();
         }
         catch (Exception e)
@@ -151,6 +193,25 @@ else
     {
         return (movie.IsFavorite != null && movie.IsFavorite.Value);
     }
-}
+    
+    private void OnPersonClicked(string personId){
+        NavManager.NavigateTo($"PersonDetails/{personId}");
+    }
+
+    private void OnAddReview()
+    {
+        modalRef.Show();
+    }
+
+    private async Task HideModal()
+    {
+        await UserModel.SetReview(FirebaseModel.CurrentUser.TokenValue, MovieId, reviewText.Text);
+        modalRef.Hide();
+    }
+
+    private void CancelModal()
+    {
+        modalRef.Hide();
+    }
 
 }

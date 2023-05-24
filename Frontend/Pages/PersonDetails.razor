@@ -1,0 +1,65 @@
+﻿@page "/PersonDetails/{personId}"
+@using Blazorise
+@using Frontend.Entities
+@using Frontend.Components
+@using Frontend.Model.Person
+@inject IPersonModel PersonModel
+@inject NavigationManager NavManager
+
+@if (_person != null)
+{
+    <div class="person-container">
+        <Row>
+            <Column ColumnSize="ColumnSize.Is3.OnWidescreen.Is12.OnDesktop.Is12.OnTablet">
+                <Div Display="Display.Flex" Flex="Flex.JustifyContent.Center">
+                    <img src="@_person.ImageUrl" class="person-image" alt="person-image"/>
+                </Div>
+            </Column>
+            <Column ColumnSize="ColumnSize.Is7.OnWidescreen.Is12.OnDesktop.Is12.OnTablet">
+                <Row><Heading Size="HeadingSize.Is2">@_person.Name</Heading></Row>
+                <Row><Heading Size="HeadingSize.Is5">Biography</Heading></Row>
+                <Row>
+                    <p class="person-biography">@_person.Bio</p>
+                </Row>
+            </Column>
+            <Column ColumnSize="ColumnSize.Is2.OnWidescreen.Is12.OnDesktop.Is12.OnTablet">
+                <Row><Heading Size="HeadingSize.Is5">Birthyear</Heading></Row>
+                <Row><Text>@_person.BirthYear</Text></Row>
+            </Column>
+        </Row>
+    <Row>
+        @if (_person.ActedInList != null && _person.ActedInList.Any())
+        {
+            <Column>
+                <Row Margin="Margin.Is2.FromTop"><Heading Size="HeadingSize.Is5">Acted in movies</Heading></Row>
+                <MovieTable MovieList="_person.ActedInList" PosterSize="100" OnMovieClicked="OnMovieClick"/>
+            </Column>
+        }
+        @if (_person.DirectedList != null && _person.DirectedList.Any())
+            {
+                <Column>
+                    <Row Margin="Margin.Is2.FromTop"><Heading Size="HeadingSize.Is5">Directed Movies</Heading></Row>
+                    <MovieTable MovieList="@_person.DirectedList" PosterSize="100" OnMovieClicked="OnMovieClick"/>
+                </Column>
+            }
+    </Row>
+</div>
+
+
+}
+
+
+@code {
+    [Parameter] public string PersonId { get; set; }
+    private Person _person;
+    protected override async Task OnInitializedAsync()
+    {
+       _person=  await PersonModel.GetPersonDetails(PersonId);
+    }
+    
+    private void OnMovieClick(string movieId)
+    {
+        NavManager.NavigateTo($"movieDetails/{movieId}");
+    }
+
+}

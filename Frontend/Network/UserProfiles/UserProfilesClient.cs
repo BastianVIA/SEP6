@@ -37,10 +37,52 @@ namespace Frontend.Network.UserProfiles
                 Username = response.UserProfile.DisplayName,
                 Email = response.UserProfile.Email,
                 Bio = response.UserProfile.Bio,
-                AverageOfUserRatings = response.UserProfile.AverageOfUserRatings
+                AverageOfUserRatings = response.UserProfile.AverageOfUserRatings,
+                RatingDataPoints = response.UserProfile.RatingsDataPoints
             };
 
             return user;
+        }
+
+        public async Task UpdateUserProfile(Entities.User user)
+        {
+            //     var request = new UserProfileUpdateRequest
+            //     {
+            //         UserId = user.Id,
+            //         DisplayName = user.Username,
+            //         Email = user.Email,
+            //         Bio = user.Bio,
+
+            //     };
+            //
+            //     try
+            //     {
+            //         await _api.UserPUTAsync(request);
+            //     }
+            //     catch (Exception e)
+            //     {
+            //         Console.WriteLine(e);
+            //         throw;
+            //     }
+            //
+        }
+
+        public async Task FollowUser(string userToken, string userId)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+            await _api.FollowUserAsync(userId);
+        }
+
+        public async Task UnFollowUser(string userToken, string userId)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+            await _api.UnFollowUserAsync(userId);
+        }
+
+        public async Task<GetFollowingResponse> GetFollowingUsers(string userToken, string userId)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+            return await _api.FollowsAsync(userId);
         }
 
         public UserProfileClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)

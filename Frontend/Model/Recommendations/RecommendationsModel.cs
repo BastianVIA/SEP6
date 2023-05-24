@@ -4,11 +4,11 @@ using Frontend.Network.Recommendations;
 
 namespace Frontend.Model.Recommendations;
 
-public class RecommendationsModel : NSwagBaseClient, IRecommendationsModel
+public class RecommendationsModel : IRecommendationsModel
 {
     private IRecommendationsClient _client;
     
-    public RecommendationsModel(IRecommendationsClient client,IConfiguration configuration,IHttpClientFactory clientFactory):base(clientFactory,configuration)
+    public RecommendationsModel(IRecommendationsClient client)
     {
         _client = client;
     }

@@ -13,9 +13,14 @@ public class Controller : ControllerBase
     {
         _mediator = mediator;
     }
+    /// <summary>
+    /// Gets details of the specified user
+    /// </summary>
+    /// <param name="userId">Id to specify user</param>
+    /// <returns></returns>
     [HttpGet]
     [Route("user/{userId}")]
-    [Tags("UserApi")]
+    [Tags("User")]
     [ProducesResponseType(typeof(UserProfileResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get([Required]string userId)

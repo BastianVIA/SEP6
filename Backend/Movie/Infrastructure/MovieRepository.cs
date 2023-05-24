@@ -1,4 +1,5 @@
-﻿using Backend.Database.Transaction;
+﻿using System.Diagnostics;
+using Backend.Database.Transaction;
 using Backend.Enum;
 using Backend.Movie.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -9,46 +10,15 @@ namespace Backend.Movie.Infrastructure;
 public class MovieRepository : IMovieRepository
 {
     private int NumberOfResultsPerPage;
-    private int Top100;
+    private int NumberOfMoviesForPerson;
 
     public MovieRepository(IConfiguration configuration)
     {
         NumberOfResultsPerPage = configuration.GetSection("QueryConstants").GetValue<int>("MoviesPerPage");
-        Top100 = configuration.GetSection("QueryConstants").GetValue<int>("Top100");
+        NumberOfMoviesForPerson = configuration.GetSection("QueryConstants").GetValue<int>("NumberOfMoviesForPerson");
     }
 
-    public async Task<List<Domain.Movie>> SearchForMovie(string title, MovieSortingKey movieSortingKey,
-        SortingDirection sortingDirection, int requestPageNumber, DbReadOnlyTransaction tx)
-    {
-        var query = tx.DataContext.Movies.Include(m => m.Rating)
-            .Where(m => EF.Functions.Like(m.Title, $"%{title}%"));
-
-        switch (movieSortingKey)
-        {
-            case MovieSortingKey.Votes:
-                query = SearchForMoveOrderByVotesAsync(query, sortingDirection);
-                break;
-            case MovieSortingKey.ReleaseYear:
-                query = SearchForMoveOrderByReleaseYearAsync(query, sortingDirection);
-                break;
-            case MovieSortingKey.Rating:
-                query = SearchForMoveOrderByRatingAsync(query, sortingDirection);
-                break;
-            default:
-                throw new KeyNotFoundException($"{movieSortingKey} not a valid movie sorting key ");
-        }
-
-        Task<List<MovieDAO>> foundMovies = query
-            .Skip(NumberOfResultsPerPage * (requestPageNumber - 1))
-            .Take(NumberOfResultsPerPage)
-            .ToListAsync();
-
-
-        return ToDomain(await foundMovies);
-    }
-
-
-    public async Task<Domain.Movie> ReadMovieFromId(string id, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeActors = false, bool includeDirectors = false)
+    public async Task<Domain.Movie> ReadMovieFromIdAsync(string id, DbReadOnlyTransaction tx, bool includeRatings = false, bool includeActors = false, bool includeDirectors = false)
     {
         var query = tx.DataContext.Movies.Where(m => m.Id == id);
         if (includeRatings)
@@ -78,7 +48,40 @@ public class MovieRepository : IMovieRepository
         return ToDomain(result);
     }
 
-    public async Task<List<Domain.Movie>> ReadMoviesFromList(List<string> movieIds, int requestedPageNumber,
+    public async Task<(List<Domain.Movie> Movies, int NumberOfPages)> SearchForMovieAsync(string title, MovieSortingKey movieSortingKey,
+        SortingDirection sortingDirection, int requestPageNumber, DbReadOnlyTransaction tx)
+    {
+        var query = tx.DataContext.Movies.Include(m => m.Rating)
+            .Where(m => EF.Functions.Like(m.Title, $"%{title}%"));
+
+        switch (movieSortingKey)
+        {
+            case MovieSortingKey.Votes:
+                query = SearchForMoveOrderByVotesAsync(query, sortingDirection);
+                break;
+            case MovieSortingKey.ReleaseYear:
+                query = SearchForMoveOrderByReleaseYearAsync(query, sortingDirection);
+                break;
+            case MovieSortingKey.Rating:
+                query = SearchForMoveOrderByRatingAsync(query, sortingDirection);
+                break;
+            default:
+                throw new KeyNotFoundException($"{movieSortingKey} not a valid movie sorting key ");
+        }
+
+        var totalMoviesCount = await query.CountAsync();
+        var totalPages = (int)Math.Ceiling((double)totalMoviesCount / NumberOfResultsPerPage);
+
+        Task<List<MovieDAO>> foundMovies = query
+            .Skip(NumberOfResultsPerPage * (requestPageNumber - 1))
+            .Take(NumberOfResultsPerPage)
+            .ToListAsync();
+
+
+        return (Movies: ToDomain(await foundMovies), NumberOfPages: totalPages) ;
+    }
+    
+    public async Task<List<Domain.Movie>> ReadMoviesFromListAsync(List<string> movieIds, int requestedPageNumber,
         DbReadOnlyTransaction tx)
     {
         var foundMovies = tx.DataContext.Movies.Include(m => m.Rating)
@@ -89,7 +92,7 @@ public class MovieRepository : IMovieRepository
         return ToDomain(await foundMovies);
     }
 
-    public async Task<List<Domain.Movie>> GetRecommendedMovies(int minVotes, float minRating, DbReadOnlyTransaction tx)
+    public async Task<List<Domain.Movie>> GetRecommendedMoviesAsync(int minVotes, float minRating, DbReadOnlyTransaction tx)
     {
         var random = new Random();
         var movies = tx.DataContext.Movies
@@ -110,8 +113,7 @@ public class MovieRepository : IMovieRepository
         var movieDao = await tx.DataContext.Movies
             .Include(m => m.Rating)
             .SingleAsync(m => m.Id == movie.Id);
-
-
+        
         excludeActorsAndDirectorsFromupdate(tx, movieDao);
 
         movieDao.Title = movie.Title;
@@ -124,16 +126,83 @@ public class MovieRepository : IMovieRepository
 
         tx.DataContext.Movies.Update(movieDao);
     }
+    public async Task<List<Domain.Movie>?> GetActedMoviesForPersonAsync(string personId, DbReadOnlyTransaction tx)
+    {
+        var result = await tx.DataContext.Persons
+            .FirstOrDefaultAsync(p => p.Id == personId);
 
-    public async Task<List<Domain.Movie>> GetTop100Movies(int minVotes, DbReadOnlyTransaction tx)
+        if (result == null)
+        {
+            return null;
+        }
+
+        await tx.DataContext.Entry(result)
+            .Collection(p => p.ActedMovies)
+            .LoadAsync();
+
+        var orderedMovies = result.ActedMovies.ToList();
+        var movieIds = orderedMovies.Select(movie => movie.Id).ToList();
+
+        await tx.DataContext.Entry(result)
+            .Collection(p => p.ActedMovies)
+            .Query()
+            .Where(movie => movieIds.Contains(movie.Id))
+            .Include(movie => movie.Rating)
+            .LoadAsync();
+
+        orderedMovies = orderedMovies.OrderByDescending(movie => movie.Rating?.Votes ?? 0)
+            .Take(NumberOfMoviesForPerson).ToList();
+        
+        return ToDomain(orderedMovies);
+    }
+    
+    public async Task<List<Domain.Movie>?> GetDirectedMoviesForPersonAsync(string personId, DbReadOnlyTransaction tx)
+    {
+        var result = await tx.DataContext.Persons
+            .FirstOrDefaultAsync(p => p.Id == personId);
+
+        if (result == null)
+        {
+            return null;
+        }
+
+        await tx.DataContext.Entry(result)
+            .Collection(p => p.DirectedMovies)
+            .LoadAsync();
+
+        var orderedMovies = result.DirectedMovies.ToList();
+        var movieIds = orderedMovies.Select(movie => movie.Id).ToList();
+
+        await tx.DataContext.Entry(result)
+            .Collection(p => p.DirectedMovies)
+            .Query()
+            .Where(movie => movieIds.Contains(movie.Id))
+            .Include(movie => movie.Rating)
+            .LoadAsync();
+
+        orderedMovies = orderedMovies.OrderByDescending(movie => movie.Rating?.Votes ?? 0)
+            .Take(NumberOfMoviesForPerson).ToList();
+        
+        return ToDomain(orderedMovies);
+    }
+
+    public async Task<int> NumberOfResultsForSearch(string title, DbReadOnlyTransaction tx)
+    {
+        var query = tx.DataContext.Movies
+            .Where(m => EF.Functions.Like(m.Title, $"%{title}%"));
+        return await query.CountAsync();
+    }
+
+    public async Task<List<Domain.Movie>> GetTopMoviesAsync(int minVotes,int pageNumber, DbReadOnlyTransaction tx)
     {
         var movies = tx.DataContext.Movies
             .Include(m => m.Rating)
             .Where(m => m.Rating != null && m.Rating.Votes > minVotes)
             .OrderByDescending(m => m.Rating.Rating)
-            .Take(Top100)
-            .ToList();
-        return ToDomain(movies);
+            .Skip(NumberOfResultsPerPage * (pageNumber - 1))
+            .Take(NumberOfResultsPerPage)
+            .ToListAsync();
+        return ToDomain(await movies);
     }
 
     private static void excludeActorsAndDirectorsFromupdate(DbTransaction tx, MovieDAO movieDao)
@@ -150,6 +219,16 @@ public class MovieRepository : IMovieRepository
 
         tx.DataContext.Entry(movieDao).Collection(m => m.Actors).IsModified = false;
         tx.DataContext.Entry(movieDao).Collection(m => m.Directors).IsModified = false;
+    }
+
+    private List<Domain.Movie>? ToDomain(ICollection<MovieDAO>? movies)
+    {
+        if (movies == null || !movies.Any())
+        {
+            return null;
+        }
+
+        return ToDomain(movies.ToList());
     }
 
     private List<Domain.Movie> ToDomain(List<MovieDAO> movieDaos)
@@ -189,7 +268,7 @@ public class MovieRepository : IMovieRepository
             Votes = ratingDao.Votes
         };
     }
-
+    
     private RatingDAO FromDomain(Domain.Rating rating, string movieId)
     {
         return new RatingDAO

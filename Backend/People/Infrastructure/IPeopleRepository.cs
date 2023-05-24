@@ -4,7 +4,10 @@ namespace Backend.People.Infrastructure;
 
 public interface IPeopleRepository
 {
-    Task<List<Domain.Person>> SearchForPerson(string name, int requestPageNumber, DbReadOnlyTransaction tx);
-    Task<List<Domain.Person>> FindPersons(List<string> personIds, DbReadOnlyTransaction tx);
-    
+    Task<Domain.Person> ReadPersonFromIdAsync(string id, DbReadOnlyTransaction tx, bool includeActed = false,
+        bool includeDirected = false);
+
+    Task<(List<Domain.Person> People, int NumberOfPages )> SearchForPersonAsync(string name, int requestPageNumber, DbReadOnlyTransaction tx);
+    Task<List<Domain.Person>> FindPersonsAsync(List<string> personIds, DbReadOnlyTransaction tx);
+    Task<int> NumberOfResultsForSearch(string requestName, DbReadOnlyTransaction tx);
 }

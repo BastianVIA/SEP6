@@ -1,30 +1,75 @@
-﻿using Backend.Database.Transaction;
+﻿using System.Diagnostics;
+using Backend.Database.Transaction;
 using Backend.People.Domain;
+using Backend.Service;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.People.Infrastructure;
 
 public class PeopleRepository : IPeopleRepository
 {
-    private const int NumberOfResultsPerPage = 20;
-    
-    public async Task<List<Person>> SearchForPerson(string name, int requestPageNumber, DbReadOnlyTransaction tx)
+    private int NumberOfResultsPerPage;
+
+    public PeopleRepository(IConfiguration configuration)
+    {
+        NumberOfResultsPerPage = configuration.GetSection("QueryConstants").GetValue<int>("PeoplePerPage");
+    }
+
+    public async Task<Person> ReadPersonFromIdAsync(string id, DbReadOnlyTransaction tx, bool includeActed = false,
+        bool includeDirected = false)
+    {
+        var result = await tx.DataContext.People
+            .Where(p => p.Id == id)
+            .FirstOrDefaultAsync();
+        
+        if (result == null)
+        {
+            throw new KeyNotFoundException($"Could not find person with id: {id}");
+        }
+        
+        if (includeActed)
+        {
+            await tx.DataContext.Entry(result)
+                .Collection(p => p.ActedMovies)
+                .LoadAsync();
+        }
+
+        if (includeDirected)
+        {
+            await tx.DataContext.Entry(result)
+                .Collection(p => p.DirectedMovies)
+                .LoadAsync();
+        }
+
+        return ToDomain(result);
+    }
+
+    public async Task<(List<Domain.Person> People, int NumberOfPages )> SearchForPersonAsync(string name, int requestPageNumber, DbReadOnlyTransaction tx)
     {
         var query = tx.DataContext.People.Where(p => EF.Functions.Like(p.Name, $"%{name}%"));
 
+        var totalPeopleCount = await query.CountAsync();
+        var totalPages = (int)Math.Ceiling((double)totalPeopleCount / NumberOfResultsPerPage);
+        
         Task<List<PeopleDAO>> foundPersons = query
             .Skip(NumberOfResultsPerPage * (requestPageNumber - 1))
             .Take(NumberOfResultsPerPage)
             .ToListAsync();
 
-        return ToDomain(await foundPersons);
+        return (People:ToDomain(await foundPersons), totalPages);
     }
 
-    public async Task<List<Person>> FindPersons(List<string> personIds, DbReadOnlyTransaction tx)
+    public async Task<List<Person>> FindPersonsAsync(List<string> personIds, DbReadOnlyTransaction tx)
     {
         var query = tx.DataContext.People.Where(p => personIds.Contains(p.Id)).ToList();
 
         return ToDomain(query);
+    }
+
+    public async Task<int> NumberOfResultsForSearch(string requestName, DbReadOnlyTransaction tx)
+    {
+        var query = tx.DataContext.People.Where(p => EF.Functions.Like(p.Name, $"%{requestName}%"));
+        return await query.CountAsync();
     }
 
     private List<Domain.Person> ToDomain(List<PeopleDAO> personDaos)
@@ -44,13 +89,14 @@ public class PeopleRepository : IPeopleRepository
         {
             BirthYear = peopleDao.BirthYear,
             Id = peopleDao.Id,
+            ImdbId = peopleDao.ImdbId,
             Name = peopleDao.Name,
             ActedMoviesId = ToDomain(peopleDao.ActedMovies),
             DirectedMoviesId = ToDomain(peopleDao.DirectedMovies)
         };
     }
 
-    private ICollection<string> ToDomain(ICollection<PeopleMovieDAO>? personDaoActedMovies)
+    private ICollection<string>? ToDomain(ICollection<PeopleMovieDAO>? personDaoActedMovies)
     {
         if (personDaoActedMovies == null || personDaoActedMovies.Count == 0)
         {

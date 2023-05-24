@@ -10,13 +10,7 @@ namespace Backend.Middleware;
 
 public class GlobalExceptionFilter : IAsyncExceptionFilter
 {
-    private readonly IDatabaseTransactionFactory _transactionFactory;
-
-    public GlobalExceptionFilter(IDatabaseTransactionFactory transactionFactory)
-    {
-        _transactionFactory = transactionFactory;
-    }
-
+    
     public async Task OnExceptionAsync(ExceptionContext context)
     {
         LogManager.GetCurrentClassLogger().Error($"An Exception occurred of type: {context.Exception.GetType()}, with message: {context.Exception.Message}");
@@ -39,7 +33,7 @@ public class GlobalExceptionFilter : IAsyncExceptionFilter
         else if (exception is KeyNotFoundException)
         {
             response.StatusCode = (int)HttpStatusCode.NotFound;
-            response.Value = "The requested resource was not found.";
+            response.Value = exception.Message;
         }
         else if (exception is UnauthorizedAccessException)
         {
@@ -59,6 +53,7 @@ public class GlobalExceptionFilter : IAsyncExceptionFilter
         else
         {
             response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            response.Value = exception.Message;
         }
 
         return response;

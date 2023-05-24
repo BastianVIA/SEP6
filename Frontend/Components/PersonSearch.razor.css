@@ -22,3 +22,8 @@
 .page-number p{
     text-align: center;
 }
+
+* {
+    cursor: pointer;
+}
+
