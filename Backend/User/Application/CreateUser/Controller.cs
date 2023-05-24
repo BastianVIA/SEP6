@@ -28,7 +28,7 @@ public class Controller : ControllerBase
     /// <returns></returns>
     /// <remarks>This method requires authorization. Make sure to provide authorization when calling this method.</remarks>
     [HttpPost]
-    [Tags("UserApi")]
+    [Tags("User")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Authorize]
     public IActionResult Post([FromBody] CreateUserRequest request)

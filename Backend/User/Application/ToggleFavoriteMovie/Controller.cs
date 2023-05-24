@@ -34,7 +34,7 @@ public class Controller : ControllerBase
     /// </remarks>
     [HttpPut]
     [Route("favorite/{movieId}")]
-    [Tags("UserApi")]
+    [Tags("User")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize]
