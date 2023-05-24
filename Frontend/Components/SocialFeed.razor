@@ -22,7 +22,7 @@
 
     @if (userFeedsLoaded)
     {
-        @if (feedPosts.Count >= 1)
+        @if (FeedPosts.Count >= 1)
         {
             foreach (var post in posts)
             {
@@ -109,7 +109,8 @@
 </Modal>
 
 @code {
-    private List<UserFeed> feedPosts;
+    [Parameter]
+    public List<UserFeed> FeedPosts { get; set; }
     private List<Post> posts = new List<Post>();
     private bool userFeedsLoaded = false;
     private int pageNumber = 1;
@@ -133,9 +134,9 @@
 
     private async Task LoadUserInfo()
     {
-        feedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue, pageNumber);
+        //FeedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue, pageNumber);
         posts.Clear();
-        foreach (var userFeed in feedPosts)
+        foreach (var userFeed in FeedPosts)
         {
             string postText = GetTextBasedOnTopic(userFeed);
             var imageDataURL = await GetProfilePicture(userFeed.UserId);
