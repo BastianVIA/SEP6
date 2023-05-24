@@ -186,16 +186,16 @@
                 textToReturn = $"{userFeed.DisplayName} just rated {userFeed.ActivityData.MovieTitle} {userFeed.ActivityData.NewRating}⭐";
                 break;
             case FeedPostDtoTopic.UpdatedRating:
-                textToReturn = "";
+                textToReturn = $"{userFeed.DisplayName} just updated their rating on {userFeed.ActivityData.MovieTitle} from {userFeed.ActivityData.OldRating}⭐ to {userFeed.ActivityData.NewRating}⭐";;
                 break;
             case FeedPostDtoTopic.RemovedRating:
-                textToReturn = "";
+                textToReturn = $"{userFeed.DisplayName} just removed their rating from {userFeed.ActivityData.MovieTitle}";
                 break;
             case FeedPostDtoTopic.NewUser:
                 textToReturn = $"{userFeed.DisplayName} created their account";
                 break;
             case FeedPostDtoTopic.UnFavoriteMovie:
-                textToReturn = "";
+                textToReturn = $"{userFeed.DisplayName} just removed {userFeed.ActivityData.MovieTitle} from their favorite movies";
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(userFeed.Topic), userFeed.Topic, null);
@@ -291,7 +291,7 @@
 
     private void OnUserClick(string userId)
     {
-        NavManager.NavigateTo($"/UserProfile2/{userId}");
+        NavManager.NavigateTo($"/UserProfile/{userId}");
     }
 
 }
