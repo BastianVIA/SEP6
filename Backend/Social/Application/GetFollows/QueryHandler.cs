@@ -12,6 +12,7 @@ public record GetFollowingResponse(List<string>? FollowingUserDtos);
 public class GetFollowingUserDto
 {
     public string Id { get; set; }
+    public string Displayname { get; set; }
 }
 
 public class QueryHandler : IRequestHandler<Query, GetFollowingResponse>
@@ -34,6 +35,7 @@ public class QueryHandler : IRequestHandler<Query, GetFollowingResponse>
 
     private GetFollowingResponse toDto(Domain.SocialUser user)
     {
+        
         return new GetFollowingResponse(user.Following);
     }
 }

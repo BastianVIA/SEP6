@@ -33,9 +33,7 @@ public class SocialUserRepository : ISocialUserRepository
             Id = user.Id
         });
     }
-
-
-
+    
     public async Task UpdateSocialUserAsync(SocialUser socialUser, DbTransaction tx)
     {
         tx.AddDomainEvents(socialUser.ReadAllDomainEvents());

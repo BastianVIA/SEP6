@@ -1,7 +1,8 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
-namespace Frontend.Service;
+namespace Frontend.Authentication;
 
 public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 {
@@ -9,7 +10,6 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
         return await Task.FromResult(new AuthenticationState(AnonymousUser));
     }
-    
     private ClaimsPrincipal AnonymousUser => new(new ClaimsIdentity(Array.Empty<Claim>()));
 
     private ClaimsPrincipal User
@@ -25,12 +25,12 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
         }
     }
     
-    public void SignIn() {
+    public async void SignIn() {
         var result = Task.FromResult(new AuthenticationState(User));
         NotifyAuthenticationStateChanged(result);
     }
     
-    public void SignOut() {
+    public async void SignOut() {
         var result = Task.FromResult(new AuthenticationState(AnonymousUser));
         NotifyAuthenticationStateChanged(result);
     }

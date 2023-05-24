@@ -7,4 +7,5 @@ public interface IUserProfileClient
     Task UpdateUserProfile(Entities.User user);
     public Task FollowUser(string userToken, string userId);
     public Task<ICollection<string>> IsFollowingUser(string userToken, string userId);
+    public Task<List<string>> GetFollowingUsers(string userToken, string ownUserId);
 }

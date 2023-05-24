@@ -36,6 +36,11 @@ public class UserProfilesModel: IUserProfilesModel
         return false;
     }
 
+    public async Task<List<string>> GetFollowingUserIds(string userToken, string ownUserId)
+    {
+        return await _client.GetFollowingUsers(userToken, ownUserId);
+    }
+
     public async Task<Entities.User> GetUserProfile(string userId)
     {
         var user = await _client.GetUserProfile(userId);

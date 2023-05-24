@@ -79,5 +79,12 @@ namespace Frontend.Network.UserProfiles
             var response = await _api.FollowsAsync(userId);
             return response.FollowingUserDtos;
         }
+
+        public async Task<List<string>> GetFollowingUsers(string userToken, string ownUserId)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+            var response = await _api.FollowsAsync(ownUserId);
+            return response.FollowingUserDtos as List<string>;
+        }
     }
 }

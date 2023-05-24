@@ -12,7 +12,7 @@ public class User
     
     public List<UserRating> UserRatings { get; set; }
     
-    public byte[]? ProfilePicture { get; set;}
+    public string? ProfilePicture { get; set;}
     public List<Movie> FavoriteMovies { get; set; }
     
     public int RatedMovies { get; set; }
