@@ -39,7 +39,7 @@ public class GlobalExceptionFilter : IAsyncExceptionFilter
         else if (exception is KeyNotFoundException)
         {
             response.StatusCode = (int)HttpStatusCode.NotFound;
-            response.Value = "The requested resource was not found.";
+            response.Value = exception.Message;
         }
         else if (exception is UnauthorizedAccessException)
         {
@@ -59,6 +59,7 @@ public class GlobalExceptionFilter : IAsyncExceptionFilter
         else
         {
             response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            response.Value = exception.Message;
         }
 
         return response;
