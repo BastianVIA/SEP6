@@ -8,7 +8,7 @@ public class PersonDetailClient : NSwagBaseClient, IPersonDetailClient
   
     public async Task<Person> GetPersonDetail(string personId)
     {
-        var response = await _api.DetailsAsync(personId);
+        var response = await _api.PersonAsync(personId);
         var actedMovies = response.ActedMovies?.Select(movie => new Movie
         {
             Id = movie.MovieId,

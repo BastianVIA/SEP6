@@ -53,6 +53,11 @@ namespace Frontend.Service
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Search for movie on the movies title
+        /// </summary>
+        /// <param name="pageNumber">The number of movies per. page can be set in the
+        /// <br/>            configuration with "MoviesPerPage"</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<MovieSearchResponse> SearchAsync(string title, MovieSortingKey? movieSortingKey = null, SortingDirection? sortingDirection = null, int? pageNumber = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -224,6 +229,9 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Get the recommended movies. The recommendation is based on the movies rating
+        /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<MovieRecommendationsResponse> RecommendationsAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -291,6 +299,10 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Gets the details of a movie
+        /// </summary>
+        /// <param name="id">Internal Id of movie, Id is the same as it is on IMDB</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<MovieDetailsResponse> MovieAsync(string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -372,6 +384,11 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Searching for person on their name
+        /// </summary>
+        /// <param name="pageNumber">The number of movies per. page can be set in the
+        /// <br/>            configuration with "PeoplePerPage"</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<PersonSearchResponse> Search2Async(string name, int? pageNumber = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -458,17 +475,19 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Gets details of person based on Id
+        /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<GetPersonDetailsResponse> DetailsAsync(string personId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<GetPersonDetailsResponse> PersonAsync(string id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
-            if (personId == null)
-                throw new System.ArgumentNullException("personId");
+            if (id == null)
+                throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/person/details?");
-            urlBuilder_.Append(System.Uri.EscapeDataString("personId") + "=").Append(System.Uri.EscapeDataString(ConvertToString(personId, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            urlBuilder_.Length--;
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/person/{Id}");
+            urlBuilder_.Replace("{Id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -540,6 +559,10 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Gets the Id of all users the specified user follows
+        /// </summary>
+        /// <param name="userId">Id to specify user</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<GetFollowingResponse> FollowsAsync(string userId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -615,7 +638,9 @@ namespace Frontend.Service
         /// Retrieves the social feed for a user.
         /// </summary>
         /// <remarks>
-        /// The data optionally includes an "ActivityDataDto", and the fields filled out in this dto depend on the topic:
+        /// This method requires authorization. Make sure to provide authorization when calling this method.
+        /// <br/>
+        /// <br/>The data optionally includes an "ActivityDataDto", and the fields filled out in this dto depend on the topic:
         /// <br/>- FavoriteMovie: No ActivityDataDto provided.
         /// <br/>- CreatedRating: ActivityDataDto provided with "MovieId" and "NewRating" fields.
         /// <br/>- UpdatedRating: ActivityDataDto provided with "MovieId", "NewRating", and "OldRating" fields.
@@ -696,12 +721,22 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Follow another user
+        /// </summary>
+        /// <remarks>
+        /// This method requires authorization. Make sure to provide authorization when calling this method.
+        /// </remarks>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task FollowUserAsync(string body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task FollowUserAsync(string userIdToFollow, string body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
+            if (userIdToFollow == null)
+                throw new System.ArgumentNullException("userIdToFollow");
+
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Social/followUser");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Social/followUser/{userIdToFollow}");
+            urlBuilder_.Replace("{userIdToFollow}", System.Uri.EscapeDataString(ConvertToString(userIdToFollow, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -781,6 +816,13 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// React to post
+        /// </summary>
+        /// <remarks>
+        /// This method requires authorization. Make sure to provide authorization when calling this method.
+        /// </remarks>
+        /// <param name="body">Reaction</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ReactToPostAsync(ReactToPostRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -866,6 +908,13 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Leave a comment of the post
+        /// </summary>
+        /// <remarks>
+        /// This method requires authorization. Make sure to provide authorization when calling this method.
+        /// </remarks>
+        /// <param name="body">Comment to post</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task CommentOnPostAsync(CommentOnPostRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -951,6 +1000,10 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Gets details of the specified user
+        /// </summary>
+        /// <param name="userId">Id to specify user</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<UserProfileResponse> UserGETAsync(string userId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -1028,6 +1081,15 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Toggles the users favorite status of the given movie.
+        /// </summary>
+        /// <remarks>
+        /// This method requires authorization. Make sure to provide authorization when calling this method. 
+        /// <br/>            
+        /// <br/>            If the user has the movie on their favorite list they will no longer after this is called.
+        /// <br/>            If they do not have the movie on their favorite list it will be added
+        /// </remarks>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task FavoritePUTAsync(string movieId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -1104,6 +1166,13 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Specifies what image to use for a user.
+        /// <br/>After this the image can be retrieved using the "/userImage/{userId} endpoint
+        /// </summary>
+        /// <remarks>
+        /// This method requires authorization. Make sure to provide authorization when calling this method.
+        /// </remarks>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task UserImagePUTAsync(SetUserImageRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -1175,6 +1244,10 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Searching for users on their name
+        /// </summary>
+        /// <param name="pageNumber">The number of movies per. page can be set in the configuration with "UsersPerPage"</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<UserSearchResponse> Search3Async(string displayName, UserSortingKey? userSortingKey = null, SortingDirection2? sortingDirection = null, int? pageNumber = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -1269,6 +1342,12 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Update the users rating of the movie.
+        /// </summary>
+        /// <remarks>
+        /// This method requires authorization. Make sure to provide authorization when calling this method.
+        /// </remarks>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task RateMovieAsync(SetRatingRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -1354,6 +1433,14 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Get image for specified user.
+        /// </summary>
+        /// <remarks>
+        /// A "UserImageDto" will be returned, it will contain either 
+        /// <br/>a picture if specified, or if the user has not yet specified a picture it will contain null.
+        /// </remarks>
+        /// <param name="userId">Id to specify user</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<UserImageResponse> UserImageGETAsync(string userId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -1431,6 +1518,10 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Get the specified users favorite movies
+        /// </summary>
+        /// <param name="userId">Id to specify user</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<FavoriteMovesResponse> FavoriteGETAsync(string userId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -1512,6 +1603,13 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Create new user for system.
+        /// <br/>The user must have been created in Firebase before calling this, and the token must match the user from firebase
+        /// </summary>
+        /// <remarks>
+        /// This method requires authorization. Make sure to provide authorization when calling this method.
+        /// </remarks>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task UserPOSTAsync(CreateUserRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -1577,6 +1675,13 @@ namespace Frontend.Service
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Post review of movie
+        /// </summary>
+        /// <remarks>
+        /// This method requires authorization. Make sure to provide authorization when calling this method.
+        /// </remarks>
+        /// <param name="body">Review to post</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task ReviewAsync(CreateReviewRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
@@ -1928,8 +2033,19 @@ namespace Frontend.Service
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v11.0.0.0))")]
     public partial class GetFollowingResponse
     {
-        [Newtonsoft.Json.JsonProperty("followingUserDtos", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<string> FollowingUserDtos { get; set; }
+        [Newtonsoft.Json.JsonProperty("followingUserDtos", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<GetFollowingUserDto> FollowingUserDtos { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v11.0.0.0))")]
+    public partial class GetFollowingUserDto
+    {
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Id { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("displayName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string DisplayName { get; set; }
 
     }
 
