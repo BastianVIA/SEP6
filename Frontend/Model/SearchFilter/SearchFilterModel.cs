@@ -6,9 +6,9 @@ public class SearchFilterModel : ISearchFilterModel
 {
     private ISearchFilterClient _client;
 
-    public SearchFilterModel()
+    public SearchFilterModel(ISearchFilterClient client)
     {
-        _client = new SearchFilterClient();
+        _client = client;
     }
 
     public async Task<Entities.SearchFilter> GetSearchFilter(string searchTerm)

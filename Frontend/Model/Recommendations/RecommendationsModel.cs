@@ -4,13 +4,13 @@ using Frontend.Network.Recommendations;
 
 namespace Frontend.Model.Recommendations;
 
-public class RecommendationsModel : NSwagBaseClient, IRecommendationsModel
+public class RecommendationsModel : IRecommendationsModel
 {
     private IRecommendationsClient _client;
     
-    public RecommendationsModel()
+    public RecommendationsModel(IRecommendationsClient client)
     {
-        _client = new RecommendationsClient();
+        _client = client;
     }
     
     public async Task<List<Movie>> GetRecommendations()

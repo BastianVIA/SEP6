@@ -5,12 +5,13 @@ using Frontend.Service;
 
 namespace Frontend.Model.MovieSearch
 {
-    public class MovieSearchModel : NSwagBaseClient, IMovieSearchModel
+    public class MovieSearchModel : IMovieSearchModel
     {
             private IMovieSearchClient _client;
-            public MovieSearchModel()
+            
+            public MovieSearchModel(IMovieSearchClient client)
             {
-                _client = new MovieSearchClient();
+                _client = client;
             }
 
             public async Task<List<Movie>> SearchForMovieAsync(string title, MovieSortingKey? movieSortingKey = null, SortingDirection? sortingDirection = null, int? pageNumber = null)

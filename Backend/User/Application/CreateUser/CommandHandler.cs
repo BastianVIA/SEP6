@@ -12,7 +12,7 @@ public class CommandHandler : IRequestHandler<Command>
     private readonly IUserRepository _repository;
     private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
    
-    public CommandHandler(IUserRepository userRepository, IMediator mediator, IDatabaseTransactionFactory databaseTransactionFactory)
+    public CommandHandler(IUserRepository userRepository , IDatabaseTransactionFactory databaseTransactionFactory)
     {
         _repository = userRepository;
         _databaseTransactionFactory = databaseTransactionFactory;

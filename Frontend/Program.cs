@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Frontend.Service;
+
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
 using Blazorise;
@@ -17,11 +21,44 @@ using Frontend.Model.User;
 using Frontend.Model.UserProfilePicture;
 using Frontend.Model.UserProfiles;
 using Frontend.Model.UserSearch;
+using Frontend.Network.FavoriteMovies;
+using Frontend.Network.Firebase;
+using Frontend.Network.MovieDetail;
+using Frontend.Network.MovieSearch;
+using Frontend.Network.PersonDetail;
+using Frontend.Network.PersonSearch;
+using Frontend.Network.Recommendations;
+using Frontend.Network.SearchFilter;
+using Frontend.Network.SocialFeed;
+using Frontend.Network.Top100;
+using Frontend.Network.User;
+using Frontend.Network.UserProfilePicture;
+using Frontend.Network.UserProfiles;
+using Frontend.Network.UserSearch;
 using Frontend.Service;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Specify URLs your application will listen on
+builder.WebHost.UseUrls("http://localhost:5233");
+
+builder.Services.AddScoped<IMovieSearchClient, MovieSearchClient>();
+builder.Services.AddScoped<IMovieDetailClient, MovieDetailClient>();
+builder.Services.AddScoped<IFirebaseClient, FirebaseClient>();
+builder.Services.AddScoped<IFavoriteMoviesClient, FavoriteMoviesClient>();
+builder.Services.AddScoped<IUserClient, UserClient>();
+builder.Services.AddScoped<IPersonSearchClient, PersonSearchClient>();
+builder.Services.AddScoped<IUserProfileClient, UserProfileClient>();
+builder.Services.AddScoped<IRecommendationsClient, RecommendationsClient>();
+builder.Services.AddScoped<IPersonDetailClient, PersonDetailClient>();
+builder.Services.AddScoped<ISocialFeedClient, SocialFeedClient>();
+builder.Services.AddScoped<ITop100Client, Top100Client>();
+builder.Services.AddScoped<IUserProfilePictureClient, UserProfilePictureClient>();
+builder.Services.AddScoped<IUserSearchClient, UserSearchClient>();
+builder.Services.AddScoped<ISearchFilterClient, SearchFilterClient>();
+
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -48,6 +85,16 @@ builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
 builder.Services.AddAuthorizationCore();
 
+
+
+var configuration = builder.Configuration;
+var backendApiUrl = configuration.GetValue<string>("BackendApiUrl");
+
+builder.Services.AddHttpClient("BackendApi", client => 
+{
+    client.BaseAddress = new Uri(backendApiUrl);
+});
+
 builder.Services
     .AddBlazorise( options =>
     {
@@ -55,6 +102,9 @@ builder.Services
     } )
     .AddBootstrapProviders()
     .AddFontAwesomeIcons();
+
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
@@ -75,4 +125,3 @@ app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
 app.Run();
-

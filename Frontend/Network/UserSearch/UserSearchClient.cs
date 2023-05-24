@@ -23,4 +23,8 @@ public class UserSearchClient : NSwagBaseClient, IUserSearchClient
 
         return users;
     }
+
+    public UserSearchClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    {
+    }
 }
