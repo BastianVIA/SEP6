@@ -25,6 +25,7 @@
 
     <ItemGroup>
       <Compile Remove="Data\**" />
+      <Compile Remove="Authentication\UserSession.cs" />
     </ItemGroup>
 
     <ItemGroup>

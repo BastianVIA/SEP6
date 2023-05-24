@@ -47,4 +47,6 @@ public class UserModel : NSwagBaseClient, IUserModel, IAlertNotifier
             Message = message
         });
     }
+    
+    
 }
