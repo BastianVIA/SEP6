@@ -9,7 +9,7 @@ public record Query
 (string userName, UserSortingKey UserSortingKey, SortingDirection sortingDirection,
     int pageNumber) : IRequest<UserSearchResponse>;
 
-public record UserSearchResponse(List<UserDto> UserDtos, int NumberOfPagesAvailable);
+public record UserSearchResponse(List<UserDto> UserDtos);
 
 public class UserDto
 {
@@ -18,10 +18,10 @@ public class UserDto
     public int RatedMovie { get; set; }
 }
 
-public class QueryHandler : IRequestHandler<Query, UserSearchResponse>
-{
-    private readonly IUserRepository _repository;
-    private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
+    public class QueryHandler : IRequestHandler<Query, UserSearchResponse>
+    {
+        private readonly IUserRepository _repository;
+        private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
 
     public QueryHandler(IUserRepository repository,
         IDatabaseTransactionFactory databaseTransactionFactory)
@@ -52,6 +52,6 @@ public class QueryHandler : IRequestHandler<Query, UserSearchResponse>
             userToDto.Add(userToAdd);
         }
 
-        return new UserSearchResponse(userToDto, searchResponse.NumberOfPages);
+        return new UserSearchResponse(userToDto);
     }
 }

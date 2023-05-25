@@ -11,7 +11,7 @@ public class CommandHandler : IRequestHandler<Command>
     private readonly IUserRepository _repository;
     private readonly IDatabaseTransactionFactory _transactionFactory;
    
-    public CommandHandler(IUserRepository userRepository, IMediator mediator, IDatabaseTransactionFactory transactionFactory)
+    public CommandHandler(IUserRepository userRepository, IDatabaseTransactionFactory transactionFactory)
     {
         _repository = userRepository;
         _transactionFactory = transactionFactory;

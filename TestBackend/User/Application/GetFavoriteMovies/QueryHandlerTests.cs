@@ -1,7 +1,6 @@
 ﻿using AutoFixture;
 using Backend.Database.Transaction;
 using Backend.Database.TransactionManager;
-using Backend.Movie.Application.GetInfoFromMovies;
 using Backend.Movie.Application.GetMovieInfo;
 using Backend.User.Domain;
 using Backend.User.Infrastructure;
@@ -12,7 +11,7 @@ using QueryHandler = Backend.User.Application.GetFavoriteMovies.QueryHandler;
 
 namespace TestBackend.User.Application.GetFavoriteMovies;
 
-public class QueryHandlerTest
+public class QueryHandlerTests
 {
     private readonly QueryHandler _handler;
     private readonly IUserRepository _userRepository = Substitute.For<IUserRepository>();
@@ -20,7 +19,7 @@ public class QueryHandlerTest
     private readonly IDatabaseTransactionFactory _transactionFactory = Substitute.For<IDatabaseTransactionFactory>();
     private readonly Fixture _fixture = new();
 
-    public QueryHandlerTest()
+    public QueryHandlerTests()
     {
         _handler = new QueryHandler(_userRepository, _mediator, _transactionFactory);
     }

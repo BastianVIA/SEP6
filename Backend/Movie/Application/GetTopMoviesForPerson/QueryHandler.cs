@@ -1,4 +1,5 @@
-﻿using Backend.Database.TransactionManager;
+﻿using System.Diagnostics;
+using Backend.Database.TransactionManager;
 using Backend.Movie.Infrastructure;
 using Backend.Service;
 using MediatR;

@@ -1,4 +1,5 @@
-﻿using Backend.Database.TransactionManager;
+﻿using System.ComponentModel.DataAnnotations;
+using Backend.Database.TransactionManager;
 using Backend.User.Infrastructure;
 using MediatR;
 
@@ -11,7 +12,7 @@ public class CommandHandler : IRequestHandler<Command>
     private readonly IUserRepository _repository;
     private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
    
-    public CommandHandler(IUserRepository userRepository , IDatabaseTransactionFactory databaseTransactionFactory)
+    public CommandHandler(IUserRepository userRepository, IDatabaseTransactionFactory databaseTransactionFactory)
     {
         _repository = userRepository;
         _databaseTransactionFactory = databaseTransactionFactory;
