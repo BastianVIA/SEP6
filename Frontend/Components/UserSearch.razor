@@ -127,7 +127,7 @@
         NavManager.NavigateTo($"UserProfile/{userId}");
     }
 
-    private async void GoToPreviousPage()
+    private async Task GoToPreviousPage()
     {
         if (pageNumber <= 1)
         {
@@ -137,7 +137,7 @@
         await SearchForUser();
     }
 
-    private async void GoToNextPage()
+    private async Task GoToNextPage()
     {
         if (userList.Count < usersPerPage)
         {
