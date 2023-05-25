@@ -5,6 +5,6 @@ namespace Frontend.Network.MovieSearch;
 
 public interface IMovieSearchClient
 {
-    public Task<(int NumberOfPages, List<Movie> MovieList)> SearchForMovieAsync(string title, MovieSortingKey? movieSortingKey = null,
+    public Task<List<Movie>> SearchForMovieAsync(string title, MovieSortingKey? movieSortingKey = null,
         SortingDirection? sortingDirection = null, int? pageNumber = null);
 }

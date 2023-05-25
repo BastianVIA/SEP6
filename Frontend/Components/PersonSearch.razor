@@ -41,7 +41,7 @@
                 <Icon Name="@IconName.AngleLeft"/>
             </button>
             <div class="page-number">
-                <p>Page @pageNumber / @numberOfPagesSearchResult</p>
+                <p>Page @pageNumber</p>
             </div>
             <button class="btn btn-secondary" @onclick="@GoToNextPage">
                 <Icon Name="@IconName.AngleRight"/>
@@ -66,7 +66,6 @@ else
     
     private bool isDataFetched = false;
     private int peoplePerPage = 20;
-    private int numberOfPagesSearchResult;
     private bool isConnected;
 
     protected override async Task OnParametersSetAsync()
@@ -79,9 +78,7 @@ else
     {
         isDataFetched = false;
         personList.Clear();
-        var result = await PersonSearchModel.SearchForPersonAsync(PersonName, pageNumber);
-        personList = result.PersonList;
-        numberOfPagesSearchResult = result.NumberOfPage;
+        personList = await PersonSearchModel.SearchForPersonAsync(PersonName, pageNumber);
         isDataFetched = true;
     }
 

@@ -5,7 +5,7 @@ namespace Backend.Movie.Infrastructure;
 
 public interface IMovieRepository
 {
-    Task<(List<Domain.Movie> Movies, int NumberOfPages)> SearchForMovieAsync(string title, MovieSortingKey movieSortingKey,
+    Task<List<Domain.Movie>> SearchForMovieAsync(string title, MovieSortingKey movieSortingKey,
         SortingDirection sortingDirection, int requestPageNumber, DbReadOnlyTransaction tx);
 
     Task<Domain.Movie> ReadMovieFromIdAsync(string id, DbReadOnlyTransaction tx, bool includeRatings = false,

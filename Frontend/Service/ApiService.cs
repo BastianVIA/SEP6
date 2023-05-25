@@ -2471,9 +2471,6 @@ namespace Frontend.Service
         [Newtonsoft.Json.JsonProperty("movieDtos", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<MovieDto> MovieDtos { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("numberOfPagesAvailable", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int NumberOfPagesAvailable { get; set; }
-
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -2565,9 +2562,6 @@ namespace Frontend.Service
     {
         [Newtonsoft.Json.JsonProperty("personDtos", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<PersonDto> PersonDtos { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("numberOfPagesAvailable", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int NumberOfPagesAvailable { get; set; }
 
     }
 
@@ -2728,9 +2722,6 @@ namespace Frontend.Service
     {
         [Newtonsoft.Json.JsonProperty("userDtos", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<UserDto> UserDtos { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("numberOfPagesAvailable", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int NumberOfPagesAvailable { get; set; }
 
     }
 

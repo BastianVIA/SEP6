@@ -4,5 +4,5 @@ namespace Frontend.Network.PersonSearch;
 
 public interface IPersonSearchClient
 {
-    public Task<(int NumberOfPage, List<Person> PersonList)> SearchForPersonAsync(string name, int? pageNumber = null);
+    public Task<List<Person>> SearchForPersonAsync(string name, int? pageNumber = null);
 }

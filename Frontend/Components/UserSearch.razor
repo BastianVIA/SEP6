@@ -59,7 +59,7 @@
                 <Icon Name="@IconName.AngleLeft"/>
             </button>
             <div class="page-number">
-                <p>Page @pageNumber / @numberOfPagesSearchResult</p>
+                <p>Page @pageNumber </p>
             </div>
             <button class="btn btn-secondary" @onclick="@GoToNextPage">
                 <Icon Name="@IconName.AngleRight"/>
@@ -85,7 +85,6 @@ else
     private int pageNumber { get; set; }
     private int usersPerPage = 10;
     private UserSortingKey? userSortingKey;
-    private int numberOfPagesSearchResult;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -105,9 +104,7 @@ else
         {
             sortingDirection = displayNameSortingDirection;
         }
-        var result = await UserSearchModel.SearchForUserAsync(DisplayName, userSortingKey, sortingDirection, pageNumber);
-        userList = result.UserList;
-        numberOfPagesSearchResult = result.NumberOfPages;
+       userList = await UserSearchModel.SearchForUserAsync(DisplayName, userSortingKey, sortingDirection, pageNumber);
         isDataFetched = true;
     }
    

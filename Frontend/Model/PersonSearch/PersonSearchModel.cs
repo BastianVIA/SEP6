@@ -13,7 +13,7 @@ public class PersonSearchModel : IPersonSearchModel
         _client = client;
     }
     
-    public async Task<(int NumberOfPage, List<Entities.Person> PersonList)> SearchForPersonAsync(string name, int? pageNumber = null)
+    public async Task<List<Entities.Person>> SearchForPersonAsync(string name, int? pageNumber = null)
     {
         return await _client.SearchForPersonAsync(name, pageNumber);
     }
