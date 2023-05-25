@@ -78,13 +78,13 @@
 trigger:
   branches:
     include:
-      - '*'
+      - main
 
 pool:
   vmImage: 'windows-latest'
 
 stages:
-  - stage: BuildTestPackage
+  - stage: BuildReleasePackage
     displayName: Build, package
     jobs:
       - job: BuildDevVersionsJob
@@ -102,3 +102,5 @@ stages:
               artifactName: 'BuildPackages'
               artifactType: 'pipeline'
 
+          - script: dotnet ef database update --connection "Server=tcp:farligtigermovies.database.windows.net,1433;Initial Catalog=movies;Persist Security Info=False;User ID=serverAdmin;Password=Hejhej123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+            displayName: 'Update database'
