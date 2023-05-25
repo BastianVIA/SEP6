@@ -40,10 +40,11 @@ public class CommandHandlerTests
     public async Task Handle_ShouldAddReactionToCorrectPost_WhenCommandValid()
     {
         // Arrange
-        var command = _fixture.Create<Command>();
-        var post = _fixture.Build<Post>()
-            .With(p => p.Id, new Guid(command.PostId))
+        var command = _fixture.Build<Command>()
+            .With(c => c.PostId, new Guid().ToString)
             .Create();
+
+        var post = Substitute.For<Post>();
 
         _repository.ReadPostFromIdAsync(command.PostId, Arg.Any<DbTransaction>(), includeReactions: true)
             .Returns(post);
@@ -61,11 +62,13 @@ public class CommandHandlerTests
         var command = _fixture.Create<Command>();
         var post = _fixture.Create<Post>();
         
-        // Act
         _repository.ReadPostFromIdAsync(command.PostId, Arg.Any<DbTransaction>(), includeReactions: true)
             .Returns(post);
+        // Act
+        await _handler.Handle(command, CancellationToken.None);
         
         // Assert
-        await 
+        await _repository.Received(1)
+            .UpdateAsync(post, Arg.Any<DbTransaction>());
     }
 }

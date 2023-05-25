@@ -1,9 +1,6 @@
-﻿using System.Net.NetworkInformation;
-using AutoFixture;
+﻿using AutoFixture;
 using Backend.Database.Transaction;
 using Backend.Database.TransactionManager;
-using Backend.Movie.Application.GetDetails;
-using Backend.Movie.Domain;
 using Backend.Movie.Infrastructure;
 using Backend.People.Application.GetPeopleFromId;
 using Backend.People.Application.Search;

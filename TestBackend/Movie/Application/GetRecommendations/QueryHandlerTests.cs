@@ -10,7 +10,7 @@ using TestBackend.Util;
 
 namespace TestBackend.Movie.Application.GetRecommendations;
 
-public class QueryHandlerTest
+public class QueryHandlerTests
 {
     private QueryHandler _handler;
     private Fixture _fixture = new();
@@ -20,7 +20,7 @@ public class QueryHandlerTest
     private readonly IDatabaseTransactionFactory _transactionFactory = Substitute.For<IDatabaseTransactionFactory>();
 
     
-    public QueryHandlerTest()
+    public QueryHandlerTests()
     {
         _handler = new QueryHandler(GetConfig.GetTestConfig(),_repository, _imageService, _transactionFactory);
     }

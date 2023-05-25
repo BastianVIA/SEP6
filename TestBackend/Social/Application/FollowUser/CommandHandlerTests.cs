@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using Backend.Database.Transaction;
 using Backend.Database.TransactionManager;
+using Backend.Social.Application.FollowUser;
 using Backend.SocialFeed.Application.FollowUser;
 using Backend.SocialFeed.Domain;
 using Backend.SocialFeed.Infrastructure;
@@ -28,7 +29,7 @@ public class CommandHandlerTests
         var command = _fixture.Create<Command>();
         var user = _fixture.Create<SocialUser>();
 
-        _repository.ReadSocialUserAsync(command.userId, Arg.Any<DbReadOnlyTransaction>(), includeFollowing: true)
+        _repository.ReadSocialUserAsync(command.userId, Arg.Any<DbTransaction>(), includeFollowing: true)
             .Returns(user);
         // Act
 
@@ -47,13 +48,13 @@ public class CommandHandlerTests
             .With(su => su.Id, command.userId)
             .Create();
 
-        _repository.ReadSocialUserAsync(command.userId, Arg.Any<DbReadOnlyTransaction>(), includeFollowing: true)
+        _repository.ReadSocialUserAsync(command.userId, Arg.Any<DbTransaction>(), includeFollowing: true)
             .Returns(user);
         // Act
         await _handler.Handle(command, CancellationToken.None);
         // Assert
         await _repository.Received(1)
-            .ReadSocialUserAsync(command.userId, Arg.Any<DbReadOnlyTransaction>(), includeFollowing: true);
+            .ReadSocialUserAsync(command.userId, Arg.Any<DbTransaction>(), includeFollowing: true);
         await _repository.Received(1).UpdateSocialUserAsync(user, Arg.Any<DbTransaction>());
 
     }

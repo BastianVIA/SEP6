@@ -28,10 +28,4 @@
       <ProjectReference Include="..\Backend\Backend.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="User\Application\CreateUser" />
-      <Folder Include="User\Application\RemoveMovieFromFavorites" />
-      <Folder Include="User\Application\SetFavoriteMovie" />
-    </ItemGroup>
-
 </Project>

@@ -3,7 +3,7 @@ using Backend.User.Domain;
 
 namespace TestBackend.User.Domain;
 
-public class UserRatingTest
+public class UserRatingTests
 {
     [Fact]
     public void UserRating_Constructor_DoesNotThrowWithValidData()

@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Backend.Database.TransactionManager;
+﻿using Backend.Database.TransactionManager;
 using Backend.SocialFeed.Infrastructure;
 using MediatR;
 
-namespace Backend.SocialFeed.Application.FollowUser;
+namespace Backend.Social.Application.FollowUser;
 
 
 public record Command(string userId, string userIdToFollow) : IRequest;
