@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -12,6 +14,7 @@ using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
+using Nuke.Common.Tools.MSBuild;
 using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
@@ -19,6 +22,9 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Git.GitTasks;
 using static Nuke.Common.IO.FileSystemTasks;
 using Nuke.Common.Tools.Xunit;
+using Nuke.Common.Tools.ReportGenerator;
+using static Nuke.Common.IO.FileSystemTasks;
+using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 
 
@@ -33,16 +39,17 @@ class Build : NukeBuild
 
     [Solution] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
-    
+    [PathExecutable] readonly Tool ReportGenerator;
+
     
     [Parameter("The build id used as the 4. number in the .Net version number")] 
     readonly int BuildId = 0;
     Version Version => new Version(1,0 , 0, BuildId);
     
     Target CiBuild => _ => _
-        .DependsOn(Clean, Restore, Compile,PublishBackend,ZipBackend,PublishFrontend,ZipFrontend,CleanPublishFolder);
+        .DependsOn(Clean, Restore, Compile,Test,ZipBackend,PublishFrontend,ZipFrontend,CleanPublishFolder);
     Target LocalBuild => _ => _
-        .DependsOn(Clean, Restore, Compile,VerifyOutput,PublishBackend,PublishFrontend,ZipBackend,ZipFrontend);
+        .DependsOn(Clean, Restore, Compile,Test,PublishBackend,PublishFrontend,ZipBackend,ZipFrontend);
     
     AbsolutePath OutputDirectory => RootDirectory / "output";
     AbsolutePath PublishDirectory => OutputDirectory / "Publish";
@@ -72,6 +79,8 @@ class Build : NukeBuild
         .Executes(() =>
         {
             DotNetRestore(s => s.SetProjectFile(Solution));
+            DotNetRestore(s => s.SetProjectFile(Solution.GetProject("TestBackend")));
+
         });
     
     
@@ -79,9 +88,8 @@ class Build : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
-            var projectsToCompile = Solution.AllProjects.Where(project => project.Name != "TestBackend");
 
-            // var projectsToCompile = Solution.AllProjects;
+            var projectsToCompile = Solution.AllProjects;
             foreach (var project in projectsToCompile)
             {
                 DotNetBuild(s => s
@@ -91,6 +99,7 @@ class Build : NukeBuild
             }
         });
     
+ 
     
     // Target Test => _ => _
     //     .DependsOn(Compile)
@@ -101,9 +110,30 @@ class Build : NukeBuild
     //         DotNetTest(_ => _
     //             .SetProjectFile(Solution.GetProject("TestBackend"))
     //             .SetConfiguration(Configuration)
+    //
     //             .EnableNoBuild());
     //     });
-    //
+
+
+    Target Test => _ => _
+        .DependsOn(Compile)
+        .After(Compile)
+        .Before(PublishBackend, PublishFrontend)
+        .Executes(() =>
+        {
+    
+            EnsureCleanDirectory(PublishDirectory);
+    
+            DotNetTest(_ => _
+                    .SetProjectFile(Solution.GetProject("TestBackend"))
+                    .SetConfiguration(Configuration)
+                    .EnableNoBuild()
+                    .SetProcessArgumentConfigurator(a => a.Add("--logger:trx")) // Set logger to trx for XML report
+                    .SetResultsDirectory(PublishDirectory) 
+            );
+        });
+    
+
     public void CreateInfoFile(Version version, GitRepository gitRepository, string versionInfoPath)
     {
         StringBuilder stringBuilder = new StringBuilder();
