@@ -42,6 +42,5 @@ public class Controller : ControllerBase
 
         await _mediator.Send(new Command(userid, userIdToFollow));
         return Ok();
-
     }
 }

@@ -89,9 +89,10 @@ public class UserRepository : IUserRepository
     {
         tx.AddDomainEvents(domainUser.ReadAllDomainEvents());
         var user = await tx.DataContext.Users
+            .Include(u => u.UserReviews)
             .Include(u => u.FavoriteMovies)
             .Include(u => u.UserRatings)
-            .SingleAsync(user => user.Id == domainUser.Id);
+            .FirstAsync(user => user.Id == domainUser.Id);
         
         
         if (domainUser.FavoriteMovies != null)

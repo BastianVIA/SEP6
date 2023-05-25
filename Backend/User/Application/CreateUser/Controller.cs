@@ -28,7 +28,7 @@ public class Controller : ControllerBase
     [Tags("User")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Authorize]
-    public IActionResult Post([FromBody] CreateUserRequest request)
+    public async Task<IActionResult> Post([FromBody] CreateUserRequest request)
     {
         try
         {
@@ -38,8 +38,8 @@ public class Controller : ControllerBase
                 return BadRequest("No token provided to create the user");
             }
             var command = new Command(userid, request.DisplayName, request.Email);
-            var result = _mediator.Send(command);
-            return Ok(result);
+            await _mediator.Send(command);
+            return Ok();
         }
         catch (Exception e)
         {

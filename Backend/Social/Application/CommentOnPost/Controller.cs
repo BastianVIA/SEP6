@@ -41,7 +41,6 @@ public class Controller : ControllerBase
 
         await _mediator.Send(new Command(request.PostId, userid, request.Comment));
         return Ok();
-
     }
     
     public class CommentOnPostRequest
