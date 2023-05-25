@@ -1,18 +1,16 @@
 ﻿@page "/SearchResult/{SearchText}"
 @using Frontend.Components
 @using Blazorise
-@using Frontend.Entities
-@using Frontend.Model.SearchFilter
-@inject ISearchFilterModel SearchFilterModel
+
 
 <Row>
     <Column ColumnSize="ColumnSize.Is2">
         <Div Margin="Margin.Is2.FromStart.Is2.FromBottom">
             <h4>Filter</h4>
             <RadioGroup Orientation="Orientation.Vertical" TValue="string" Name="searchType" CheckedValue="@checkedValue" Buttons CheckedValueChanged="@OnChange">
-                <Radio Value="@("movies")">Movies @searchFilter.numberOfMovies</Radio>
-                <Radio Value="@("users")">Users @searchFilter.numberOfUsers</Radio>
-                <Radio Value="@("persons")">Persons @searchFilter.numberOfPersons</Radio>
+                <Radio Value="@("movies")">Movies </Radio>
+                <Radio Value="@("users")">Users </Radio>
+                <Radio Value="@("persons")">Persons</Radio>
             </RadioGroup>
         </Div>
     </Column>
@@ -45,12 +43,6 @@
 
     private string checkedValue = "movies";
 
-    private SearchFilter searchFilter = new SearchFilter
-    {
-        numberOfPersons = 0,
-        numberOfUsers = 0,
-        numberOfMovies = 0
-    };
 
     private bool pageLoaded;
 
@@ -58,22 +50,5 @@
     {
         checkedValue = value;
     }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadFilter();
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await LoadFilter();
-    }
-
-    private async Task LoadFilter()
-    {
-        searchFilter = await SearchFilterModel.GetSearchFilter(SearchText);
-        pageLoaded = true;
-        StateHasChanged();
-    }
-
+    
 }
