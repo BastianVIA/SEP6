@@ -23,18 +23,10 @@ public class DataContext : DbContext
     {
         _configuration = configuration;
     }
-
-    // protected override void OnConfiguring(DbContextOptionsBuilder options)
-    // {
-    //     // connect to sqlite database
-    //     // options.UseSqlite(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
-    //     options.UseSqlServer(Configuration.GetConnectionString("WebApiDatabase"));
-    // }
     
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         options.UseSqlServer(_configuration.GetConnectionString("WebApiDatabase"));
-        Console.WriteLine(_configuration.GetConnectionString("WebApiDatabase"));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
