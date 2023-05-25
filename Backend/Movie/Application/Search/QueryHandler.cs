@@ -40,27 +40,23 @@ public class QueryHandler : IRequestHandler<Query, MovieSearchResponse>
     public async Task<MovieSearchResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var searchResponse = await _repository.SearchForMovieAsync(request.Title, request.sortingKey, request.sortingDirection,
-            request.pageNumber, transaction);
-        var moviesToDto = new List<MovieDto>();
-        foreach (var foundMovie in searchResponse)
+        var searchResponse = await _repository.SearchForMovieAsync(request.Title, request.sortingKey, request.sortingDirection, request.pageNumber, transaction);
+
+        var posterTasks = searchResponse.Select(async foundMovie =>
         {
-            var posterPath = _imageService.GetPathForPosterAsync(foundMovie.Id);
-            var movieToAdd = new MovieDto
+            var posterPath = await _imageService.GetPathForPosterAsync(foundMovie.Id);
+            return new MovieDto
             {
                 Id = foundMovie.Id,
                 Title = foundMovie.Title,
                 ReleaseYear = foundMovie.ReleaseYear,
-                PathToPoster = await posterPath
+                PathToPoster = posterPath,
+                Rating = foundMovie.Rating != null ? new RatingDto(foundMovie.Rating.AverageRating, foundMovie.Rating.Votes) : null
             };
-            if (foundMovie.Rating != null)
-            {
-                movieToAdd.Rating = new RatingDto(foundMovie.Rating.AverageRating, foundMovie.Rating.Votes);
-            }
+        });
 
-            moviesToDto.Add(movieToAdd);
-        }
-
-        return new MovieSearchResponse(moviesToDto);
+        var moviesToDto = await Task.WhenAll(posterTasks);
+        return new MovieSearchResponse(moviesToDto.ToList());
     }
+
 }
