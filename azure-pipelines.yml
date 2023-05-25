@@ -84,7 +84,7 @@ pool:
   vmImage: 'windows-latest'
 
 stages:
-  - stage: BuildReleasePackage
+  - stage: BuildTestPackage
     displayName: Build, package
     jobs:
       - job: BuildDevVersionsJob
@@ -101,6 +101,9 @@ stages:
               targetPath: 'output/'
               artifactName: 'BuildPackages'
               artifactType: 'pipeline'
+
+          - script: dotnet tool install --global dotnet-ef
+            displayName: 'Install Entity Framework Core Tools'
 
           - script: dotnet ef database update --connection "Server=tcp:farligtigermovies.database.windows.net,1433;Initial Catalog=movies;Persist Security Info=False;User ID=serverAdmin;Password=Hejhej123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
             displayName: 'Update database'
