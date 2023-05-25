@@ -28,7 +28,7 @@ public class QueryHandlerTests
             .With(q => q.userName, "AUserNameWhichDoesNotExistInTheSystem")
             .Create();
         var returnedPeople = new List<Backend.User.Domain.User>();
-        var expectedReturn = (returnedPeople, Arg.Any<int>());
+        var expectedReturn = returnedPeople;
 
         _repository.SearchForUserAsync(Arg.Any<string>(), Arg.Any<UserSortingKey>(), Arg.Any<SortingDirection>(),
             Arg.Any<int>(), Arg.Any<DbReadOnlyTransaction>())
@@ -50,7 +50,7 @@ public class QueryHandlerTests
             .With(u => u.DisplayName, $"NameWhichContains{query.userName}SearchTerm")
             .CreateMany()
             .ToList();
-        var expectedReturn = (returnedPeople, Arg.Any<int>());
+        var expectedReturn = returnedPeople;
         _repository.SearchForUserAsync(Arg.Any<string>(), Arg.Any<UserSortingKey>(), Arg.Any<SortingDirection>(),
                 Arg.Any<int>(), Arg.Any<DbReadOnlyTransaction>())
             .Returns(expectedReturn);

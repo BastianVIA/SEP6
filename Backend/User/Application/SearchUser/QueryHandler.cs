@@ -33,11 +33,11 @@ public class UserDto
     public async Task<UserSearchResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var searchResponse = await _repository.SearchForUserAsync(request.userName, request.UserSortingKey,
+        var users = await _repository.SearchForUserAsync(request.userName, request.UserSortingKey,
             request.sortingDirection,
             request.pageNumber, transaction);
         var userToDto = new List<UserDto>();
-        foreach (var foundUser in searchResponse.Users)
+        foreach (var foundUser in users)
         {
             var userToAdd = new UserDto
             {

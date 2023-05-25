@@ -23,7 +23,7 @@
                 <Icon Name="@IconName.AngleLeft"/>
             </button>
             <div class="page-number">
-                <p>Page @pageNumber / @numberOfPagesSearchResult</p>
+                <p>Page @pageNumber</p>
             </div>
             <button class="btn btn-secondary" @onclick="@GoToNextPage">
                 <Icon Name="@IconName.AngleRight"/>
@@ -56,7 +56,6 @@ else
     public string SearchTerm { get; set; } = string.Empty;
     private SortingDirection? ratingSortingDirection = SortingDirection.ASC;
     private SortingDirection? releaseYearSortingDirection = SortingDirection.ASC;
-    private int numberOfPagesSearchResult;
 
 
     
@@ -79,9 +78,7 @@ else
         {
             sortingDirection = releaseYearSortingDirection;
         }
-        var result = await MovieSearchModel.SearchForMovieAsync(movieTitle, sortingKey, sortingDirection, pageNumber);
-        movieList = result.MovieList;
-        numberOfPagesSearchResult = result.NumberOfPages;
+        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle, sortingKey, sortingDirection, pageNumber);
         isDataFetched = true;
     }
 
