@@ -67,7 +67,7 @@
                                                     <Column ColumnSize="ColumnSize.Is2" Margin="Margin.Is4.FromEnd">
                                                         <img @onclick="() => OnUserClick(comment.UserId)" src="@comment.ProfilePicture" alt="profile pic">
                                                     </Column>
-                                                    <Column ColumnSize="ColumnSize.Is3">
+                                                    <Column ColumnSize="ColumnSize.Is5">
                                                         <h4>@comment.DisplayNameOfUser</h4>
                                                         <p>@GetTimeSincePost(comment.TimeStamp)</p>
                                                     </Column>
@@ -123,6 +123,10 @@
     private Modal modalRef;
     private string postIdToCommentOn;
     private string commentToUpload;
+    [Parameter]
+    public bool isUserProfile { get; set; }
+    [Parameter]
+    public string UID { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -138,7 +142,7 @@
 
     private async Task LoadUserInfo()
     {
-    //FeedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue, pageNumber);
+        await LoadUserFeedsDependingOnPage();
         posts.Clear();
         foreach (var userFeed in FeedPosts)
         {
@@ -185,23 +189,23 @@
         switch (userFeed.Topic)
         {
             case FeedPostDtoTopic.FavoriteMovie:
-                textToReturn = $"{userFeed.DisplayName} just added {userFeed.ActivityData.MovieTitle} to their favorite movies";
+                textToReturn = $"{userFeed.DisplayName} just added {userFeed.ActivityData.MovieTitle} to favorite movies";
                 break;
             case FeedPostDtoTopic.CreatedRating:
                 textToReturn = $"{userFeed.DisplayName} just rated {userFeed.ActivityData.MovieTitle} {userFeed.ActivityData.NewRating}⭐";
                 break;
             case FeedPostDtoTopic.UpdatedRating:
-                textToReturn = $"{userFeed.DisplayName} just updated their rating on {userFeed.ActivityData.MovieTitle} from {userFeed.ActivityData.OldRating}⭐ to {userFeed.ActivityData.NewRating}⭐";
+                textToReturn = $"{userFeed.DisplayName} just updated the rating on {userFeed.ActivityData.MovieTitle} from {userFeed.ActivityData.OldRating}⭐ to {userFeed.ActivityData.NewRating}⭐";
                 ;
                 break;
             case FeedPostDtoTopic.RemovedRating:
-                textToReturn = $"{userFeed.DisplayName} just removed their rating from {userFeed.ActivityData.MovieTitle}";
+                textToReturn = $"{userFeed.DisplayName} just removed the rating from {userFeed.ActivityData.MovieTitle}";
                 break;
             case FeedPostDtoTopic.NewUser:
-                textToReturn = $"{userFeed.DisplayName} created their account";
+                textToReturn = $"{userFeed.DisplayName} created an account";
                 break;
             case FeedPostDtoTopic.UnFavoriteMovie:
-                textToReturn = $"{userFeed.DisplayName} just removed {userFeed.ActivityData.MovieTitle} from their favorite movies";
+                textToReturn = $"{userFeed.DisplayName} just removed {userFeed.ActivityData.MovieTitle} from favorite movies";
                 break;
             case FeedPostDtoTopic.CreatedReview:
                 textToReturn = $"{userFeed.DisplayName} added a review for {userFeed.ActivityData.MovieTitle} saying: '{userFeed.ActivityData.ReviewBody}'";
@@ -303,6 +307,18 @@
     private void OnUserClick(string userId)
     {
         NavManager.NavigateTo($"/UserProfile/{userId}");
+    }
+
+    private async Task LoadUserFeedsDependingOnPage()
+    {
+        if (isUserProfile)
+        {
+            FeedPosts = await SocialFeedModel.GetOwnSocialFeed(UID, pageNumber);
+        }
+        else
+        {
+            FeedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue, pageNumber);
+        }
     }
 
 }
