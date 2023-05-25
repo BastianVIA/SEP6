@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Backend.SocialFeed.Infrastructure;
+namespace Backend.Social.Infrastructure.Models;
 
 public class CommentDAO
 {

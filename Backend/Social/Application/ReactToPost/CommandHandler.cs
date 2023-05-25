@@ -1,6 +1,6 @@
 ﻿using Backend.Database.TransactionManager;
-using Backend.SocialFeed.Domain;
-using Backend.SocialFeed.Infrastructure;
+using Backend.Social.Domain;
+using Backend.Social.Infrastructure;
 using MediatR;
 
 namespace Backend.Social.Application.ReactToPost;

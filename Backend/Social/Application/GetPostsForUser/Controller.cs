@@ -1,5 +1,4 @@
-﻿using Backend.Middleware;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Social.Application.GetPostsForUser;

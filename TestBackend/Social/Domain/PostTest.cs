@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Backend.SocialFeed.Domain;
+using Backend.Social.Domain;
 
 namespace TestBackend.Social.Domain;
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Backend.SocialFeed.Domain;
+namespace Backend.Social.Domain;
 
 public class Comment
 {

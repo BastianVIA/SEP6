@@ -1,9 +1,9 @@
 ﻿using Backend.Database.TransactionManager;
-using Backend.SocialFeed.Application.GetFeedForUser;
-using Backend.SocialFeed.Infrastructure;
+using Backend.Social.Domain;
+using Backend.Social.Infrastructure;
 using MediatR;
 
-namespace Backend.SocialFeed.Application.GetFollowing;
+namespace Backend.Social.Application.GetFollows;
 
 public record Query(string userId) : IRequest<GetFollowingResponse>;
 
@@ -35,7 +35,7 @@ public class QueryHandler : IRequestHandler<Query, GetFollowingResponse>
         return await toDto(user);
     }
 
-    private async Task<GetFollowingResponse> toDto(Domain.SocialUser user)
+    private async Task<GetFollowingResponse> toDto(SocialUser user)
     {
         List<GetFollowingUserDto> followingUserDtos = new List<GetFollowingUserDto>();
         foreach (var id in user.Following)

@@ -1,8 +1,5 @@
-﻿using System.Diagnostics;
-using Backend.Middleware;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using NLog;
 
 namespace Backend.User.Application.GetFavoriteMovies;
 

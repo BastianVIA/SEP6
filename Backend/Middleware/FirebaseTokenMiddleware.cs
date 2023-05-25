@@ -1,4 +1,5 @@
 ﻿using FirebaseAdmin.Auth;
+using NLog;
 
 namespace Backend.Middleware;
 
@@ -27,7 +28,7 @@ public class FirebaseTokenMiddleware
         }
         catch (Exception e)
         {
-            NLog.LogManager.GetCurrentClassLogger().Error(e.StackTrace);
+            LogManager.GetCurrentClassLogger().Error(e.StackTrace);
             throw new UnauthorizedAccessException("Access denied");
         }
         

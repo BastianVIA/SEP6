@@ -1,9 +1,8 @@
-﻿using System.Diagnostics;
-using Backend.Database.Transaction;
+﻿using Backend.Database.Transaction;
 using Backend.Enum;
 using Backend.Movie.Domain;
+using Backend.Movie.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
-
 
 namespace Backend.Movie.Infrastructure;
 
@@ -255,21 +254,21 @@ public class MovieRepository : IMovieRepository
         };
     }
 
-    private Domain.Rating? ToDomain(RatingDAO? ratingDao)
+    private Rating? ToDomain(RatingDAO? ratingDao)
     {
         if (ratingDao == null)
         {
             return null;
         }
 
-        return new Domain.Rating
+        return new Rating
         {
             AverageRating = ratingDao.Rating,
             Votes = ratingDao.Votes
         };
     }
     
-    private RatingDAO FromDomain(Domain.Rating rating, string movieId)
+    private RatingDAO FromDomain(Rating rating, string movieId)
     {
         return new RatingDAO
         {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Backend.Middleware;
-using Backend.SocialFeed.Domain;
+using Backend.Social.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

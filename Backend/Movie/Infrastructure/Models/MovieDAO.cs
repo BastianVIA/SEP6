@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Backend.Movie.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.Movie.Infrastructure;
+namespace Backend.Movie.Infrastructure.Models;
 
 [Index(nameof(Id))]
 [Index(nameof(Title))]

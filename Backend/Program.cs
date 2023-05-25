@@ -4,22 +4,22 @@ using Backend.Middleware;
 using Backend.Movie.Infrastructure;
 using Backend.People.Infrastructure;
 using Backend.Service;
-using Backend.SocialFeed.Infrastructure;
+using Backend.Social.Infrastructure;
 using Backend.User.Infrastructure;
 using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Newtonsoft.Json.Converters;
 using FirebaseAdmin.Auth;
+using Google.Apis.Auth.OAuth2;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using NLog;
 using LogLevel = NLog.LogLevel;
 
@@ -39,7 +39,7 @@ builder.Services.AddScoped<ITrailerService, TMDBService>();
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.Converters.Add(new StringEnumConverter());
-    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 });
 
 builder.Services.AddCors(options =>
