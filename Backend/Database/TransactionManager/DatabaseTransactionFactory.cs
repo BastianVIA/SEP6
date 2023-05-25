@@ -18,6 +18,7 @@ public class DatabaseTransactionFactory : IDatabaseTransactionFactory
         _transactionSemaphore = transactionSemaphore;
         _mediator = mediator;
     }
+    
 
     public DbTransaction GetCurrentTransaction()
     {
