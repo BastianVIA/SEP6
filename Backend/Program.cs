@@ -120,6 +120,7 @@ builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
 
+
 var app = builder.Build();
 app.UseMiddleware<FirebaseTokenMiddleware>();
 
