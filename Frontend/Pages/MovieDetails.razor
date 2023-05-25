@@ -9,9 +9,9 @@
 @inject IFavoriteMoviesModel FavoriteMoviesModel
 @inject IFirebaseModel FirebaseModel
 @inject IUserModel UserModel
-@using Blazorise.LottieAnimation
 @using Frontend.Model.User
 @inject NavigationManager NavManager
+@using Frontend.Components
 
 
 @if (movieLoaded)
@@ -134,7 +134,7 @@
 }
 else
 {
-    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
+    <Loading/>
 }
 
 
