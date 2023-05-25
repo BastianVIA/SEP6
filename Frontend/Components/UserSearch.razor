@@ -4,7 +4,6 @@
 @inject NavigationManager NavManager
 @using Blazorise
 @using Frontend.Model.UserSearch
-@using Blazorise.LottieAnimation
 
 <PageTitle>Search User</PageTitle>
 
@@ -71,7 +70,7 @@ else
 {
     @if (isConnected)
     {
-        <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
+        <Loading/>
     }
 }
 

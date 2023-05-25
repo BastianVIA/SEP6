@@ -2,7 +2,6 @@
 @using Frontend.Entities
 @using Frontend.Service
 @inject NavigationManager NavManager
-@using Blazorise.LottieAnimation
 @using Blazorise
 @using Frontend.Model.PersonSearch
 @inject IPersonSearchModel PersonSearchModel
@@ -54,7 +53,7 @@ else
 {
     @if (isConnected)
     {
-        <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
+        <Loading/>
     }
 }
 
@@ -108,7 +107,6 @@ else
     private void OnPersonClick(string personId)
     {
         NavManager.NavigateTo($"/PersonDetails/{personId}");
-        return;
     }
     
     protected override void OnAfterRender(bool firstRender)

@@ -4,7 +4,6 @@
 @using Frontend.Model.Recommendations
 @inject NavigationManager NavManager
 @inject IRecommendationsModel RecommendationsModel
-@using Blazorise.LottieAnimation
 @using Frontend.Components
 @using Frontend.Model.Firebase
 @using Frontend.Model.SocialFeed
@@ -85,7 +84,7 @@
 
 else
 {
-    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
+    <Loading/>
 }
 @code {
 

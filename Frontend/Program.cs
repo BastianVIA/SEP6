@@ -85,8 +85,6 @@ builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
 builder.Services.AddAuthorizationCore();
 
-
-
 var configuration = builder.Configuration;
 var backendApiUrl = configuration.GetValue<string>("BackendApiUrl");
 
