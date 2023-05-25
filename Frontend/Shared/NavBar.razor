@@ -126,7 +126,7 @@
         searchUsers = isSearchUsers;
     }
     
-    private async void Logout()
+    private async Task Logout()
     {
         FirebaseModel.Logout();
         await AuthStateProvider.UpdateAuthenticationState(null);

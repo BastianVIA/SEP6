@@ -67,7 +67,7 @@ else
         await LoadFilter();
     }
 
-    protected override async void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         await LoadFilter();
     }
