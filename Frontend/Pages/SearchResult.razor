@@ -8,12 +8,14 @@
 <Row>
     <Column ColumnSize="ColumnSize.Is2">
         <Div Margin="Margin.Is2.FromStart.Is2.FromBottom">
-            <h4>Filter</h4>
-            <RadioGroup Orientation="Orientation.Vertical" TValue="string" Name="searchType" CheckedValue="@checkedValue" Buttons CheckedValueChanged="@OnChange">
-                <Radio Value="@("movies")">Movies @searchFilter.numberOfMovies</Radio>
-                <Radio Value="@("users")">Users @searchFilter.numberOfUsers</Radio>
-                <Radio Value="@("persons")">Persons @searchFilter.numberOfPersons</Radio>
-            </RadioGroup>
+            <h4 style="margin-left: 5px">Filter</h4>
+            <Div Width="Width.Is100">
+                <RadioGroup Flex="Flex.AlignItems.Stretch" Orientation="Orientation.Vertical" TValue="string" Name="searchType" CheckedValue="@checkedValue" Buttons CheckedValueChanged="@OnChange">
+                    <Radio Value="@("movies")"><b>Movies @searchFilter.numberOfMovies</b></Radio>
+                    <Radio Value="@("users")"><b>Users @searchFilter.numberOfUsers</b></Radio>
+                    <Radio Value="@("persons")"><b>Persons @searchFilter.numberOfPersons</b></Radio>
+                </RadioGroup>
+            </Div>
         </Div>
     </Column>
 
