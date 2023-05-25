@@ -1,8 +1,6 @@
-﻿using System.Diagnostics;
-using Backend.Database.Transaction;
+﻿using Backend.Database.Transaction;
 using Backend.People.Domain;
 using Backend.People.Infrastructure.Models;
-using Backend.Service;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.People.Infrastructure;
@@ -45,7 +43,7 @@ public class PeopleRepository : IPeopleRepository
         return ToDomain(result);
     }
 
-    public async Task<(List<Domain.Person> People, int NumberOfPages )> SearchForPersonAsync(string name, int requestPageNumber, DbReadOnlyTransaction tx)
+    public async Task<(List<Person> People, int NumberOfPages )> SearchForPersonAsync(string name, int requestPageNumber, DbReadOnlyTransaction tx)
     {
         var query = tx.DataContext.People.Where(p => EF.Functions.Like(p.Name, $"%{name}%"));
 
@@ -73,9 +71,9 @@ public class PeopleRepository : IPeopleRepository
         return await query.CountAsync();
     }
 
-    private List<Domain.Person> ToDomain(List<PeopleDAO> personDaos)
+    private List<Person> ToDomain(List<PeopleDAO> personDaos)
     {
-        var listOfDomainPersons = new List<Domain.Person>();
+        var listOfDomainPersons = new List<Person>();
         foreach (var personDao in personDaos)
         {
             listOfDomainPersons.Add(ToDomain(personDao));

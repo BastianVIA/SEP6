@@ -4,7 +4,6 @@ using Backend.User.Domain;
 using Backend.User.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace Backend.User.Infrastructure;
 
 public class UserRepository : IUserRepository

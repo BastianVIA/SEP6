@@ -1,5 +1,4 @@
 ﻿using Backend.Database.TransactionManager;
-using Backend.Movie.Application.GetInfoFromMovies;
 using Backend.Movie.Application.GetMovieInfo;
 using Backend.User.Infrastructure;
 using MediatR;

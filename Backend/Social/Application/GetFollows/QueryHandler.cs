@@ -1,4 +1,5 @@
 ﻿using Backend.Database.TransactionManager;
+using Backend.Social.Domain;
 using Backend.Social.Infrastructure;
 using MediatR;
 
@@ -34,7 +35,7 @@ public class QueryHandler : IRequestHandler<Query, GetFollowingResponse>
         return await toDto(user);
     }
 
-    private async Task<GetFollowingResponse> toDto(Domain.SocialUser user)
+    private async Task<GetFollowingResponse> toDto(SocialUser user)
     {
         List<GetFollowingUserDto> followingUserDtos = new List<GetFollowingUserDto>();
         foreach (var id in user.Following)

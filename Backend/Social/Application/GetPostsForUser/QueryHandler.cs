@@ -1,5 +1,4 @@
-﻿using Backend.Database.TransactionManager;
-using Backend.Social.Application.GetPostsForUsers;
+﻿using Backend.Social.Application.GetPostsForUsers;
 using MediatR;
 
 namespace Backend.Social.Application.GetPostsForUser;

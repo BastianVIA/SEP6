@@ -4,7 +4,6 @@ using Backend.Movie.Application.GetTopMoviesForPerson;
 using Backend.People.Domain;
 using Backend.People.Infrastructure;
 using Backend.Service;
-using FirebaseAdmin.Auth;
 using MediatR;
 
 namespace Backend.People.Application.GetDetails;

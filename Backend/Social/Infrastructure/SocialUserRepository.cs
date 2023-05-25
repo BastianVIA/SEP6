@@ -73,7 +73,7 @@ public class SocialUserRepository : ISocialUserRepository
         }
     }
     
-    private Domain.SocialUser ToDomain(SocialUserDAO userDao)
+    private SocialUser ToDomain(SocialUserDAO userDao)
     {
         return new SocialUser
         {

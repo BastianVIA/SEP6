@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Backend.Middleware;
-using Backend.Movie.Application.Search;
-using FirebaseAdmin.Auth;
+﻿using Backend.Middleware;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
