@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.People.Infrastructure;
+namespace Backend.People.Infrastructure.Models;
 
 [Index(nameof(Id))]
 public class PeopleDAO

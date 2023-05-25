@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Backend.User.Infrastructure;
+namespace Backend.User.Infrastructure.Models;
 
 public class ReviewDAO
 {

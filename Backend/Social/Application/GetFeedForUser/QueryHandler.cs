@@ -1,7 +1,6 @@
 ﻿using Backend.Database.TransactionManager;
 using Backend.Social.Application.GetPostsForUsers;
-using Backend.SocialFeed.Domain;
-using Backend.SocialFeed.Infrastructure;
+using Backend.Social.Infrastructure;
 using MediatR;
 
 namespace Backend.Social.Application.GetFeedForUser;

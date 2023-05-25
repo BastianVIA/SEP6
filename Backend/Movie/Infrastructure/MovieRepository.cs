@@ -2,6 +2,7 @@
 using Backend.Database.Transaction;
 using Backend.Enum;
 using Backend.Movie.Domain;
+using Backend.Movie.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
 

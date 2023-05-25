@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Backend.SocialFeed.Infrastructure;
+namespace Backend.Social.Infrastructure.Models;
 
 public class ActivityDAO
 {

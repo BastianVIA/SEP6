@@ -1,8 +1,7 @@
 ﻿using Backend.Database.Transaction;
-using Backend.SocialFeed.Domain;
-using FirebaseAdmin.Auth;
+using Backend.Social.Domain;
 
-namespace Backend.SocialFeed.Infrastructure;
+namespace Backend.Social.Infrastructure;
 
 public interface ISocialUserRepository
 {

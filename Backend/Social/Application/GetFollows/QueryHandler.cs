@@ -1,9 +1,8 @@
 ﻿using Backend.Database.TransactionManager;
-using Backend.SocialFeed.Application.GetFeedForUser;
-using Backend.SocialFeed.Infrastructure;
+using Backend.Social.Infrastructure;
 using MediatR;
 
-namespace Backend.SocialFeed.Application.GetFollowing;
+namespace Backend.Social.Application.GetFollows;
 
 public record Query(string userId) : IRequest<GetFollowingResponse>;
 

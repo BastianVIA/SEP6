@@ -156,7 +156,7 @@ using Backend.Middleware;
 using Backend.Movie.Infrastructure;
 using Backend.People.Infrastructure;
 using Backend.Service;
-using Backend.SocialFeed.Infrastructure;
+using Backend.Social.Infrastructure;
 using Backend.User.Infrastructure;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;

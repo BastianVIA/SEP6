@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Backend.User.Infrastructure;
+﻿namespace Backend.User.Infrastructure.Models;
 
 public class UserMovieDAO
 {

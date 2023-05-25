@@ -1,4 +1,4 @@
-﻿namespace Backend.People.Infrastructure;
+﻿namespace Backend.People.Infrastructure.Models;
 
 public class PeopleMovieDAO
 {

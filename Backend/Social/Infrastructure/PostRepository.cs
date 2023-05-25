@@ -1,9 +1,9 @@
 ﻿using Backend.Database.Transaction;
-using Backend.SocialFeed.Application.GetFeedForUser;
-using Backend.SocialFeed.Domain;
+using Backend.Social.Domain;
+using Backend.Social.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.SocialFeed.Infrastructure;
+namespace Backend.Social.Infrastructure;
 
 public class PostRepository : IPostRepository
 {

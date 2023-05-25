@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Backend.Database.Transaction;
 using Backend.People.Domain;
+using Backend.People.Infrastructure.Models;
 using Backend.Service;
 using Microsoft.EntityFrameworkCore;
 

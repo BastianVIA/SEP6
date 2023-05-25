@@ -1,7 +1,10 @@
 ﻿using Backend.Movie.Infrastructure;
+using Backend.Movie.Infrastructure.Models;
 using Backend.People.Infrastructure;
-using Backend.SocialFeed.Infrastructure;
+using Backend.People.Infrastructure.Models;
+using Backend.Social.Infrastructure.Models;
 using Backend.User.Infrastructure;
+using Backend.User.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Database;
