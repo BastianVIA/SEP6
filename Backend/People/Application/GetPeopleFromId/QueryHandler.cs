@@ -2,7 +2,6 @@
 using Backend.People.Application.Search;
 using Backend.People.Domain;
 using Backend.People.Infrastructure;
-using Backend.User.Infrastructure;
 using MediatR;
 
 namespace Backend.People.Application.GetPeopleFromId;

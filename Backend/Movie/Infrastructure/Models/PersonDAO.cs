@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace Backend.Movie.Infrastructure;
+namespace Backend.Movie.Infrastructure.Models;
 
 [Index(nameof(Id))]
 public class PersonDAO

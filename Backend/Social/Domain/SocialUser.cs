@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Backend.Foundation;
 
-namespace Backend.SocialFeed.Domain;
+namespace Backend.Social.Domain;
 
 public class SocialUser : BaseDomain
 {

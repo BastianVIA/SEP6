@@ -4,7 +4,6 @@ using Backend.Movie.Application.GetTopMoviesForPerson;
 using Backend.People.Domain;
 using Backend.People.Infrastructure;
 using Backend.Service;
-using FirebaseAdmin.Auth;
 using MediatR;
 
 namespace Backend.People.Application.GetDetails;
@@ -21,7 +20,10 @@ public class PersonDetailsMovieDto
     public string Title { get; set; }
     public int ReleaseYear { get; set; }
     public Uri? PathToPoster { get; set; }
+    public PersonMovieRating? Rating { get; set; }
 }
+
+public record PersonMovieRating(double AvgRating, int Votes);
 
 public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
 {
@@ -42,11 +44,8 @@ public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
     public async Task<GetPersonDetailsResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _transactionFactory.BeginReadOnlyTransaction();
-        Stopwatch stopwatch = Stopwatch.StartNew();
         var person =
             await _repository.ReadPersonFromIdAsync(request.PersonId, transaction);
-        stopwatch.Stop();
-        Console.WriteLine("STOOOOOOOOPPPPEED: " + stopwatch.Elapsed);
         var personDetails = _personService.GetPersonAsync(person.ImdbId);
         var movies = _mediator.Send(new Movie.Application.GetTopMoviesForPerson.Query(request.PersonId));
 
@@ -79,13 +78,18 @@ public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
 
         foreach (var m in movies)
         {
-            personMovies.Add(new PersonDetailsMovieDto
+            var topMovie = new PersonDetailsMovieDto
             {
                 MovieId = m.MovieId,
                 Title = m.Title,
                 ReleaseYear = m.ReleaseYear,
                 PathToPoster = m.PathToPoster
-            });
+            };
+            if (m.Rating != null)
+            {
+                topMovie.Rating = new PersonMovieRating(m.Rating.AvgRating, m.Rating.Votes);
+            }
+            personMovies.Add(topMovie);
         }
 
         return personMovies;

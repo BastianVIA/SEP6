@@ -1,6 +1,4 @@
-﻿
-using Backend.SocialFeed.Domain;
-using Frontend.Entities;
+﻿using Frontend.Entities;
 
 namespace Frontend.Network.SocialFeed;
 

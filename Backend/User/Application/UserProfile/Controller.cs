@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.User.Application.UserProfile;

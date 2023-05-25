@@ -1,10 +1,9 @@
 ﻿using Backend.Middleware;
-using Backend.Social.Application.GetFeedForUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.SocialFeed.Application.GetFeedForUser;
+namespace Backend.Social.Application.GetFeedForUser;
 
 [ApiController]
 [Route("Social")]

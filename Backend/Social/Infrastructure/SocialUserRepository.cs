@@ -1,8 +1,9 @@
 ﻿using Backend.Database.Transaction;
-using Backend.SocialFeed.Domain;
+using Backend.Social.Domain;
+using Backend.Social.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.SocialFeed.Infrastructure;
+namespace Backend.Social.Infrastructure;
 
 public class SocialUserRepository : ISocialUserRepository
 {
@@ -72,7 +73,7 @@ public class SocialUserRepository : ISocialUserRepository
         }
     }
     
-    private Domain.SocialUser ToDomain(SocialUserDAO userDao)
+    private SocialUser ToDomain(SocialUserDAO userDao)
     {
         return new SocialUser
         {

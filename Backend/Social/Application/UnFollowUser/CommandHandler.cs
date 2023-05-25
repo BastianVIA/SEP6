@@ -1,6 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Backend.Database.TransactionManager;
-using Backend.SocialFeed.Infrastructure;
+﻿using Backend.Database.TransactionManager;
+using Backend.Social.Infrastructure;
 using MediatR;
 
 namespace Backend.Social.Application.UnFollowUser;

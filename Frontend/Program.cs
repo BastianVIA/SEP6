@@ -78,7 +78,7 @@ builder.Services.AddScoped<ITop100Model, Top100Model>();
 builder.Services.AddScoped<IUserProfilePictureModel, UserProfilePictureModel>();
 builder.Services.AddScoped<IUserSearchModel, UserSearchModel>();
 builder.Services.AddScoped<ISearchFilterModel, SearchFilterModel>();
-builder.Services.AddScoped<ProtectedSessionStorage>();
+builder.Services.AddScoped<ProtectedLocalStorage>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();

@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Backend.Foundation;
 
 namespace Backend.User.Domain;
 
-public class User : Foundation.BaseDomain
+public class User : BaseDomain
 {
     public string Id { get; set; }
     public string DisplayName { get; set; }

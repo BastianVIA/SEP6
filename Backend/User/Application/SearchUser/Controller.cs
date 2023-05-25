@@ -1,13 +1,9 @@
-﻿namespace Backend.User.Application.SearchUser;
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Backend.Enum;
-using Backend.Middleware;
-using FirebaseAdmin.Auth;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace Backend.User.Application.SearchUser;
 
 [ApiController]
 [Route("user")]

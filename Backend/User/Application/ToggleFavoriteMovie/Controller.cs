@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Backend.Middleware;
-using Backend.User.Application.SetFavoriteMovie;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

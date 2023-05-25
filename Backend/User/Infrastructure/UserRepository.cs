@@ -1,8 +1,8 @@
 using Backend.Database.Transaction;
 using Backend.Enum;
 using Backend.User.Domain;
+using Backend.User.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
-
 
 namespace Backend.User.Infrastructure;
 

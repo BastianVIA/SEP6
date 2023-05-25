@@ -1,7 +1,5 @@
 ﻿using Backend.Database.Transaction;
 using MediatR;
-using Microsoft.EntityFrameworkCore.Storage;
-using NLog;
 
 namespace Backend.Database.TransactionManager;
 

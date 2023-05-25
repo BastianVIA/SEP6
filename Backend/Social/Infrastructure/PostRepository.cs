@@ -1,9 +1,9 @@
 ﻿using Backend.Database.Transaction;
-using Backend.SocialFeed.Application.GetFeedForUser;
-using Backend.SocialFeed.Domain;
+using Backend.Social.Domain;
+using Backend.Social.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.SocialFeed.Infrastructure;
+namespace Backend.Social.Infrastructure;
 
 public class PostRepository : IPostRepository
 {
@@ -66,7 +66,7 @@ public class PostRepository : IPostRepository
         });
     }
 
-    public async Task UpdateAsync(Domain.Post domainPost, DbTransaction tx)
+    public async Task UpdateAsync(Post domainPost, DbTransaction tx)
     {
         tx.AddDomainEvents(domainPost.ReadAllDomainEvents());
         var postDao = await tx.DataContext.Posts
@@ -176,14 +176,14 @@ public class PostRepository : IPostRepository
         }
     }
     
-    private List<Domain.Post> ToDomain(List<PostDAO>? daos)
+    private List<Post> ToDomain(List<PostDAO>? daos)
     {
         if (daos == null || !daos.Any())
         {
             return new List<Post>();
         }
 
-        var domainList = new List<Domain.Post>();
+        var domainList = new List<Post>();
         foreach (var postDao in daos)
         {
             domainList.Add(ToDomain(postDao));
@@ -192,7 +192,7 @@ public class PostRepository : IPostRepository
         return domainList;
     }
 
-    private Domain.Post ToDomain(PostDAO dao)
+    private Post ToDomain(PostDAO dao)
     {
         return new Post
         {
@@ -206,7 +206,7 @@ public class PostRepository : IPostRepository
         };
     }
 
-    private List<Domain.Comment>? ToDomain(List<CommentDAO>? commentDaos)
+    private List<Comment>? ToDomain(List<CommentDAO>? commentDaos)
     {
         if (commentDaos == null)
         {
@@ -243,7 +243,7 @@ public class PostRepository : IPostRepository
 
         return domainReactions;
     }
-    private Domain.ActivityData? ToDomain(ActivityDAO? dao)
+    private ActivityData? ToDomain(ActivityDAO? dao)
     {
         if (dao == null)
         {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Backend.SocialFeed.Domain;
+using Backend.Social.Domain;
 
-namespace Backend.SocialFeed.Infrastructure;
+namespace Backend.Social.Infrastructure.Models;
 
 public class PostDAO
 {

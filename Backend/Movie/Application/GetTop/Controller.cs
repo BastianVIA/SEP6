@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.Movie.Application.GetTop100;
+namespace Backend.Movie.Application.GetTop;
 
 [ApiController]
 [Route("movie")]

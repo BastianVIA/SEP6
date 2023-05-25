@@ -1,10 +1,10 @@
 ﻿using Backend.Database.TransactionManager;
-using Backend.SocialFeed.Domain;
-using Backend.SocialFeed.Infrastructure;
+using Backend.Social.Domain;
+using Backend.Social.Infrastructure;
 using Backend.User.IntegrationEvents;
 using MediatR;
 
-namespace Backend.SocialFeed.EventHandler.IntegrationEvents.UserEvents;
+namespace Backend.Social.EventHandler.IntegrationEvents.UserEvents;
 
 public class CreatedRatingEventHandler : INotificationHandler<CreatedRatingIntegrationEvent>
 {
