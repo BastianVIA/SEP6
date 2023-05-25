@@ -23,17 +23,12 @@ public class DataContext : DbContext
     {
         _configuration = configuration;
     }
-
-    // protected override void OnConfiguring(DbContextOptionsBuilder options)
-    // {
-    //     // connect to sqlite database
-    //     // options.UseSqlite(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
-    //     options.UseSqlServer(Configuration.GetConnectionString("WebApiDatabase"));
-    // }
+    
     
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        options.UseSqlServer(_configuration.GetConnectionString("WebApiDatabase"));
+        options.UseSqlServer(_configuration.GetConnectionString("WebApiDatabase"), options => options.CommandTimeout(600));
+        options.EnableSensitiveDataLogging();
         Console.WriteLine(_configuration.GetConnectionString("WebApiDatabase"));
     }
 
