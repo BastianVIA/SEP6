@@ -126,10 +126,10 @@
         searchUsers = isSearchUsers;
     }
     
-    private void Logout()
+    private async void Logout()
     {
         FirebaseModel.Logout();
-        AuthStateProvider.SignOut();
+        await AuthStateProvider.UpdateAuthenticationState(null);
         NavManager.NavigateTo("/");
     }
     
