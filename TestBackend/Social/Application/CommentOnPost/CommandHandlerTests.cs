@@ -2,11 +2,10 @@
 using Backend.Database.Transaction;
 using Backend.Database.TransactionManager;
 using Backend.Social.Application.CommentOnPost;
-using Backend.SocialFeed.Domain;
-using Backend.SocialFeed.Infrastructure;
+using Backend.Social.Domain;
+using Backend.Social.Infrastructure;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
-using NSubstitute.ReceivedExtensions;
+
 
 namespace TestBackend.Social.Application.CommentOnPost;
 

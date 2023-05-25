@@ -27,11 +27,12 @@ public class QueryHandlerTests
         var query = _fixture.Build<Query>()
             .With(q => q.userName, "AUserNameWhichDoesNotExistInTheSystem")
             .Create();
-        var expectedList = new List<Backend.User.Domain.User>();
+        var returnedPeople = new List<Backend.User.Domain.User>();
+        var expectedReturn = (returnedPeople, Arg.Any<int>());
 
         _repository.SearchForUserAsync(Arg.Any<string>(), Arg.Any<UserSortingKey>(), Arg.Any<SortingDirection>(),
             Arg.Any<int>(), Arg.Any<DbReadOnlyTransaction>())
-            .Returns(expectedList);
+            .Returns(expectedReturn);
         // Act
 
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -45,14 +46,14 @@ public class QueryHandlerTests
     public async Task Handle_ReturnsListOfUsers_WhenNamesPartiallyMatch()
     {
         var query = _fixture.Create<Query>();
-        var expectedList = _fixture.Build<Backend.User.Domain.User>()
+        var returnedPeople = _fixture.Build<Backend.User.Domain.User>()
             .With(u => u.DisplayName, $"NameWhichContains{query.userName}SearchTerm")
             .CreateMany()
             .ToList();
-        
+        var expectedReturn = (returnedPeople, Arg.Any<int>());
         _repository.SearchForUserAsync(Arg.Any<string>(), Arg.Any<UserSortingKey>(), Arg.Any<SortingDirection>(),
                 Arg.Any<int>(), Arg.Any<DbReadOnlyTransaction>())
-            .Returns(expectedList);
+            .Returns(expectedReturn);
 
         var result = await _handler.Handle(query, CancellationToken.None);
 

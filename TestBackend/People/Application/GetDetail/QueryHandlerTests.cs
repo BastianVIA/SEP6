@@ -1,7 +1,6 @@
 ﻿using AutoFixture;
 using Backend.Database.Transaction;
 using Backend.Database.TransactionManager;
-using Backend.Movie.Application.GetTop100;
 using Backend.Movie.Application.GetTopMoviesForPerson;
 using Backend.People.Domain;
 using Backend.People.Infrastructure;
@@ -34,6 +33,7 @@ public class QueryHandlerTests
         
         var query = _fixture.Create<Query>();
         var expectedDetails = _fixture.Build<Person>()
+            .With(p => p.Id, query.PersonId)
             .With(p => p.DirectedMoviesId, _fixture.Create<List<string>>())
             .With(p => p.ActedMoviesId, _fixture.Create<List<string>>())
             .Create();
@@ -43,7 +43,7 @@ public class QueryHandlerTests
 
         _repository.ReadPersonFromIdAsync(query.PersonId, Arg.Any<DbReadOnlyTransaction>(), includeActed: true, includeDirected:true)
             .Returns(expectedDetails);
-        _personService.GetPersonAsync(expectedDetails.ImdbId)
+        _personService.GetPersonAsync(Arg.Any<string>())
             .Returns(expectedPersonServiceDto);
         _mediator.Send(Arg.Is(new Backend.Movie.Application.GetTopMoviesForPerson.Query(query.PersonId)),
                 CancellationToken.None)

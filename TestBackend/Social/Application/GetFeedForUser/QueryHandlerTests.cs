@@ -1,9 +1,9 @@
 ﻿using AutoFixture;
 using Backend.Database.Transaction;
 using Backend.Database.TransactionManager;
-using Backend.SocialFeed.Application.GetFeedForUser;
-using Backend.SocialFeed.Domain;
-using Backend.SocialFeed.Infrastructure;
+using Backend.Social.Application.GetFeedForUser;
+using Backend.Social.Domain;
+using Backend.Social.Infrastructure;
 using MediatR;
 using NSubstitute;
 
@@ -44,7 +44,7 @@ public class QueryHandlerTests
 
         var result = await _handler.Handle(query, CancellationToken.None);
         // Assert
-        Assert.Empty(result.FeedPostDtos);
+        Assert.Empty(result.GetPostsForUsersResponse.FeedPostDtos);
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class QueryHandlerTests
 
         var result = await _handler.Handle(query, CancellationToken.None);
         // Assert
-        Assert.Equal(expectedReturn.Count, result.FeedPostDtos.Count);
-        Assert.All(result.FeedPostDtos, dto => Assert.Contains(dto.UserId, user.Following));
+        Assert.Equal(expectedReturn.Count, result.GetPostsForUsersResponse.FeedPostDtos.Count);
+        Assert.All(result.GetPostsForUsersResponse.FeedPostDtos, dto => Assert.Contains(dto.UserId, user.Following));
     }
 }

@@ -28,7 +28,7 @@ public class QueryHandlerTests
         var query = _fixture.Build<Query>()
             .With(q => q.name, "ANameWhichNoPersonHasBeenXÆA-12")
             .Create();
-        var expectedList = new List<Person>();
+        var expectedList = _fixture.Create<(List<Person>, int)>();
 
         _repository.SearchForPersonAsync(query.name, Arg.Any<int>(), Arg.Any<DbReadOnlyTransaction>())
             .Returns(expectedList);
@@ -44,13 +44,14 @@ public class QueryHandlerTests
     {
         // Arrange
         var query = _fixture.Create<Query>();
-        var expectedList = _fixture.Build<Person>()
+        var returnedPeople = _fixture.Build<Person>()
             .With(p => p.Name, $"NameWhichContains{query.name}SearchTerm")
             .CreateMany()
             .ToList();
+        var expectedReturn = (returnedPeople, _fixture.Create<int>());
 
         _repository.SearchForPersonAsync(query.name, Arg.Any<int>(), Arg.Any<DbReadOnlyTransaction>())
-            .Returns(expectedList);
+            .Returns(expectedReturn);
         // Act
 
         var result = await _handler.Handle(query, CancellationToken.None);

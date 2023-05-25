@@ -1,9 +1,10 @@
 ﻿using AutoFixture;
 using Backend.Database.Transaction;
 using Backend.Database.TransactionManager;
-using Backend.SocialFeed.Application.GetFollowing;
-using Backend.SocialFeed.Domain;
-using Backend.SocialFeed.Infrastructure;
+using Backend.Social.Application.GetFollows;
+using Backend.Social.Domain;
+using Backend.Social.Infrastructure;
+using MediatR;
 using NSubstitute;
 
 namespace TestBackend.Social.Application.GetFollows;
@@ -15,10 +16,11 @@ public class QueryHandlerTests
     
     private readonly ISocialUserRepository _userRepository = Substitute.For<ISocialUserRepository>();
     private readonly IDatabaseTransactionFactory _transactionFactory = Substitute.For<IDatabaseTransactionFactory>();
+    private readonly IMediator _mediator = Substitute.For<IMediator>();
 
     public QueryHandlerTests()
     {
-        _handler = new QueryHandler(_userRepository, _transactionFactory);
+        _handler = new QueryHandler(_userRepository, _transactionFactory, _mediator);
     }
 
     [Fact]
@@ -56,6 +58,6 @@ public class QueryHandlerTests
         var result = await _handler.Handle(query, CancellationToken.None);
         // Assert
         Assert.Equal(user.Following.Count, result.FollowingUserDtos.Count);
-        Assert.All(result.FollowingUserDtos, id => Assert.Contains(id, user.Following));
+        Assert.All(result.FollowingUserDtos, dto => Assert.Contains(dto.DisplayName, user.Following));
     }
 }

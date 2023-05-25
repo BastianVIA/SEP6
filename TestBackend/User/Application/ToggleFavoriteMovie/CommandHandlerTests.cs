@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
 using Backend.Database.Transaction;
 using Backend.Database.TransactionManager;
-using Backend.User.Application.SetFavoriteMovie;
+using Backend.User.Application.ToggleFavoriteMovie;
 using Backend.User.Infrastructure;
 using NSubstitute;
 

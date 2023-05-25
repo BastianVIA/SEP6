@@ -52,6 +52,6 @@ public class UserDto
             userToDto.Add(userToAdd);
         }
 
-        return new UserSearchResponse(userToDto, searchResponse.NumberOfPages);
+        return new UserSearchResponse(userToDto);
     }
 }

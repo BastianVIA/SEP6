@@ -2,11 +2,9 @@
 using Backend.Database.Transaction;
 using Backend.Database.TransactionManager;
 using Backend.Social.Application.FollowUser;
-using Backend.SocialFeed.Application.FollowUser;
-using Backend.SocialFeed.Domain;
-using Backend.SocialFeed.Infrastructure;
+using Backend.Social.Domain;
+using Backend.Social.Infrastructure;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 
 namespace TestBackend.Social.Application.FollowUser;
 

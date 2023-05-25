@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
 using Backend.Database.Transaction;
 using Backend.Database.TransactionManager;
-using Backend.Movie.Application.GetTop100;
+using Backend.Movie.Application.GetTop;
 using Backend.Movie.Domain;
 using Backend.Movie.Infrastructure;
 using Backend.Service;

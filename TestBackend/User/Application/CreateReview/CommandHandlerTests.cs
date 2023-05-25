@@ -1,11 +1,9 @@
 ﻿using AutoFixture;
 using Backend.Database.Transaction;
 using Backend.Database.TransactionManager;
-using Backend.SocialFeed.Domain;
 using Backend.User.Application.CreateReview;
 using Backend.User.Infrastructure;
 using NSubstitute;
-using NSubstitute.ReceivedExtensions;
 
 namespace TestBackend.User.Application.CreateReview;
 

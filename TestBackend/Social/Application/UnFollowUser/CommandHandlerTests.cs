@@ -4,8 +4,8 @@ using AutoFixture;
 using Backend.Database.Transaction;
 using Backend.Database.TransactionManager;
 using Backend.Social.Application.UnFollowUser;
-using Backend.SocialFeed.Domain;
-using Backend.SocialFeed.Infrastructure;
+using Backend.Social.Domain;
+using Backend.Social.Infrastructure;
 using NSubstitute;
 
 namespace TestBackend.Social.Application.UnFollowUser;
