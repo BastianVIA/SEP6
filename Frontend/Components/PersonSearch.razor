@@ -41,7 +41,7 @@
                 <Icon Name="@IconName.AngleLeft"/>
             </button>
             <div class="page-number">
-                <p>Page @pageNumber</p>
+                <p>Page @pageNumber / @numberOfPagesSearchResult</p>
             </div>
             <button class="btn btn-secondary" @onclick="@GoToNextPage">
                 <Icon Name="@IconName.AngleRight"/>
@@ -52,7 +52,10 @@
 }
 else
 {
-    @* <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/> *@
+    @if (isConnected)
+    {
+        <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
+    }
 }
 
 @code {
@@ -63,6 +66,8 @@ else
     
     private bool isDataFetched = false;
     private int peoplePerPage = 20;
+    private int numberOfPagesSearchResult;
+    private bool isConnected;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -74,7 +79,9 @@ else
     {
         isDataFetched = false;
         personList.Clear();
-        personList = await PersonSearchModel.SearchForPersonAsync(PersonName, pageNumber);
+        var result = await PersonSearchModel.SearchForPersonAsync(PersonName, pageNumber);
+        personList = result.PersonList;
+        numberOfPagesSearchResult = result.NumberOfPage;
         isDataFetched = true;
     }
 
@@ -103,6 +110,10 @@ else
         NavManager.NavigateTo($"/PersonDetails/{personId}");
         return;
     }
-
+    
+    protected override void OnAfterRender(bool firstRender)
+    {
+        isConnected = !firstRender;
+    }
 }
 

@@ -14,7 +14,7 @@ namespace Frontend.Model.MovieSearch
                 _client = client;
             }
 
-            public async Task<List<Movie>> SearchForMovieAsync(string title, MovieSortingKey? movieSortingKey = null, SortingDirection? sortingDirection = null, int? pageNumber = null)
+            public async Task<(int NumberOfPages, List<Movie> MovieList)> SearchForMovieAsync(string title, MovieSortingKey? movieSortingKey = null, SortingDirection? sortingDirection = null, int? pageNumber = null)
             {
                 return await _client.SearchForMovieAsync(title, movieSortingKey, sortingDirection, pageNumber);
             }

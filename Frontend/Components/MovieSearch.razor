@@ -25,7 +25,7 @@
                 <Icon Name="@IconName.AngleLeft"/>
             </button>
             <div class="page-number">
-                <p>Page @pageNumber</p>
+                <p>Page @pageNumber / @numberOfPagesSearchResult</p>
             </div>
             <button class="btn btn-secondary" @onclick="@GoToNextPage">
                 <Icon Name="@IconName.AngleRight"/>
@@ -37,9 +37,9 @@
 else
 { 
     @if (isConnected)
-{
-    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
-}
+    {
+        <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
+    }
 }
 @code {
     [Parameter]
@@ -58,6 +58,7 @@ else
     public string SearchTerm { get; set; } = string.Empty;
     private SortingDirection? ratingSortingDirection = SortingDirection.ASC;
     private SortingDirection? releaseYearSortingDirection = SortingDirection.ASC;
+    private int numberOfPagesSearchResult;
 
 
     
@@ -80,7 +81,9 @@ else
         {
             sortingDirection = releaseYearSortingDirection;
         }
-        movieList = await MovieSearchModel.SearchForMovieAsync(movieTitle, sortingKey, sortingDirection, pageNumber);
+        var result = await MovieSearchModel.SearchForMovieAsync(movieTitle, sortingKey, sortingDirection, pageNumber);
+        movieList = result.MovieList;
+        numberOfPagesSearchResult = result.NumberOfPages;
         isDataFetched = true;
     }
 
@@ -127,7 +130,7 @@ else
     
     protected override void OnAfterRender(bool firstRender)
     {
-        isConnected = firstRender;
+        isConnected = !firstRender;
     }
 }
 

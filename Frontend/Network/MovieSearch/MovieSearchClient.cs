@@ -5,7 +5,7 @@ namespace Frontend.Network.MovieSearch;
 
 public class MovieSearchClient : NSwagBaseClient, IMovieSearchClient
 {
-    public async Task<List<Movie>> SearchForMovieAsync(string title, MovieSortingKey? movieSortingKey = null,
+    public async Task<(int NumberOfPages, List<Movie> MovieList)> SearchForMovieAsync(string title, MovieSortingKey? movieSortingKey = null,
         SortingDirection? sortingDirection = null, int? pageNumber = null)
     {
         var response = await _api.Search2Async(title, movieSortingKey, sortingDirection, pageNumber);
@@ -31,7 +31,7 @@ public class MovieSearchClient : NSwagBaseClient, IMovieSearchClient
                 Rating = rating
             });
         }
-        return movies;
+        return (NumberOfPages: response.NumberOfPagesAvailable, MovieList: movies);
     }
 
     public MovieSearchClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)

@@ -42,14 +42,18 @@
                             @post.PostText
                         </Column>
                     </Row>
-                    <Row Margin="Margin.Is2.FromTop">
-                        <Column ColumnSize="ColumnSize.Is12">
-                            <Button Color="Color.Primary" Clicked="() => OnLikePost(post)">
-                                @post.NumberOfReactions <Icon Name="IconName.ThumbsUp" TextColor="TextColor.Light"/>
-                            </Button>
-                            <Button Color="Color.Primary" Clicked="() => OnCommentClicked(post)">Comment</Button>
-                        </Column>
-                    </Row>
+                    <AuthorizeView>
+                        <Authorized>
+                            <Row Margin="Margin.Is2.FromTop">
+                                <Column ColumnSize="ColumnSize.Is12">
+                                    <Button Color="Color.Primary" Clicked="() => OnLikePost(post)">
+                                        @post.NumberOfReactions <Icon Name="IconName.ThumbsUp" TextColor="TextColor.Light"/>
+                                    </Button>
+                                    <Button Color="Color.Primary" Clicked="() => OnCommentClicked(post)">Comment</Button>
+                                </Column>
+                            </Row>
+                        </Authorized>
+                    </AuthorizeView>
                     <Row Margin="Margin.Is2.FromTop">
                         <Column ColumnSize="ColumnSize.Is12">
                             <Accordion>
