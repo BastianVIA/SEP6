@@ -5,44 +5,37 @@
 @using Frontend.Model.SearchFilter
 @inject ISearchFilterModel SearchFilterModel
 
-@if (pageLoaded)
-{
-    <Row>
-        <Column ColumnSize="ColumnSize.Is2">
-            <Div Margin="Margin.Is2.FromStart.Is2.FromBottom">
-                <h4>Filter</h4>
-                <RadioGroup Orientation="Orientation.Vertical" TValue="string" Name="searchType" CheckedValue="@checkedValue" Buttons CheckedValueChanged="@OnChange">
-                    <Radio Value="@("movies")">Movies @searchFilter.numberOfMovies</Radio>
-                    <Radio Value="@("users")">Users @searchFilter.numberOfUsers</Radio>
-                    <Radio Value="@("persons")">Persons @searchFilter.numberOfPersons</Radio>
-                </RadioGroup>
-            </Div>
-        </Column>
+<Row>
+    <Column ColumnSize="ColumnSize.Is2">
+        <Div Margin="Margin.Is2.FromStart.Is2.FromBottom">
+            <h4>Filter</h4>
+            <RadioGroup Orientation="Orientation.Vertical" TValue="string" Name="searchType" CheckedValue="@checkedValue" Buttons CheckedValueChanged="@OnChange">
+                <Radio Value="@("movies")">Movies @searchFilter.numberOfMovies</Radio>
+                <Radio Value="@("users")">Users @searchFilter.numberOfUsers</Radio>
+                <Radio Value="@("persons")">Persons @searchFilter.numberOfPersons</Radio>
+            </RadioGroup>
+        </Div>
+    </Column>
 
-        <Column ColumnSize="ColumnSize.Is8">
-            @switch (checkedValue)
-            {
-                case "movies":
-                    <MovieSearch MovieTitle="@SearchText"/>
-                    break;
-                case "users":
-                    <UserSearch DisplayName="@SearchText"/>
-                    break;
-                case "persons":
-                    <PersonSearch PersonName="@SearchText"/>
-                    break;
-                default:
-                    <p>Nothing found</p>
-                    break;
-            }
+    <Column ColumnSize="ColumnSize.Is8">
+        @switch (checkedValue)
+        {
+            case "movies":
+                <MovieSearch MovieTitle="@SearchText"/>
+                break;
+            case "users":
+                <UserSearch DisplayName="@SearchText"/>
+                break;
+            case "persons":
+                <PersonSearch PersonName="@SearchText"/>
+                break;
+            default:
+                <p>Nothing found</p>
+                break;
+        }
 
-        </Column>
-    </Row>
-}
-else
-{
-    <Loading/>
-}
+    </Column>
+</Row>
 
 
 @code {
@@ -51,10 +44,14 @@ else
     public string SearchText { get; set; }
 
     private string checkedValue = "movies";
-    private int numberOfMovies;
-    private int numberOfUsers;
-    private int numberOfPersons;
-    private SearchFilter searchFilter;
+
+    private SearchFilter searchFilter = new SearchFilter
+    {
+        numberOfPersons = 0,
+        numberOfUsers = 0,
+        numberOfMovies = 0
+    };
+
     private bool pageLoaded;
 
     private void OnChange(string value)
