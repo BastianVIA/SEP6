@@ -22,11 +22,13 @@ public class DataContext : DbContext
     public DataContext(IConfiguration configuration, DbContextOptions options) : base(options)
     {
         _configuration = configuration;
-    }
+    }    
     
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        options.UseSqlServer(_configuration.GetConnectionString("WebApiDatabase"));
+        options.UseSqlServer(_configuration.GetConnectionString("WebApiDatabase"), options => options.CommandTimeout(600));
+        options.EnableSensitiveDataLogging();
+        Console.WriteLine(_configuration.GetConnectionString("WebApiDatabase"));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
