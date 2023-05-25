@@ -38,23 +38,27 @@
                 <h3>Display Name: <b>@user.Username</b></h3>
             </Column>
             <Column ColumnSize="ColumnSize.Is5">
-                <Div Width="Width.Is100" Flex="Flex.JustifyContent.End">
-                    @if (IsOwnProfile())
-                    {
-                        <Button Color="Color.Primary" Clicked="OnFollowList">Follow List</Button>
-                    }
-                    else
-                    {
-                        @if (isFollowing)
-                        {
-                            <Button Color="Color.Secondary" Clicked="UnFollow">Unfollow</Button>
-                        }
-                        else
-                        {
-                            <Button Color="Color.Primary" Clicked="Follow">Follow</Button>
-                        }
-                    }
-                </Div>
+                <AuthorizeView>
+                    <Authorized>
+                        <Div Width="Width.Is100" Flex="Flex.JustifyContent.End">
+                            @if (IsOwnProfile())
+                            {
+                                <Button Color="Color.Primary" Clicked="OnFollowList">Follow List</Button>
+                            }
+                            else
+                            {
+                                @if (isFollowing)
+                                {
+                                    <Button Color="Color.Secondary" Clicked="UnFollow">Unfollow</Button>
+                                }
+                                else
+                                {
+                                    <Button Color="Color.Primary" Clicked="Follow">Follow</Button>
+                                }
+                            }
+                        </Div>
+                    </Authorized>
+                </AuthorizeView>
             </Column>
         </Row>
 
@@ -191,9 +195,11 @@
         feedPosts = await SocialFeedModel.GetOwnSocialFeed(UID, pageNumber);
         user = await UserProfilesModel.GetUserProfile(UID);
         imageDataURL = await GetProfilePicture(UID);
-
-        isFollowing = await UserProfilesModel.IsFollowingUser(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID, UID);
-        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, UID);
+        if (FirebaseModel.CurrentUser != null)
+        {
+            isFollowing = await UserProfilesModel.IsFollowingUser(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID, UID);
+        }
+        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(UID);
         if (favoriteMovies.Any())
         {
             averageRatingFavMovies = favoriteMovies.Average(movie => movie.Rating?.AverageRating ?? 0);
@@ -213,7 +219,11 @@
 
     private bool IsOwnProfile()
     {
-        return (FirebaseModel.CurrentUser.UID == UID);
+        if (FirebaseModel.CurrentUser != null)
+        {
+            return (FirebaseModel.CurrentUser.UID == UID);
+        }
+        return false;
     }
 
     async Task HandleRedraw()

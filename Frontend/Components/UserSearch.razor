@@ -59,13 +59,20 @@
                 <Icon Name="@IconName.AngleLeft"/>
             </button>
             <div class="page-number">
-                <p>Page @pageNumber</p>
+                <p>Page @pageNumber / @numberOfPagesSearchResult</p>
             </div>
             <button class="btn btn-secondary" @onclick="@GoToNextPage">
                 <Icon Name="@IconName.AngleRight"/>
             </button>
         </div>
     </div>
+}
+else
+{
+    @if (isConnected)
+    {
+        <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
+    }
 }
 
 @code {
@@ -78,6 +85,7 @@
     private int pageNumber { get; set; }
     private int usersPerPage = 10;
     private UserSortingKey? userSortingKey;
+    private int numberOfPagesSearchResult;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -97,13 +105,16 @@
         {
             sortingDirection = displayNameSortingDirection;
         }
-        userList = await UserSearchModel.SearchForUserAsync(DisplayName, userSortingKey, sortingDirection, pageNumber);
+        var result = await UserSearchModel.SearchForUserAsync(DisplayName, userSortingKey, sortingDirection, pageNumber);
+        userList = result.UserList;
+        numberOfPagesSearchResult = result.NumberOfPages;
         isDataFetched = true;
     }
    
 
     private SortingDirection2 sortingDirection = SortingDirection2.ASC;
     private SortingDirection2 displayNameSortingDirection = SortingDirection2.ASC;
+    private bool isConnected;
 
     private async Task SortByNumberOfVotedMovies()
     {
@@ -147,4 +158,8 @@
         await SearchForUser();
     }
 
+    protected override void OnAfterRender(bool firstRender)
+    {
+        isConnected = !firstRender;
+    }
 }
