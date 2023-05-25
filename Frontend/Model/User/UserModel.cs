@@ -6,14 +6,14 @@ using Frontend.Service;
 
 namespace Frontend.Model.User;
 
-public class UserModel : NSwagBaseClient, IUserModel, IAlertNotifier
+public class UserModel : IUserModel, IAlertNotifier
 {
     private IUserClient _client;
     private IAlertAggregator _alertAggregator;
 
-    public UserModel(IAlertAggregator alertAggregator)
+    public UserModel(IUserClient client,IAlertAggregator alertAggregator )
     {
-        _client = new UserClient();
+        _client = client;
         _alertAggregator = alertAggregator;
     }
 
@@ -47,4 +47,6 @@ public class UserModel : NSwagBaseClient, IUserModel, IAlertNotifier
             Message = message
         });
     }
+    
+    
 }

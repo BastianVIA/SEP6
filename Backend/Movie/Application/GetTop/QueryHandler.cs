@@ -3,7 +3,7 @@ using Backend.Movie.Infrastructure;
 using Backend.Service;
 using MediatR;
 
-namespace Backend.Movie.Application.GetTop100;
+namespace Backend.Movie.Application.GetTop;
 
 public record Query(int PageNumber) : IRequest<MovieTop100Response>;
 

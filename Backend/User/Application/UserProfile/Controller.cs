@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.User.Application.UserProfile;
@@ -20,7 +19,7 @@ public class Controller : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("user/{userId}")]
-    [Tags("UserApi")]
+    [Tags("User")]
     [ProducesResponseType(typeof(UserProfileResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get([Required]string userId)

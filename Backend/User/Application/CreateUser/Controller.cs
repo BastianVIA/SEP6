@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Backend.Middleware;
-using Backend.Movie.Application.Search;
-using FirebaseAdmin.Auth;
+﻿using Backend.Middleware;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +25,7 @@ public class Controller : ControllerBase
     /// <returns></returns>
     /// <remarks>This method requires authorization. Make sure to provide authorization when calling this method.</remarks>
     [HttpPost]
-    [Tags("UserApi")]
+    [Tags("User")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Authorize]
     public IActionResult Post([FromBody] CreateUserRequest request)

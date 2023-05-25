@@ -25,7 +25,7 @@ public class Controller : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("search")]
-    [Tags("PersonApi")]
+    [Tags("Person")]
     [ProducesResponseType(typeof(PersonSearchResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
 

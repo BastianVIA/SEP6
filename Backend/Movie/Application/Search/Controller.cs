@@ -1,9 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Backend.Enum;
-using Backend.Middleware;
-using FirebaseAdmin.Auth;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Movie.Application.Search;
@@ -31,7 +28,7 @@ public class Controller: ControllerBase
     /// /// <returns></returns>
     [HttpGet]
     [Route("search")]
-    [Tags("MovieApi")]
+    [Tags("Movie")]
     [ProducesResponseType(typeof(MovieSearchResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get([Required] string title, MovieSortingKey movieSortingKey = MovieSortingKey.Votes, SortingDirection sortingDirection = SortingDirection.DESC, int pageNumber = 1)

@@ -1,4 +1,4 @@
-﻿namespace Backend.SocialFeed.Domain;
+﻿namespace Backend.Social.Domain;
 
 public class ActivityData
 {

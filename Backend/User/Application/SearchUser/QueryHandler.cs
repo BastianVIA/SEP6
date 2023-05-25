@@ -16,13 +16,12 @@ public class UserDto
     public string DisplayName { get; set; }
     public string Id { get; set; }
     public int RatedMovie { get; set; }
-
 }
 
-public class QueryHandler : IRequestHandler<Query, UserSearchResponse>
-{
-    private readonly IUserRepository _repository;
-    private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
+    public class QueryHandler : IRequestHandler<Query, UserSearchResponse>
+    {
+        private readonly IUserRepository _repository;
+        private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
 
     public QueryHandler(IUserRepository repository,
         IDatabaseTransactionFactory databaseTransactionFactory)
@@ -34,22 +33,25 @@ public class QueryHandler : IRequestHandler<Query, UserSearchResponse>
     public async Task<UserSearchResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var foundUsers = await _repository.SearchForUserAsync(request.userName, request.UserSortingKey,
+        var searchResponse = await _repository.SearchForUserAsync(request.userName, request.UserSortingKey,
             request.sortingDirection,
             request.pageNumber, transaction);
         var userToDto = new List<UserDto>();
-        foreach (var foundUser in foundUsers)
+        foreach (var foundUser in searchResponse.Users)
         {
             var userToAdd = new UserDto
             {
                 Id = foundUser.Id,
                 DisplayName = foundUser.DisplayName,
-                RatedMovie = foundUser.FavoriteMovies.Count
             };
+            if (foundUser.Ratings != null)
+            {
+                userToAdd.RatedMovie = foundUser.Ratings.Count;
+            }
 
             userToDto.Add(userToAdd);
         }
 
-        return new UserSearchResponse(userToDto);
+        return new UserSearchResponse(userToDto, searchResponse.NumberOfPages);
     }
 }

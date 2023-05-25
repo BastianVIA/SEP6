@@ -1,8 +1,5 @@
-﻿using System.Diagnostics;
-using Backend.Middleware;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using NLog;
 
 namespace Backend.User.Application.GetFavoriteMovies;
 
@@ -26,7 +23,7 @@ public class Controller : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("favorite/{userId}")]
-    [Tags("UserApi")]
+    [Tags("User")]
     [ProducesResponseType(typeof(FavoriteMovesResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(string userId)

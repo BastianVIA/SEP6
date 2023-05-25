@@ -1,6 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Components
 @using System.ComponentModel.DataAnnotations
 @using Blazorise
+@using Frontend.Authentication
+@using Frontend.Entities
 @using Frontend.Model.Firebase
 @using Frontend.Service
 @inject IFirebaseModel FirebaseModel;
@@ -82,8 +84,15 @@
 
         if (await FirebaseModel.Login(user.Email, user.Password))
         {
-            AuthStateProvider.SignIn();
+            //AuthStateProvider.SignIn();
+            await AuthStateProvider.UpdateAuthenticationState(new UserSession
+            {
+                Email = user.Email,
+                Password = user.Password,
+                Role = "user"
+            });
             await LoginSuccess.InvokeAsync(true);
+            StateHasChanged();
         }
         else
         {

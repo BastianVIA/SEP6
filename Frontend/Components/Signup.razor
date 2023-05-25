@@ -1,5 +1,6 @@
 ﻿@using Blazorise
 @using System.ComponentModel.DataAnnotations
+@using Frontend.Authentication
 @using Frontend.Model.Firebase
 @using Frontend.Model.User
 @using Frontend.Service
@@ -114,7 +115,12 @@
         {
             Console.WriteLine(FirebaseModel.CurrentUser.TokenValue);
             await UserModel.CreateUser(FirebaseModel.CurrentUser.TokenValue, user.DisplayName, user.Email);
-            AuthStateProvider.SignIn();
+            await AuthStateProvider.UpdateAuthenticationState(new UserSession
+            {
+                Email = user.Email,
+                Password = user.Password,
+                Role = "user"
+            });
             await SignupSuccess.InvokeAsync(true);
         }
         else

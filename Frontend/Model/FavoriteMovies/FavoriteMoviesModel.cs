@@ -8,15 +8,15 @@ using Frontend.Service;
 
 namespace Frontend.Model.FavoriteMovies;
 
-public class FavoriteMoviesModel : NSwagBaseClient, IFavoriteMoviesModel, IAlertNotifier
+public class FavoriteMoviesModel : IFavoriteMoviesModel, IAlertNotifier
 {
 
     private IFavoriteMoviesClient _client;
     private IAlertAggregator _alertAggregator;
 
-    public FavoriteMoviesModel(IAlertAggregator alertAggregator)
+    public FavoriteMoviesModel(IFavoriteMoviesClient client, IAlertAggregator alertAggregator)
     {
-        _client = new FavoriteMoviesClient();
+        _client = client;
         _alertAggregator = alertAggregator;
     }
 

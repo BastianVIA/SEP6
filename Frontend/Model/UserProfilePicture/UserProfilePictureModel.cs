@@ -1,5 +1,6 @@
 ﻿using Frontend.Events;
 using Frontend.Network.UserProfilePicture;
+using Frontend.Network.UserProfiles;
 
 namespace Frontend.Model.UserProfilePicture;
 
@@ -8,9 +9,9 @@ public class UserProfilePictureModel : IUserProfilePictureModel, IAlertNotifier
     private IUserProfilePictureClient _client;
     private IAlertAggregator _alertAggregator;
 
-    public UserProfilePictureModel(IAlertAggregator alertAggregator)
+    public UserProfilePictureModel(IUserProfilePictureClient client, IAlertAggregator alertAggregator)
     {
-        _client = new UserProfilePictureClient();
+        _client = client;
         _alertAggregator = alertAggregator;
     }
     

@@ -27,7 +27,7 @@ public class Controller : ControllerBase
     /// a picture if specified, or if the user has not yet specified a picture it will contain null.</remarks>
     [HttpGet]
     [Route("userImage/{userId}")]
-    [Tags("UserApi")]
+    [Tags("User")]
     [ProducesResponseType(typeof(UserImageResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserImage([Required]string userId)

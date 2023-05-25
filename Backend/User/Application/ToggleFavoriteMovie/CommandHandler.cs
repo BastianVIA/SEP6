@@ -1,10 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Backend.Database.TransactionManager;
+﻿using Backend.Database.TransactionManager;
 using Backend.User.Infrastructure;
 using MediatR;
-using NLog;
 
-namespace Backend.User.Application.SetFavoriteMovie;
+namespace Backend.User.Application.ToggleFavoriteMovie;
 
 public record Command(string userId, string movieId) : IRequest;
 

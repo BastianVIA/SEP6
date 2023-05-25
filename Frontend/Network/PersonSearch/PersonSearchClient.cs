@@ -6,7 +6,7 @@ public class PersonSearchClient : NSwagBaseClient, IPersonSearchClient
 {
     public async Task<List<Person>> SearchForPersonAsync(string name, int? pageNumber = null)
     {
-        var response = await _api.Search2Async(name, pageNumber);
+        var response = await _api.Search3Async(name, pageNumber);
         List<Person> persons = new List<Person>();
         foreach (var person in response.PersonDtos)
         {
@@ -19,5 +19,9 @@ public class PersonSearchClient : NSwagBaseClient, IPersonSearchClient
         }
 
         return persons;
+    }
+
+    public PersonSearchClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    {
     }
 }

@@ -36,7 +36,7 @@ public class QueryHandler : IRequestHandler<Query, GetMovieInfoResponse>
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
         var pathForPoster = _imageService.GetPathForPosterAsync(request.MovieId);
-        var movie = await _repository.ReadMovieFromIdAsync(request.MovieId, transaction);
+        var movie = await _repository.ReadMovieFromIdAsync(request.MovieId, transaction, includeRatings:true);
         
         return await toDto(movie, pathForPoster);;
     }

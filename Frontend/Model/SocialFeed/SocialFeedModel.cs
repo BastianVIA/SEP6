@@ -7,9 +7,9 @@ public class SocialFeedModel : ISocialFeedModel
 {
     private ISocialFeedClient _client;
 
-    public SocialFeedModel()
+    public SocialFeedModel(ISocialFeedClient client)
     {
-        _client = new SocialFeedClient();
+        _client = client;
     }
     
     public async Task<List<UserFeed>> GetSocialFeed(string userToken, int? pageNumber = null)
@@ -25,5 +25,10 @@ public class SocialFeedModel : ISocialFeedModel
     public async Task CommentOnPost(string userToken, string postId, string comment)
     {
         await _client.CommentOnPost(userToken, postId, comment);
+    }
+
+    public async Task<List<UserFeed>> GetOwnSocialFeed(string userId, int? pageNumber = null)
+    {
+        return await _client.GetOwnSocialFeed(userId, pageNumber);
     }
 }

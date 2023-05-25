@@ -1,0 +1,27 @@
+trigger:
+  branches:
+    include:
+      - '*'
+
+pool:
+  vmImage: 'windows-latest'
+
+stages:
+  - stage: BuildTestPackage
+    displayName: Build, package
+    jobs:
+      - job: BuildDevVersionsJob
+        displayName: Build, package
+        steps:
+          - task: CmdLine@2
+            displayName: "Build process"
+            inputs:
+              script: './build.cmd CiBuild --no-logo'
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Collect build artifacts'
+            inputs:
+              targetPath: 'output/'
+              artifactName: 'BuildPackages'
+              artifactType: 'pipeline'
+

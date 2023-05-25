@@ -1,7 +1,6 @@
-﻿using System.Diagnostics;
-using Backend.Database.Transaction;
+﻿using Backend.Database.Transaction;
 using Backend.People.Domain;
-using Backend.Service;
+using Backend.People.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.People.Infrastructure;
@@ -44,16 +43,19 @@ public class PeopleRepository : IPeopleRepository
         return ToDomain(result);
     }
 
-    public async Task<List<Person>> SearchForPersonAsync(string name, int requestPageNumber, DbReadOnlyTransaction tx)
+    public async Task<(List<Person> People, int NumberOfPages )> SearchForPersonAsync(string name, int requestPageNumber, DbReadOnlyTransaction tx)
     {
         var query = tx.DataContext.People.Where(p => EF.Functions.Like(p.Name, $"%{name}%"));
 
+        var totalPeopleCount = await query.CountAsync();
+        var totalPages = (int)Math.Ceiling((double)totalPeopleCount / NumberOfResultsPerPage);
+        
         Task<List<PeopleDAO>> foundPersons = query
             .Skip(NumberOfResultsPerPage * (requestPageNumber - 1))
             .Take(NumberOfResultsPerPage)
             .ToListAsync();
 
-        return ToDomain(await foundPersons);
+        return (People:ToDomain(await foundPersons), totalPages);
     }
 
     public async Task<List<Person>> FindPersonsAsync(List<string> personIds, DbReadOnlyTransaction tx)
@@ -63,9 +65,15 @@ public class PeopleRepository : IPeopleRepository
         return ToDomain(query);
     }
 
-    private List<Domain.Person> ToDomain(List<PeopleDAO> personDaos)
+    public async Task<int> NumberOfResultsForSearch(string requestName, DbReadOnlyTransaction tx)
     {
-        var listOfDomainPersons = new List<Domain.Person>();
+        var query = tx.DataContext.People.Where(p => EF.Functions.Like(p.Name, $"%{requestName}%"));
+        return await query.CountAsync();
+    }
+
+    private List<Person> ToDomain(List<PeopleDAO> personDaos)
+    {
+        var listOfDomainPersons = new List<Person>();
         foreach (var personDao in personDaos)
         {
             listOfDomainPersons.Add(ToDomain(personDao));

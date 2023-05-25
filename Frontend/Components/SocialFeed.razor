@@ -17,12 +17,12 @@
 @inject NavigationManager NavManager
 
 <div class="card-deck-container">
-    
+
     <h3>Social Feed</h3>
 
     @if (userFeedsLoaded)
     {
-        @if (feedPosts.Count >= 1)
+        @if (FeedPosts.Count >= 1)
         {
             foreach (var post in posts)
             {
@@ -44,7 +44,9 @@
                     </Row>
                     <Row Margin="Margin.Is2.FromTop">
                         <Column ColumnSize="ColumnSize.Is12">
-                            <Button Color="Color.Primary" Clicked="() => OnLikePost(post)">@post.NumberOfReactions <Icon Name="IconName.ThumbsUp" TextColor="TextColor.Light"/></Button>
+                            <Button Color="Color.Primary" Clicked="() => OnLikePost(post)">
+                                @post.NumberOfReactions <Icon Name="IconName.ThumbsUp" TextColor="TextColor.Light"/>
+                            </Button>
                             <Button Color="Color.Primary" Clicked="() => OnCommentClicked(post)">Comment</Button>
                         </Column>
                     </Row>
@@ -65,7 +67,7 @@
                                                     <Column ColumnSize="ColumnSize.Is2" Margin="Margin.Is4.FromEnd">
                                                         <img @onclick="() => OnUserClick(comment.UserId)" src="@comment.ProfilePicture" alt="profile pic">
                                                     </Column>
-                                                    <Column ColumnSize="ColumnSize.Is3">
+                                                    <Column ColumnSize="ColumnSize.Is5">
                                                         <h4>@comment.DisplayNameOfUser</h4>
                                                         <p>@GetTimeSincePost(comment.TimeStamp)</p>
                                                     </Column>
@@ -93,7 +95,7 @@
     <ModalContent Centered>
         <ModalHeader>
             <ModalTitle>Comment on post</ModalTitle>
-            <CloseButton />
+            <CloseButton/>
         </ModalHeader>
         <ModalBody>
             <Field>
@@ -109,7 +111,10 @@
 </Modal>
 
 @code {
-    private List<UserFeed> feedPosts;
+
+    [Parameter]
+    public List<UserFeed> FeedPosts { get; set; }
+
     private List<Post> posts = new List<Post>();
     private bool userFeedsLoaded = false;
     private int pageNumber = 1;
@@ -118,7 +123,11 @@
     private Modal modalRef;
     private string postIdToCommentOn;
     private string commentToUpload;
-    
+    [Parameter]
+    public bool isUserProfile { get; set; }
+    [Parameter]
+    public string UID { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadUserFeeds();
@@ -133,9 +142,9 @@
 
     private async Task LoadUserInfo()
     {
-        feedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue, pageNumber);
+        await LoadUserFeedsDependingOnPage();
         posts.Clear();
-        foreach (var userFeed in feedPosts)
+        foreach (var userFeed in FeedPosts)
         {
             string postText = GetTextBasedOnTopic(userFeed);
             var imageDataURL = await GetProfilePicture(userFeed.UserId);
@@ -180,22 +189,26 @@
         switch (userFeed.Topic)
         {
             case FeedPostDtoTopic.FavoriteMovie:
-                textToReturn = $"{userFeed.DisplayName} just added {userFeed.ActivityData.MovieTitle} to their favorite movies";
+                textToReturn = $"{userFeed.DisplayName} just added {userFeed.ActivityData.MovieTitle} to favorite movies";
                 break;
             case FeedPostDtoTopic.CreatedRating:
                 textToReturn = $"{userFeed.DisplayName} just rated {userFeed.ActivityData.MovieTitle} {userFeed.ActivityData.NewRating}⭐";
                 break;
             case FeedPostDtoTopic.UpdatedRating:
-                textToReturn = "";
+                textToReturn = $"{userFeed.DisplayName} just updated the rating on {userFeed.ActivityData.MovieTitle} from {userFeed.ActivityData.OldRating}⭐ to {userFeed.ActivityData.NewRating}⭐";
+                ;
                 break;
             case FeedPostDtoTopic.RemovedRating:
-                textToReturn = "";
+                textToReturn = $"{userFeed.DisplayName} just removed the rating from {userFeed.ActivityData.MovieTitle}";
                 break;
             case FeedPostDtoTopic.NewUser:
-                textToReturn = $"{userFeed.DisplayName} created their account";
+                textToReturn = $"{userFeed.DisplayName} created an account";
                 break;
             case FeedPostDtoTopic.UnFavoriteMovie:
-                textToReturn = "";
+                textToReturn = $"{userFeed.DisplayName} just removed {userFeed.ActivityData.MovieTitle} from favorite movies";
+                break;
+            case FeedPostDtoTopic.CreatedReview:
+                textToReturn = $"{userFeed.DisplayName} added a review for {userFeed.ActivityData.MovieTitle} saying: '{userFeed.ActivityData.ReviewBody}'";
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(userFeed.Topic), userFeed.Topic, null);
@@ -208,7 +221,7 @@
         var timeSpan = DateTimeOffset.Now - timeOfActivity;
 
         var timeSincePost = "";
-        
+
         if (timeSpan.Days > 1)
         {
             timeSincePost = $"{timeSpan.Days} days ago";
@@ -242,7 +255,8 @@
         try
         {
             await SocialFeedModel.ReactToSocialFeed(FirebaseModel.CurrentUser.TokenValue, post.Id.ToString());
-            await LoadUserFeeds();
+            await LoadUserInfo();
+            await InvokeAsync(StateHasChanged);
         }
         catch (Exception e)
         {
@@ -262,8 +276,9 @@
         await SocialFeedModel.CommentOnPost(FirebaseModel.CurrentUser.TokenValue, postIdToCommentOn, commentToUpload);
         postIdToCommentOn = "";
         commentToUpload = "";
-        await LoadUserFeeds();
+        await LoadUserInfo();
         await modalRef.Hide();
+        await InvokeAsync(StateHasChanged);
     }
 
     private Task HideModal()
@@ -280,7 +295,7 @@
         if (profilePicture != null && profilePicture.Any())
         {
             var profilePictureString = Convert.ToBase64String(profilePicture, 0, profilePicture.Length);
-            imageDataURL = string.Format("data:image/svg+xml;base64,{0}", profilePictureString);
+            imageDataURL = $"data:image/jpg;base64,{profilePictureString}";
         }
         else
         {
@@ -291,7 +306,19 @@
 
     private void OnUserClick(string userId)
     {
-        NavManager.NavigateTo($"/UserProfile2/{userId}");
+        NavManager.NavigateTo($"/UserProfile/{userId}");
+    }
+
+    private async Task LoadUserFeedsDependingOnPage()
+    {
+        if (isUserProfile)
+        {
+            FeedPosts = await SocialFeedModel.GetOwnSocialFeed(UID, pageNumber);
+        }
+        else
+        {
+            FeedPosts = await SocialFeedModel.GetSocialFeed(FirebaseModel.CurrentUser.TokenValue, pageNumber);
+        }
     }
 
 }

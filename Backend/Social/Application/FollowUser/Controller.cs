@@ -1,11 +1,11 @@
-﻿using System.Diagnostics.Contracts;
+using System.Diagnostics.Contracts;
 using Backend.Middleware;
 using Backend.Social.Application.FollowUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.SocialFeed.Application.FollowUser;
+namespace Backend.Social.Application.FollowUser;
 
 [ApiController]
 [Route("Social")]

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Backend.Middleware;
+﻿using Backend.Middleware;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +24,7 @@ public class Controller : ControllerBase
 
     [HttpPut]
     [Route("userImage")]
-    [Tags("UserApi")]
+    [Tags("User")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize]

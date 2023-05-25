@@ -1,4 +1,5 @@
 ﻿@using Blazorise
+@using Frontend.Authentication
 @using Frontend.Events
 @using Frontend.Model.Firebase
 @using Frontend.Pages
@@ -125,16 +126,17 @@
         searchUsers = isSearchUsers;
     }
     
-    private void Logout()
+    private async void Logout()
     {
         FirebaseModel.Logout();
-        AuthStateProvider.SignOut();
+        await AuthStateProvider.UpdateAuthenticationState(null);
         NavManager.NavigateTo("/");
     }
     
     private void MyProfile()
     {
-        NavManager.NavigateTo($"/userprofile2/{FirebaseModel.CurrentUser.UID}");
+        NavManager.NavigateTo("/");
+        NavManager.NavigateTo($"/userprofile/{FirebaseModel.CurrentUser.UID}");
     }
 
 }

@@ -16,7 +16,10 @@ public class TopMoviesDto
     public string Title { get; set; }
     public int ReleaseYear { get; set; }
     public Uri? PathToPoster { get; set; }
+    public TopMoviesRating? Rating { get; set; }
 }
+
+public record TopMoviesRating(double AvgRating, int Votes);
 
 public class QueryHandler : IRequestHandler<Query, GetTopMoviesForPersonResponse>
 {
@@ -37,7 +40,6 @@ public class QueryHandler : IRequestHandler<Query, GetTopMoviesForPersonResponse
         var actedMovies =  await _repository.GetActedMoviesForPersonAsync(request.PersonId, transaction);
         var directedMovies =  await _repository.GetDirectedMoviesForPersonAsync(request.PersonId, transaction);
         var dto = await toDto(actedMovies, directedMovies);
-        
         return dto;
     }
 
@@ -57,13 +59,18 @@ public class QueryHandler : IRequestHandler<Query, GetTopMoviesForPersonResponse
         foreach (var m in movies)
         {
             var pathToPoster = _imageService.GetPathForPosterAsync(m.Id);
-            movieList.Add(new TopMoviesDto
+            var topMovie = new TopMoviesDto
             {
                 MovieId = m.Id,
                 Title = m.Title,
                 ReleaseYear = m.ReleaseYear,
                 PathToPoster = await pathToPoster
-            });
+            };
+            if (m.Rating != null)
+            {
+                topMovie.Rating = new TopMoviesRating(m.Rating.AverageRating, m.Rating.Votes);
+            }
+            movieList.Add(topMovie);
         }
 
         return movieList;

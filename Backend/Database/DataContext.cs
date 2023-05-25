@@ -1,7 +1,7 @@
-﻿using Backend.Movie.Infrastructure;
-using Backend.People.Infrastructure;
-using Backend.SocialFeed.Infrastructure;
-using Backend.User.Infrastructure;
+﻿using Backend.Movie.Infrastructure.Models;
+using Backend.People.Infrastructure.Models;
+using Backend.Social.Infrastructure.Models;
+using Backend.User.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Database;
@@ -17,15 +17,16 @@ public class DataContext : DbContext
     public DbSet<PostDAO> Posts { get; set; }
     public DbSet<SocialUserDAO> SocialUsers { get; set; }
 
+    private readonly IConfiguration _configuration;
+
     public DataContext(IConfiguration configuration, DbContextOptions options) : base(options)
     {
-        Configuration = configuration;
+        _configuration = configuration;
     }
-
+    
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        // connect to sqlite database
-        options.UseSqlite(Configuration.GetConnectionString("WebApiDatabase"));
+        options.UseSqlServer(_configuration.GetConnectionString("WebApiDatabase"));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

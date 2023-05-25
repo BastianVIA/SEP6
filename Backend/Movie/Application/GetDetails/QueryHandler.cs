@@ -1,5 +1,4 @@
 ﻿using Backend.Database.TransactionManager;
-using Backend.Movie.Domain;
 using Backend.Movie.Infrastructure;
 using Backend.People.Application.GetPeopleFromId;
 using Backend.Service;

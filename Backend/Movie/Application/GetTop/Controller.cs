@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.Movie.Application.GetTop100;
+namespace Backend.Movie.Application.GetTop;
 
 [ApiController]
 [Route("movie")]
@@ -22,7 +22,7 @@ public class Controller : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("top")]
-    [Tags("MovieApi")]
+    [Tags("Movie")]
     [ProducesResponseType(typeof(MovieTop100Response), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(int pageNumber = 1)
     {

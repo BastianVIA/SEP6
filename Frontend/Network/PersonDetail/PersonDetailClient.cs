@@ -5,7 +5,6 @@ namespace Frontend.Network.PersonDetail;
 
 public class PersonDetailClient : NSwagBaseClient, IPersonDetailClient
 {
-  
     public async Task<Person> GetPersonDetail(string personId)
     {
         var response = await _api.PersonAsync(personId);
@@ -14,15 +13,21 @@ public class PersonDetailClient : NSwagBaseClient, IPersonDetailClient
             Id = movie.MovieId,
             Title = movie.Title,
             ReleaseYear = movie.ReleaseYear,
-            PosterUrl = movie.PathToPoster
+            PosterUrl = movie.PathToPoster,
+            Rating = movie.Rating != null
+                ? new Rating { AverageRating = movie.Rating.AvgRating, RatingCount = movie.Rating.Votes }
+                : null
         }).ToList();
-        
+
         var directedMovies = response.DirectedMovies?.Select(movie => new Movie
         {
             Id = movie.MovieId,
             Title = movie.Title,
             ReleaseYear = movie.ReleaseYear,
-            PosterUrl = movie.PathToPoster
+            PosterUrl = movie.PathToPoster,
+            Rating = movie.Rating != null
+                ? new Rating { AverageRating = movie.Rating.AvgRating, RatingCount = movie.Rating.Votes }
+                : null
         }).ToList();
 
         var person = new Person
@@ -35,8 +40,12 @@ public class PersonDetailClient : NSwagBaseClient, IPersonDetailClient
             ImageUrl = response.PathToPic,
             Bio = response.Bio,
             KnownFor = response.KnownFor
-
         };
         return person;
+    }
+
+    public PersonDetailClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory,
+        configuration)
+    {
     }
 }

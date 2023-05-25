@@ -1,8 +1,7 @@
-﻿using Backend.SocialFeed.Application.GetFollowing;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.SocialFeed.Application.GetFollows;
+namespace Backend.Social.Application.GetFollows;
 [ApiController]
 [Route("Social")]
 public class Controller: ControllerBase

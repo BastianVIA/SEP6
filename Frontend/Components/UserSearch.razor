@@ -11,7 +11,7 @@
 @if (isDataFetched)
 {
     <div class="page-content">
-        <h3>Search Result</h3>
+        <h3>Search Result User</h3>
 
         @if (userList.Count == 0)
         {
@@ -124,7 +124,7 @@
     
     private void OnUserClick(string userId)
     {
-        NavManager.NavigateTo($"UserProfile2/{userId}");
+        NavManager.NavigateTo($"UserProfile/{userId}");
     }
 
     private async void GoToPreviousPage()

@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Backend.SocialFeed.Domain;
+namespace Backend.Social.Domain;
 
 public class SocialUserCreatedEvent : INotification
 {

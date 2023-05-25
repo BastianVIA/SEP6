@@ -1,9 +1,9 @@
-﻿using Backend.Database.TransactionManager;
+﻿using System.Diagnostics;
+using Backend.Database.TransactionManager;
 using Backend.Movie.Application.GetTopMoviesForPerson;
 using Backend.People.Domain;
 using Backend.People.Infrastructure;
 using Backend.Service;
-using FirebaseAdmin.Auth;
 using MediatR;
 
 namespace Backend.People.Application.GetDetails;
@@ -20,7 +20,10 @@ public class PersonDetailsMovieDto
     public string Title { get; set; }
     public int ReleaseYear { get; set; }
     public Uri? PathToPoster { get; set; }
+    public PersonMovieRating? Rating { get; set; }
 }
+
+public record PersonMovieRating(double AvgRating, int Votes);
 
 public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
 {
@@ -42,8 +45,7 @@ public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
     {
         var transaction = _transactionFactory.BeginReadOnlyTransaction();
         var person =
-            await _repository.ReadPersonFromIdAsync(request.PersonId, transaction, includeActed: true,
-                includeDirected: true);
+            await _repository.ReadPersonFromIdAsync(request.PersonId, transaction);
         var personDetails = _personService.GetPersonAsync(person.ImdbId);
         var movies = _mediator.Send(new Movie.Application.GetTopMoviesForPerson.Query(request.PersonId));
 
@@ -56,12 +58,12 @@ public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
     {
         var actedMovies = toDto(personsMovies.ActedMovies);
         var directedMovies = toDto(personsMovies.DirectedMovies);
-        
+
         if (personDetails == null)
         {
-            return new GetPersonDetailsResponse( person.Id, person.Name,actedMovies,directedMovies , person.BirthYear);
+            return new GetPersonDetailsResponse(person.Id, person.Name, actedMovies, directedMovies, person.BirthYear);
         }
-        
+
         return new GetPersonDetailsResponse(person.Id, person.Name, actedMovies, directedMovies, person.BirthYear,
             personDetails.KnownFor, personDetails.PathToProfilePic, personDetails.Bio);
     }
@@ -76,13 +78,18 @@ public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
 
         foreach (var m in movies)
         {
-            personMovies.Add(new PersonDetailsMovieDto
+            var topMovie = new PersonDetailsMovieDto
             {
                 MovieId = m.MovieId,
                 Title = m.Title,
                 ReleaseYear = m.ReleaseYear,
                 PathToPoster = m.PathToPoster
-            });
+            };
+            if (m.Rating != null)
+            {
+                topMovie.Rating = new PersonMovieRating(m.Rating.AvgRating, m.Rating.Votes);
+            }
+            personMovies.Add(topMovie);
         }
 
         return personMovies;

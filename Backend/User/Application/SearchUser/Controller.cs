@@ -1,13 +1,9 @@
-﻿namespace Backend.User.Application.SearchUser;
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Backend.Enum;
-using Backend.Middleware;
-using FirebaseAdmin.Auth;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace Backend.User.Application.SearchUser;
 
 [ApiController]
 [Route("user")]
@@ -31,7 +27,7 @@ public class Controller: ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("search")]
-    [Tags("UserApi")]
+    [Tags("User")]
     [ProducesResponseType(typeof(UserSearchResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get([Required] string displayName, UserSortingKey userSortingKey = UserSortingKey.DisplayName, SortingDirection sortingDirection = SortingDirection.DESC, int pageNumber = 1)

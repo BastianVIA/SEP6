@@ -29,7 +29,7 @@ public class QueryHandlerTests
         var request = _fixture.Create<Query>();
         var expected = new List<Backend.Movie.Domain.Movie>();
         _movieRepository.SearchForMovieAsync(request.Title, request.sortingKey, request.sortingDirection, request.pageNumber, Arg.Any<DbReadOnlyTransaction>())
-            .Returns(expected);
+            .Returns((expected, 2));
         
         //Act
         var result = await _handler.Handle(request, CancellationToken.None);
@@ -51,7 +51,7 @@ public class QueryHandlerTests
                 Arg.Any<SortingDirection>(), 
                 Arg.Any<int>(), 
                 Arg.Any<DbReadOnlyTransaction>())
-            .Returns(expected);
+            .Returns((expected, 2));
 
         //Act
         var result = await _handler.Handle(request, CancellationToken.None);
@@ -75,7 +75,7 @@ public class QueryHandlerTests
                 Arg.Any<SortingDirection>(), 
                 Arg.Any<int>(), 
                 Arg.Any<DbReadOnlyTransaction>())
-            .Returns(returnedMovies);
+            .Returns((returnedMovies, 2));
 
         //Act
         var result = await _handler.Handle(request, CancellationToken.None);

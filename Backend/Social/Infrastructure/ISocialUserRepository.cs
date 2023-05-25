@@ -1,12 +1,11 @@
 ﻿using Backend.Database.Transaction;
-using Backend.SocialFeed.Domain;
-using FirebaseAdmin.Auth;
+using Backend.Social.Domain;
 
-namespace Backend.SocialFeed.Infrastructure;
+namespace Backend.Social.Infrastructure;
 
 public interface ISocialUserRepository
 {
     Task<SocialUser>ReadSocialUserAsync(string id, DbReadOnlyTransaction tx, bool includeFollowing = false);
     void CreateSocialUserAsync(SocialUser user , DbTransaction tx);
-    Task UpdateSocialUserAsync(Domain.SocialUser socialUser, DbTransaction tx);
+    Task UpdateSocialUserAsync(SocialUser socialUser, DbTransaction tx);
 }

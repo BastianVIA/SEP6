@@ -4,27 +4,29 @@ using Backend.Middleware;
 using Backend.Movie.Infrastructure;
 using Backend.People.Infrastructure;
 using Backend.Service;
-using Backend.SocialFeed.Infrastructure;
+using Backend.Social.Infrastructure;
 using Backend.User.Infrastructure;
 using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Newtonsoft.Json.Converters;
 using FirebaseAdmin.Auth;
+using Google.Apis.Auth.OAuth2;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using NLog;
 using LogLevel = NLog.LogLevel;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Specify URLs your application will listen on
+builder.WebHost.UseUrls("http://localhost:5276");
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 builder.Services.AddScoped<GlobalExceptionFilter>();
@@ -37,7 +39,20 @@ builder.Services.AddScoped<ITrailerService, TMDBService>();
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.Converters.Add(new StringEnumConverter());
+    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 });
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("https://farligtigermdb.azurewebsites.net/")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
+
 
 var firebaseApp = FirebaseApp.Create(new AppOptions
 {
@@ -63,7 +78,9 @@ builder.Services
     });
 
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("WebApiDatabase")));
+        options.UseSqlServer(builder.Configuration.GetConnectionString("ContextConn")),
+    ServiceLifetime.Transient);
+
 var transactionSemaphore = new SemaphoreSlim(1, 1);
 
 builder.Services.AddScoped<IDatabaseTransactionFactory>(sp =>
@@ -99,6 +116,10 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddSwaggerGenNewtonsoftSupport();
 
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
+
 var app = builder.Build();
 app.UseMiddleware<FirebaseTokenMiddleware>();
 
@@ -107,6 +128,9 @@ LogManager.Setup().LoadConfiguration(builder =>
     builder.ForLogger().FilterMinLevel(LogLevel.Info).WriteToConsole();
     builder.ForLogger().FilterMinLevel(LogLevel.Debug).WriteToFile(fileName: "log.txt");
 });
+
+// Use CORS
+app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -130,14 +154,15 @@ app.UseExceptionHandler(appError =>
 });
 
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
+else
+{
+    app.UseHttpsRedirection();
+}
 
 app.MapControllers();
 
