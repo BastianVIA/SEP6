@@ -42,7 +42,6 @@ public class Controller : ControllerBase
 
         await _mediator.Send(new Command(request.PostId, userid, request.Reation));
         return Ok();
-
     }
     
     public class ReactToPostRequest

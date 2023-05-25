@@ -72,6 +72,7 @@ public class DbTransaction : DbReadOnlyTransaction, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        Console.WriteLine("DIIIIIIIIIIIISPPPPPPPOOOODS");
         if (Disposed)
         {
             return;
