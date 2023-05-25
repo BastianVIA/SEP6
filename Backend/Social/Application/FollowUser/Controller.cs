@@ -1,4 +1,6 @@
-﻿using Backend.Middleware;
+using System.Diagnostics.Contracts;
+using Backend.Middleware;
+using Backend.Social.Application.FollowUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +42,5 @@ public class Controller : ControllerBase
 
         await _mediator.Send(new Command(userid, userIdToFollow));
         return Ok();
-
     }
 }

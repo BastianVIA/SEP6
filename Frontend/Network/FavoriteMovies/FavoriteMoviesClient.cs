@@ -6,9 +6,8 @@ namespace Frontend.Network.FavoriteMovies;
 
 public class FavoriteMoviesClient : NSwagBaseClient, IFavoriteMoviesClient
 {
-    public async Task<IList<Movie>> GetFavoriteMovies(string userToken, string UID)
+    public async Task<IList<Movie>> GetFavoriteMovies(string UID)
     {
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
         FavoriteMovesResponse response;
         try
         {

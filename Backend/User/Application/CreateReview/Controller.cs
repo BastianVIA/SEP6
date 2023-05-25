@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.User.Application.CreateReview;
 
+[ApiController]
+[Route("user")]
 public class Controller : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -26,7 +28,7 @@ public class Controller : ControllerBase
     [Tags("User")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Authorize]
-    public IActionResult Post([FromBody] CreateReviewRequest reviewRequest)
+    public async Task<IActionResult> Post([FromBody] CreateReviewRequest reviewRequest)
     {
         var userid = (string?)HttpContext.Items[HttpContextKeys.UserId];
         if (userid == null)
@@ -34,7 +36,7 @@ public class Controller : ControllerBase
             return BadRequest("No token provided to create the user");
         }
         var command = new Command(userid, reviewRequest.MovieId, reviewRequest.ReviewBody);
-        var result = _mediator.Send(command);
+        await _mediator.Send(command);
         return Ok();
     }
 

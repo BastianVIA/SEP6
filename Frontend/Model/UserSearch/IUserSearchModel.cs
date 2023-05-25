@@ -4,5 +4,5 @@ namespace Frontend.Model.UserSearch;
 
 public interface IUserSearchModel
 {
-    Task<IList<Entities.User>> SearchForUserAsync(string displayName, UserSortingKey? userSortingKey = null, SortingDirection2? sortingDirection = null, int? pageNumber = null);
+    Task<List<Entities.User> > SearchForUserAsync(string displayName, UserSortingKey? userSortingKey = null, SortingDirection2? sortingDirection = null, int? pageNumber = null);
 }

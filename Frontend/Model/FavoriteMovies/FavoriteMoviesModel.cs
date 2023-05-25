@@ -20,9 +20,9 @@ public class FavoriteMoviesModel : IFavoriteMoviesModel, IAlertNotifier
         _alertAggregator = alertAggregator;
     }
 
-    public async Task<IList<Movie>> GetFavoriteMovies(string userToken = null, string UID = null)
+    public async Task<IList<Movie>> GetFavoriteMovies(string UID = null)
     {
-        return await _client.GetFavoriteMovies(userToken, UID);
+        return await _client.GetFavoriteMovies(UID);
     }
 
     public async Task AddToFavoriteMovies(string bearerToken, string movieId)

@@ -7,7 +7,6 @@
 @inject IFavoriteMoviesModel FavoriteMoviesModel
 @using Blazorise
 @using Frontend.Components
-@using Blazorise.LottieAnimation
 @attribute [Authorize]
 
 @if (favoriteMoviesLoaded)
@@ -20,7 +19,7 @@
 }
 else
 {
-    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
+    <Loading/>
 }
 
 @code {
@@ -35,7 +34,7 @@ else
 
     private async Task LoadFavoriteMovies()
     {
-        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID);
+        favoriteMovies = await FavoriteMoviesModel.GetFavoriteMovies(FirebaseModel.CurrentUser.UID);
         favoriteMoviesLoaded = true;
     }
 

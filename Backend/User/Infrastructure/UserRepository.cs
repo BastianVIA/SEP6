@@ -42,7 +42,7 @@ public class UserRepository : IUserRepository
         return ToDomain(user);
     }
         
-    public async Task<(List<Domain.User> Users, int NumberOfPages)> SearchForUserAsync(string displayName, UserSortingKey userSortingKey, SortingDirection sortingDirection, int requestPageNumber,
+    public async Task<List<Domain.User>> SearchForUserAsync(string displayName, UserSortingKey userSortingKey, SortingDirection sortingDirection, int requestPageNumber,
         DbReadOnlyTransaction tx)
     {
         var query = tx.DataContext.Users.Include(u=> u.FavoriteMovies)
@@ -60,16 +60,12 @@ public class UserRepository : IUserRepository
                 throw new KeyNotFoundException($"{userSortingKey} not a valid user sorting key ");
         }
         
-        var totalUsersCount = await query.CountAsync();
-        var totalPages = (int)Math.Ceiling((double)totalUsersCount / NrOfResultsEachPage);
-
-        
         List<UserDAO> foundUsers = await query
             .Skip(NrOfResultsEachPage * (requestPageNumber - 1))
             .Take(NrOfResultsEachPage)
             .ToListAsync();
 
-        return (Users:ToDomain(foundUsers), NumberOfPages:totalPages);
+        return ToDomain(foundUsers);
     }
 
     public async Task CreateUserAsync(Domain.User user, DbTransaction tx)
@@ -89,9 +85,10 @@ public class UserRepository : IUserRepository
     {
         tx.AddDomainEvents(domainUser.ReadAllDomainEvents());
         var user = await tx.DataContext.Users
+            .Include(u => u.UserReviews)
             .Include(u => u.FavoriteMovies)
             .Include(u => u.UserRatings)
-            .SingleAsync(user => user.Id == domainUser.Id);
+            .FirstAsync(user => user.Id == domainUser.Id);
         
         
         if (domainUser.FavoriteMovies != null)

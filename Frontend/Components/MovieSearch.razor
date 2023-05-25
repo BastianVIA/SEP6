@@ -1,9 +1,7 @@
-﻿
-@using Frontend.Entities
+﻿@using Frontend.Entities
 @using Frontend.Service
 @inject IMovieSearchModel MovieSearchModel
 @inject NavigationManager NavManager
-@using Blazorise.LottieAnimation
 @using Blazorise
 @using Frontend.Model.MovieSearch
 
@@ -37,9 +35,9 @@
 else
 { 
     @if (isConnected)
-{
-    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
-}
+    {
+        <Loading/>
+    }
 }
 @code {
     [Parameter]
@@ -127,7 +125,7 @@ else
     
     protected override void OnAfterRender(bool firstRender)
     {
-        isConnected = firstRender;
+        isConnected = !firstRender;
     }
 }
 

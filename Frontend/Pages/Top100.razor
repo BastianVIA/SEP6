@@ -2,7 +2,6 @@
 @using Frontend.Entities
 @inject NavigationManager NavManager
 @inject ITop100Model Top100Model
-@using Blazorise.LottieAnimation
 @using Frontend.Components
 @using Frontend.Model.Top100
 @using Blazorise
@@ -16,7 +15,7 @@
 }
 else
 {
-    <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/>
+    <Loading/>
 }
 
 @code {
@@ -37,7 +36,6 @@ else
             _movieList.AddRange(movies);
             _currentPage++;
         }
-        
     }
 
     private async Task Load100Movies()
@@ -47,7 +45,6 @@ else
             await LoadMovies();
             StateHasChanged();
         } while (_movieList.Count < 100);
-        
     }
 
     private void OnMovieClick(string movieId)

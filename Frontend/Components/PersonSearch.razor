@@ -2,7 +2,6 @@
 @using Frontend.Entities
 @using Frontend.Service
 @inject NavigationManager NavManager
-@using Blazorise.LottieAnimation
 @using Blazorise
 @using Frontend.Model.PersonSearch
 @inject IPersonSearchModel PersonSearchModel
@@ -52,7 +51,10 @@
 }
 else
 {
-    @* <LottieAnimation Path="/Animations/loadingAimation.json" Style="height: 200px"/> *@
+    @if (isConnected)
+    {
+        <Loading/>
+    }
 }
 
 @code {
@@ -63,6 +65,7 @@ else
     
     private bool isDataFetched = false;
     private int peoplePerPage = 20;
+    private bool isConnected;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -101,8 +104,11 @@ else
     private void OnPersonClick(string personId)
     {
         NavManager.NavigateTo($"/PersonDetails/{personId}");
-        return;
     }
-
+    
+    protected override void OnAfterRender(bool firstRender)
+    {
+        isConnected = !firstRender;
+    }
 }
 

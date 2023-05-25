@@ -4,7 +4,6 @@
 @inject NavigationManager NavManager
 @using Blazorise
 @using Frontend.Model.UserSearch
-@using Blazorise.LottieAnimation
 
 <PageTitle>Search User</PageTitle>
 
@@ -59,13 +58,20 @@
                 <Icon Name="@IconName.AngleLeft"/>
             </button>
             <div class="page-number">
-                <p>Page @pageNumber</p>
+                <p>Page @pageNumber </p>
             </div>
             <button class="btn btn-secondary" @onclick="@GoToNextPage">
                 <Icon Name="@IconName.AngleRight"/>
             </button>
         </div>
     </div>
+}
+else
+{
+    @if (isConnected)
+    {
+        <Loading/>
+    }
 }
 
 @code {
@@ -97,13 +103,14 @@
         {
             sortingDirection = displayNameSortingDirection;
         }
-        userList = await UserSearchModel.SearchForUserAsync(DisplayName, userSortingKey, sortingDirection, pageNumber);
+       userList = await UserSearchModel.SearchForUserAsync(DisplayName, userSortingKey, sortingDirection, pageNumber);
         isDataFetched = true;
     }
    
 
     private SortingDirection2 sortingDirection = SortingDirection2.ASC;
     private SortingDirection2 displayNameSortingDirection = SortingDirection2.ASC;
+    private bool isConnected;
 
     private async Task SortByNumberOfVotedMovies()
     {
@@ -127,7 +134,7 @@
         NavManager.NavigateTo($"UserProfile/{userId}");
     }
 
-    private async void GoToPreviousPage()
+    private async Task GoToPreviousPage()
     {
         if (pageNumber <= 1)
         {
@@ -137,7 +144,7 @@
         await SearchForUser();
     }
 
-    private async void GoToNextPage()
+    private async Task GoToNextPage()
     {
         if (userList.Count < usersPerPage)
         {
@@ -147,4 +154,8 @@
         await SearchForUser();
     }
 
+    protected override void OnAfterRender(bool firstRender)
+    {
+        isConnected = !firstRender;
+    }
 }
