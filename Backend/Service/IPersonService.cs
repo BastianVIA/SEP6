@@ -7,7 +7,7 @@ public interface IPersonService
 
 public class PersonServiceDto
 {
-    public Uri? PathToProfilePic { get; set; }
+    public Uri? PathToPersonPic { get; set; }
     public string? Bio { get; set; }
     public string? KnownFor { get; set; }
 }

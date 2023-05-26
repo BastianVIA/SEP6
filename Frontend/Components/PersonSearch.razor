@@ -28,6 +28,7 @@
                 @foreach(Person person in personList)
                 {
                     <TableRow @onclick="@(() => OnPersonClick(person.ID))">
+                        <TableRowCell><img src="@person.ImageUrl" height="200"/></TableRowCell>
                         <TableRowCell>@person.Name</TableRowCell>
                         <TableRowCell>@person.BirthYear</TableRowCell>
                     </TableRow> 

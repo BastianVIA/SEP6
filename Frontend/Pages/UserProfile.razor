@@ -78,7 +78,7 @@
         
         <Row>
             <Column ColumnSize="ColumnSize.Is4" Flex="Flex.AlignItems.Start">
-                <h5>Total Movies Reviewed: <b>@totalMoviesReviewed</b></h5>
+                <h5>Total Movies Rated: <b>@totalMoviesRated</b></h5>
             </Column>
             <Column ColumnSize="ColumnSize.Is4" Flex="Flex.AlignItems.Start">
                 <h5>User's Average Rating on Movies: <b>@averageRating.ToString("0.00")</b> ⭐</h5>
@@ -161,7 +161,7 @@
     private bool isUserLoaded = false;
     private IList<Movie> favoriteMovies = new List<Movie>();
     private double averageRating = 0;
-    private int totalMoviesReviewed = 0;
+    private int totalMoviesRated = 0;
     private double averageRatingFavMovies = 0;
     private string imageDataURL;
     private int pageNumber { get; set; } = 1;
@@ -205,8 +205,8 @@
 
         if (user.RatingDataPoints.Any())
         {
-            totalMoviesReviewed = user.RatingDataPoints.Sum(r => r.Item2);
-            averageRating = user.RatingDataPoints.Sum(r => r.Item1 * r.Item2) / (double)totalMoviesReviewed;
+            totalMoviesRated = user.RatingDataPoints.Sum(r => r.Item2);
+            averageRating = user.RatingDataPoints.Sum(r => r.Item1 * r.Item2) / (double)totalMoviesRated;
 
             ratingsCount.Clear();
             ratingsCount.AddRange(user.RatingDataPoints.OrderBy(r => r.Item1).Select(r => (double)r.Item2));

@@ -6,6 +6,7 @@ namespace Frontend.Network;
 public abstract class NSwagBaseClient
 {
     protected const string DEFAULT_POSTER_URL = "/Images/NoPosterAvailable.webp";
+    protected const string DEFUALT_PERSON_IMAGE_URL = "Images/NotFoundImage.jpg";
     protected HttpClient _httpClient;
     protected Client _api;
 

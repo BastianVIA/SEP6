@@ -37,7 +37,7 @@ public class PersonDetailClient : NSwagBaseClient, IPersonDetailClient
             ActedInList = actedMovies,
             DirectedList = directedMovies,
             BirthYear = response.BirthYear,
-            ImageUrl = response.PathToPic,
+            ImageUrl = response.PathToPic ?? new Uri(DEFUALT_PERSON_IMAGE_URL, UriKind.Relative),
             Bio = response.Bio,
             KnownFor = response.KnownFor
         };
