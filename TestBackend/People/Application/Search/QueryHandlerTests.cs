@@ -4,6 +4,7 @@ using Backend.Database.TransactionManager;
 using Backend.People.Application.Search;
 using Backend.People.Domain;
 using Backend.People.Infrastructure;
+using Backend.Service;
 using NSubstitute;
 
 namespace TestBackend.People.Application.Search;
@@ -16,9 +17,11 @@ public class QueryHandlerTests
     private readonly IDatabaseTransactionFactory _databaseTransactionFactory =
         Substitute.For<IDatabaseTransactionFactory>();
 
+    private readonly IPersonService _personService = Substitute.For<IPersonService>();
+
     public QueryHandlerTests()
     {
-        _handler = new QueryHandler(_repository, _databaseTransactionFactory);
+        _handler = new QueryHandler(_repository, _databaseTransactionFactory, _personService);
     }
 
     [Fact]
@@ -49,9 +52,11 @@ public class QueryHandlerTests
             .CreateMany()
             .ToList();
         var expectedReturn = returnedPeople;
+        var expectedPerson = _fixture.Create<PersonServiceDto>();
 
         _repository.SearchForPersonAsync(query.name, Arg.Any<int>(), Arg.Any<DbReadOnlyTransaction>())
             .Returns(expectedReturn);
+        _personService.GetPersonAsync(Arg.Any<string>()).Returns(expectedPerson);
         // Act
 
         var result = await _handler.Handle(query, CancellationToken.None);
