@@ -119,7 +119,10 @@ builder.Services.AddSwaggerGenNewtonsoftSupport();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
+using var scope = builder.Services.BuildServiceProvider().CreateScope();
 
+var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+dbContext.Database.MigrateAsync();
 
 var app = builder.Build();
 app.UseMiddleware<FirebaseTokenMiddleware>();
