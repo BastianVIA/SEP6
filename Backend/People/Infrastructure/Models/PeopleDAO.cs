@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Backend.People.Infrastructure.Models;
 
 [Index(nameof(Id))]
+[Index(nameof(Name))]
 public class PeopleDAO
 {
     [Key]

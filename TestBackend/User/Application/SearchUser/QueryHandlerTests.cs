@@ -14,10 +14,11 @@ public class QueryHandlerTests
     private Fixture _fixture = new();
     private readonly IUserRepository _repository = Substitute.For<IUserRepository>();
     private readonly IDatabaseTransactionFactory _transactionFactory = Substitute.For<IDatabaseTransactionFactory>();
+    private readonly IUserImageRepository _imageRepository = Substitute.For<IUserImageRepository>();
 
     public QueryHandlerTests()
     {
-        _handler = new QueryHandler(_repository, _transactionFactory);
+        _handler = new QueryHandler(_repository, _transactionFactory, _imageRepository);
     }
 
     [Fact]
@@ -29,10 +30,13 @@ public class QueryHandlerTests
             .Create();
         var returnedPeople = new List<Backend.User.Domain.User>();
         var expectedReturn = returnedPeople;
+        byte[]? expectedImage = null;
 
         _repository.SearchForUserAsync(Arg.Any<string>(), Arg.Any<UserSortingKey>(), Arg.Any<SortingDirection>(),
             Arg.Any<int>(), Arg.Any<DbReadOnlyTransaction>())
             .Returns(expectedReturn);
+        _imageRepository.ReadImageForUserAsync(Arg.Any<string>(), Arg.Any<DbReadOnlyTransaction>())
+            .Returns(expectedImage);
         // Act
 
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -51,16 +55,20 @@ public class QueryHandlerTests
             .CreateMany()
             .ToList();
         var expectedReturn = returnedPeople;
+        byte[]? expectedImage = _fixture.Create<byte[]>();
+
         _repository.SearchForUserAsync(Arg.Any<string>(), Arg.Any<UserSortingKey>(), Arg.Any<SortingDirection>(),
                 Arg.Any<int>(), Arg.Any<DbReadOnlyTransaction>())
             .Returns(expectedReturn);
-
+        _imageRepository.ReadImageForUserAsync(Arg.Any<string>(), Arg.Any<DbReadOnlyTransaction>())
+            .Returns(expectedImage);
         var result = await _handler.Handle(query, CancellationToken.None);
 
         Assert.NotNull(result);
         foreach (var userDto in result.UserDtos)
         {
             Assert.Contains(query.userName, userDto.DisplayName);
+            Assert.Equal(expectedImage, userDto.Image);
         }
     }
 

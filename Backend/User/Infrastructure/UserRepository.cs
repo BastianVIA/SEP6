@@ -46,6 +46,7 @@ public class UserRepository : IUserRepository
         DbReadOnlyTransaction tx)
     {
         var query = tx.DataContext.Users.Include(u=> u.FavoriteMovies)
+            .Include(u => u.UserRatings )
             .Where(u => EF.Functions.Like(u.DisplayName, $"%{displayName}%"));
 
         switch (userSortingKey)
@@ -95,7 +96,7 @@ public class UserRepository : IUserRepository
         {
             if (user.FavoriteMovies == null)
             {
-                user.FavoriteMovies = new List<UserMovieDAO>();
+                user.FavoriteMovies = new List<UserFavoriteMovieDAO>();
             }
 
             FromDomain(user.FavoriteMovies, domainUser.FavoriteMovies);
@@ -253,7 +254,7 @@ public class UserRepository : IUserRepository
     }
    
 
-    private void FromDomain(List<UserMovieDAO> userDaoMovies, List<UserFavoriteMovie> favoriteMovies)
+    private void FromDomain(List<UserFavoriteMovieDAO> userDaoMovies, List<UserFavoriteMovie> favoriteMovies)
     {
         var movieIds = favoriteMovies.Select(f => f.MovieId);
         userDaoMovies.RemoveAll(daoMovie => !movieIds.Contains(daoMovie.Id));
@@ -262,7 +263,7 @@ public class UserRepository : IUserRepository
             var movieExists = userDaoMovies.Any(daoMovie => daoMovie.Id == movie.MovieId);
             if (!movieExists)
             {
-                userDaoMovies.Add(new UserMovieDAO { Id = movie.MovieId, TimeMovieWasAdded = movie.TimeMovieWasAdded});
+                userDaoMovies.Add(new UserFavoriteMovieDAO { Id = movie.MovieId, TimeMovieWasAdded = movie.TimeMovieWasAdded});
             }
         }
     }

@@ -4,6 +4,7 @@ using Backend.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230525220622_addingIndexToPersonTable")]
+    partial class addingIndexToPersonTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -230,7 +233,7 @@ namespace Backend.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Backend.User.Infrastructure.Models.UserFavoriteMovieDAO", b =>
+            modelBuilder.Entity("Backend.User.Infrastructure.Models.UserMovieDAO", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -245,21 +248,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserFavoriteMovieDAO");
-                });
-
-            modelBuilder.Entity("Backend.User.Infrastructure.Models.UserProfileDAO", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<byte[]>("ProfilePicture")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserProfiles");
+                    b.ToTable("UserMovieDAO");
                 });
 
             modelBuilder.Entity("Backend.User.Infrastructure.Models.UserRatingDAO", b =>
@@ -412,7 +401,7 @@ namespace Backend.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("Backend.User.Infrastructure.Models.UserFavoriteMovieDAO", b =>
+            modelBuilder.Entity("Backend.User.Infrastructure.Models.UserMovieDAO", b =>
                 {
                     b.HasOne("Backend.User.Infrastructure.Models.UserDAO", "User")
                         .WithMany("FavoriteMovies")
