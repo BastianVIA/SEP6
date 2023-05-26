@@ -47,4 +47,8 @@
       <Folder Include="wwwroot\UserPictures" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\Animations\loadingAimation.json" />
+    </ItemGroup>
+
 </Project>
