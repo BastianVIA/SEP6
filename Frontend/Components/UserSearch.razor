@@ -42,11 +42,11 @@
                 @foreach (User user in userList)
                 {
                     <TableRow @onclick="@(() => OnUserClick(user.Id))">
-                        <TableRowCell>
-                            <img src="@user.ProfilePicture" height="200"/>
+                        <TableRowCell  >
+                        <img src="@(!string.IsNullOrEmpty(user.ProfilePicture) ? user.ProfilePicture : defaultProfilePicture)" alt="profile pic" width="auto" height="200" >
                         </TableRowCell>
-                        <TableRowCell>@user.Username</TableRowCell>
-                        <TableRowCell>@user.RatedMovies</TableRowCell>
+                        <TableRowCell >@user.Username</TableRowCell>
+                        <TableRowCell  >@user.RatedMovies</TableRowCell>
 
                     </TableRow>
                 }
@@ -78,7 +78,7 @@ else
 
     [Parameter]
     public string DisplayName { get; set; }
-
+    private string defaultProfilePicture = "/Images/NotFoundImage.jpg";
     private IList<User> userList = new List<User>();
     public bool isDataFetched = false;
     private int pageNumber { get; set; }

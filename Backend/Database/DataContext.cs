@@ -49,10 +49,10 @@ public class DataContext : DbContext
             .WithMany(d => d.DirectedMovies)
             .UsingEntity(j => j.ToTable("Directors"));
 
-        modelBuilder.Entity<UserMovieDAO>()
+        modelBuilder.Entity<UserFavoriteMovieDAO>()
             .HasKey(dao => new { dao.Id, dao.UserId });
         
-        modelBuilder.Entity<UserMovieDAO>()
+        modelBuilder.Entity<UserFavoriteMovieDAO>()
             .HasOne(um => um.User)
             .WithMany(u => u.FavoriteMovies)
             .HasForeignKey(um => um.UserId);
