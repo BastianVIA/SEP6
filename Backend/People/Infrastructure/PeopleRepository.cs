@@ -45,7 +45,8 @@ public class PeopleRepository : IPeopleRepository
 
     public async Task<List<Person>> SearchForPersonAsync(string name, int requestPageNumber, DbReadOnlyTransaction tx)
     {
-        var query = tx.DataContext.People.Where(p => EF.Functions.Like(p.Name, $"%{name}%"));
+        var query = tx.DataContext.People
+            .Where(p => EF.Functions.Like(p.Name, $"%{name}%"));
     
         Task<List<PeopleDAO>> foundPersons = query
             .Skip(NumberOfResultsPerPage * (requestPageNumber - 1))
