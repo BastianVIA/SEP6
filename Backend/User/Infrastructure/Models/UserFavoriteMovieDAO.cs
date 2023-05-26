@@ -1,6 +1,6 @@
 ﻿namespace Backend.User.Infrastructure.Models;
 
-public class UserMovieDAO
+public class UserFavoriteMovieDAO
 {
     public string Id { get; set; }
     public string UserId { get; set; }

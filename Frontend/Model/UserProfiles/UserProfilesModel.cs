@@ -12,12 +12,7 @@ public class UserProfilesModel: IUserProfilesModel
     {
         _client = client;
     }
-
-    public async Task UpdateUserProfile(Entities.User user)
-    {
-        await _client.UpdateUserProfile(user);
-    }
-
+    
     public async Task FollowUser(string userToken, string userId)
     {
         await _client.FollowUser(userToken, userId);

@@ -16,18 +16,21 @@ public class UserDto
     public string DisplayName { get; set; }
     public string Id { get; set; }
     public int RatedMovie { get; set; }
+    public byte[]? Image { get; set; }
 }
 
     public class QueryHandler : IRequestHandler<Query, UserSearchResponse>
     {
         private readonly IUserRepository _repository;
+        private readonly IUserImageRepository _imageRepository;
         private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
 
     public QueryHandler(IUserRepository repository,
-        IDatabaseTransactionFactory databaseTransactionFactory)
+        IDatabaseTransactionFactory databaseTransactionFactory, IUserImageRepository imageRepository)
     {
         _repository = repository;
         _databaseTransactionFactory = databaseTransactionFactory;
+        _imageRepository = imageRepository;
     }
 
     public async Task<UserSearchResponse> Handle(Query request, CancellationToken cancellationToken)
@@ -39,6 +42,7 @@ public class UserDto
         var userToDto = new List<UserDto>();
         foreach (var foundUser in users)
         {
+            var userImage = await _imageRepository.ReadImageForUserAsync(foundUser.Id, transaction);
             var userToAdd = new UserDto
             {
                 Id = foundUser.Id,
@@ -48,6 +52,12 @@ public class UserDto
             {
                 userToAdd.RatedMovie = foundUser.Ratings.Count;
             }
+
+            if (userImage != null)
+            {
+                userToAdd.Image = userImage;
+            }
+            
 
             userToDto.Add(userToAdd);
         }
