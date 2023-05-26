@@ -16,17 +16,20 @@ public class DataContext : DbContext
     public DbSet<PeopleDAO> People { get; set; }
     public DbSet<PostDAO> Posts { get; set; }
     public DbSet<SocialUserDAO> SocialUsers { get; set; }
+    public DbSet<UserProfileDAO> UserProfiles { get; set; }
 
     private readonly IConfiguration _configuration;
 
     public DataContext(IConfiguration configuration, DbContextOptions options) : base(options)
     {
         _configuration = configuration;
-    }
+    }    
     
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        options.UseSqlServer(_configuration.GetConnectionString("WebApiDatabase"));
+        options.UseSqlServer(_configuration.GetConnectionString("WebApiDatabase"), options => options.CommandTimeout(600));
+        options.EnableSensitiveDataLogging();
+        Console.WriteLine(_configuration.GetConnectionString("WebApiDatabase"));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

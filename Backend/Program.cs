@@ -33,7 +33,6 @@ builder.Services.AddScoped<GlobalExceptionFilter>();
 
 builder.Services.AddScoped<IImageService, TMDBService>();
 builder.Services.AddScoped<IResumeService, TMDBService>();
-builder.Services.AddScoped<IUserImageService, UserImageService>();
 builder.Services.AddScoped<IPersonService, TMDBService>();
 builder.Services.AddScoped<ITrailerService, TMDBService>();
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
@@ -93,6 +92,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPeopleRepository, PeopleRepository>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<ISocialUserRepository, SocialUserRepository>();
+builder.Services.AddScoped<IUserImageRepository, UserImageRepository>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
@@ -119,6 +119,10 @@ builder.Services.AddSwaggerGenNewtonsoftSupport();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
+using var scope = builder.Services.BuildServiceProvider().CreateScope();
+
+var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+dbContext.Database.MigrateAsync();
 
 var app = builder.Build();
 app.UseMiddleware<FirebaseTokenMiddleware>();

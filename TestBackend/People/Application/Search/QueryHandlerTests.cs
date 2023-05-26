@@ -28,7 +28,7 @@ public class QueryHandlerTests
         var query = _fixture.Build<Query>()
             .With(q => q.name, "ANameWhichNoPersonHasBeenXÆA-12")
             .Create();
-        var expectedList = _fixture.Create<List<Person>>();
+        var expectedList = new List<Person>();
 
         _repository.SearchForPersonAsync(query.name, Arg.Any<int>(), Arg.Any<DbReadOnlyTransaction>())
             .Returns(expectedList);
