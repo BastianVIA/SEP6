@@ -41,7 +41,7 @@ public class QueryHandlerTests
         var moviesResponse = _fixture.Create<Task<GetTopMoviesForPersonResponse>>();
         
 
-        _repository.ReadPersonFromIdAsync(query.PersonId, Arg.Any<DbReadOnlyTransaction>(), includeActed: true, includeDirected:true)
+        _repository.ReadPersonFromIdAsync(Arg.Any<string>(), Arg.Any<DbReadOnlyTransaction>(), Arg.Any<bool>(), Arg.Any<bool>())
             .Returns(expectedDetails);
         _personService.GetPersonAsync(Arg.Any<string>())
             .Returns(expectedPersonServiceDto);
