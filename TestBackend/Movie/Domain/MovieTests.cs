@@ -20,6 +20,7 @@ public class MovieTests
         Assert.Equal(4, movie.Rating.AverageRating);
         Assert.Equal(1, movie.Rating.Votes);
     }
+    
 
     [Fact]
     public void UpdateRating_UpdateExistingRating_UpdatesMovieRating()

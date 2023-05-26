@@ -14,7 +14,6 @@ using Frontend.Model.MovieSearch;
 using Frontend.Model.PersonSearch;
 using Frontend.Model.Person;
 using Frontend.Model.Recommendations;
-using Frontend.Model.SearchFilter;
 using Frontend.Model.SocialFeed;
 using Frontend.Model.Top100;
 using Frontend.Model.User;
@@ -28,7 +27,6 @@ using Frontend.Network.MovieSearch;
 using Frontend.Network.PersonDetail;
 using Frontend.Network.PersonSearch;
 using Frontend.Network.Recommendations;
-using Frontend.Network.SearchFilter;
 using Frontend.Network.SocialFeed;
 using Frontend.Network.Top100;
 using Frontend.Network.User;
@@ -57,7 +55,6 @@ builder.Services.AddScoped<ISocialFeedClient, SocialFeedClient>();
 builder.Services.AddScoped<ITop100Client, Top100Client>();
 builder.Services.AddScoped<IUserProfilePictureClient, UserProfilePictureClient>();
 builder.Services.AddScoped<IUserSearchClient, UserSearchClient>();
-builder.Services.AddScoped<ISearchFilterClient, SearchFilterClient>();
 
 
 // Add services to the container.
@@ -77,7 +74,6 @@ builder.Services.AddScoped<ISocialFeedModel, SocialFeedModel>();
 builder.Services.AddScoped<ITop100Model, Top100Model>();
 builder.Services.AddScoped<IUserProfilePictureModel, UserProfilePictureModel>();
 builder.Services.AddScoped<IUserSearchModel, UserSearchModel>();
-builder.Services.AddScoped<ISearchFilterModel, SearchFilterModel>();
 builder.Services.AddScoped<ProtectedLocalStorage>();
 
 builder.Services.AddHttpClient();

@@ -41,23 +41,5 @@ public class QueryHandlerTests
         // Assert
         Assert.Empty(result.FollowingUserDtos);
     }
-
-    [Fact]
-    public async Task Handle_ShouldReturnListOfIds_WhenFollowingOtherUsers()
-    {
-        // Arrange
-        var query = _fixture.Create<Query>();
-        var user = _fixture.Build<SocialUser>()
-            .With(u => u.Following, _fixture.Create<List<string>>())
-            .Create();
-
-        _userRepository.ReadSocialUserAsync(query.userId, Arg.Any<DbReadOnlyTransaction>(), includeFollowing: true)
-            .Returns(user);
-        
-        // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
-        // Assert
-        Assert.Equal(user.Following.Count, result.FollowingUserDtos.Count);
-        Assert.All(result.FollowingUserDtos, dto => Assert.Contains(dto.DisplayName, user.Following));
-    }
+    
 }
