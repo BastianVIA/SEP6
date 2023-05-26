@@ -1,4 +1,6 @@
-﻿using Backend.Service;
+﻿using Backend.Database.TransactionManager;
+using Backend.Service;
+using Backend.User.Infrastructure;
 using MediatR;
 
 namespace Backend.User.Application.SetUserImage;
@@ -7,15 +9,26 @@ public record Command(string userId, byte[] data) : IRequest;
 
 public class CommandHandler : IRequestHandler<Command>
 {
-    private readonly IUserImageService _userImageService;
+    private readonly IUserImageRepository _repository;
+    private readonly IDatabaseTransactionFactory _transactionFactory;
 
-    public CommandHandler(IUserImageService userImageService)
+    public CommandHandler( IUserImageRepository repository, IDatabaseTransactionFactory transactionFactory)
     {
-        _userImageService = userImageService;
+        _repository = repository;
+        _transactionFactory = transactionFactory;
     }
 
     public async Task Handle(Command request, CancellationToken cancellationToken)
     {
-        await _userImageService.UploadImageAsync(request.userId, request.data);
+        await using var transaction = await _transactionFactory.BeginTransactionAsync();
+        try
+        {
+            await _repository.UploadImageAsync(request.userId, request.data, transaction);
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackTransactionAsync();
+            throw;
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Backend.Service;
+﻿using Backend.Database.TransactionManager;
+using Backend.Service;
+using Backend.User.Infrastructure;
 using MediatR;
 
 namespace Backend.User.Application.GetUserImage;
@@ -14,18 +16,21 @@ public class UserImageDto
 
 public class QueryHandler : IRequestHandler<Query, UserImageResponse>
 {
-    private readonly IUserImageService _userImageService;
+    private readonly IUserImageRepository _repository;
+    private readonly IDatabaseTransactionFactory _transactionFactory;
 
-    public QueryHandler(IUserImageService userImageService)
+    public QueryHandler( IUserImageRepository repository, IDatabaseTransactionFactory transactionFactory)
     {
-        _userImageService = userImageService;
+        _repository = repository;
+        _transactionFactory = transactionFactory;
     }
 
     public async Task<UserImageResponse> Handle(Query request, CancellationToken cancellationToken)
     {
-        var imageData = await _userImageService.GetImageDataAsync(request.userId);
+        var transaction = _transactionFactory.BeginReadOnlyTransaction();
+        var image = await _repository.ReadImageForUserAsync(request.userId, transaction);
 
-        return new UserImageResponse(new UserImageDto(){ImageData = imageData});
+        return new UserImageResponse(new UserImageDto(){ImageData = image});
     }
 
 }
