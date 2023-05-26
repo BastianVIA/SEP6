@@ -29,13 +29,21 @@ public class UserDto
         _repository = repository;
         _databaseTransactionFactory = databaseTransactionFactory;
     }
-
+    
     public async Task<UserSearchResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
-        var users = await _repository.SearchForUserAsync(request.userName, request.UserSortingKey,
-            request.sortingDirection,
-            request.pageNumber, transaction);
+        var users = new List<Domain.User>();
+
+        if (string.IsNullOrWhiteSpace(request.userName))
+        {
+            users = await _repository.GetAllUsersAsync(transaction);
+        }
+        else
+        {
+            users = await _repository.SearchForUserAsync(request.userName, request.UserSortingKey, request.sortingDirection, request.pageNumber, transaction);
+        }
+
         var userToDto = new List<UserDto>();
         foreach (var foundUser in users)
         {
@@ -54,4 +62,5 @@ public class UserDto
 
         return new UserSearchResponse(userToDto);
     }
+
 }

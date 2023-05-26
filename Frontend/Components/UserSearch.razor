@@ -11,6 +11,7 @@
 {
     <div class="page-content">
         <h3>Search Result User</h3>
+        <Button Color="Color.Primary" Clicked="@ShowAllUsers">Show All Users</Button>
 
         @if (userList.Count == 0)
         {
@@ -78,6 +79,7 @@ else
 
     [Parameter]
     public string DisplayName { get; set; }
+    private bool fetchAll = false;
 
     private IList<User> userList = new List<User>();
     public bool isDataFetched = false;
@@ -158,4 +160,13 @@ else
     {
         isConnected = !firstRender;
     }
+    
+    
+    private async Task ShowAllUsers()
+    {
+        DisplayName = "%"; 
+        pageNumber = 1;
+        await SearchForUser();
+    }
+
 }

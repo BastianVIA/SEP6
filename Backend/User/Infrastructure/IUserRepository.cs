@@ -12,4 +12,6 @@ public interface IUserRepository
     Task CreateUserAsync(Domain.User user, DbTransaction tx);
     Task UpdateAsync(Domain.User user, DbTransaction tx);
     Task<int> NumberOfResultsForSearch(string requestDisplayName, DbReadOnlyTransaction tx);
+    Task<List<Domain.User>> GetAllUsersAsync(DbReadOnlyTransaction tx);
+
 }

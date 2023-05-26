@@ -129,6 +129,20 @@ public class UserRepository : IUserRepository
         return await query.CountAsync();
     }
 
+    public async Task<List<Domain.User>> GetAllUsersAsync(DbReadOnlyTransaction tx)
+    {
+        var query = tx.DataContext.Users.AsQueryable();
+        var userDAOs = await query.ToListAsync();
+
+        return userDAOs.Select(userDAO => new Domain.User 
+        {
+            Id = userDAO.Id,
+            DisplayName = userDAO.DisplayName,
+            
+        }).ToList();
+    }
+
+    
     private IOrderedQueryable<UserDAO> SearchForUserOrderByUsernameAsync(IQueryable<UserDAO> query,
         SortingDirection sortingDirection)
     {

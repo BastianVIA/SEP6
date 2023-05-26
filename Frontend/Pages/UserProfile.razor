@@ -15,7 +15,7 @@
 @inject ISocialFeedModel SocialFeedModel
 
 <div class="user-profile-container">
-    
+
     @if (user == null)
     {
         <Loading/>
@@ -23,12 +23,12 @@
     else
     {
         <Row Margin="Margin.Is2.FromBottom">
-            <Column ColumnSize="ColumnSize.Is3" >
+            <Column ColumnSize="ColumnSize.Is3">
                 <img src="@(!string.IsNullOrEmpty(imageDataURL) ? imageDataURL : defaultProfilePicture)" alt="profile pic" width="100%">
                 @if (IsOwnProfile())
                 {
                     <Field Width="Width.Is100">
-                        <FilePicker Upload="UpdateProfilePicture"/>
+                        <FilePicker Upload="UpdateProfilePicture" Accept=".jpg,.jpeg,.png,.gif,bmp"/>
                     </Field>
                 }
             </Column>
@@ -61,7 +61,7 @@
         </Row>
 
         <Divider Margin="Margin.Is5.FromBottom.Is5.FromTop"/>
-        
+
         <div class="favorite-container">
             <h4>Favorite Movies</h4>
             @if (favoriteMovies != null && favoriteMovies.Any())
@@ -73,9 +73,9 @@
                 <p>No favorite movies yet.</p>
             }
         </div>
-        
+
         <Divider Margin="Margin.Is5.FromBottom.Is5.FromTop"/>
-        
+
         <Row>
             <Column ColumnSize="ColumnSize.Is4" Flex="Flex.AlignItems.Start">
                 <h5>Total Movies Reviewed: <b>@totalMoviesReviewed</b></h5>
@@ -87,10 +87,10 @@
                 <h5>Favorited Movies Average: <b>@averageRatingFavMovies.ToString("0.00")</b> ⭐</h5>
             </Column>
         </Row>
-        
+
         <Divider Margin="Margin.Is5.FromBottom.Is5.FromTop"/>
     }
-    
+
     <div class="chart-container" hidden="@hideChart">
         <Row>
             <h4>Users Assessment summary on Movies</h4>
@@ -113,38 +113,38 @@
     <ModalContent Centered>
         <ModalHeader>
             <ModalTitle>Following</ModalTitle>
-            <CloseButton />
+            <CloseButton/>
         </ModalHeader>
         <ModalBody>
             <Table Hoverable Striped>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHeaderCell>Profile Picture</TableHeaderCell>
-                                <TableHeaderCell>
-                                    <div>
-                                        Username
-                                    </div>
-                                </TableHeaderCell>
-                                <TableHeaderCell>
-                                    <div>
-                                        Number Rated Movies
-                                    </div>
-                                </TableHeaderCell>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            @foreach (User user in followingUserList)
-                            {
-                                <TableRow @onclick="@(() => OnUserClick(user.Id))">
-                                    <TableRowCell>
-                                        <img src="@user.ProfilePicture" height="150"/>
-                                    </TableRowCell>
-                                    <TableRowCell>@user.Username</TableRowCell>
-                                    <TableRowCell>@user.RatedMovies</TableRowCell>
-                                </TableRow>
-                            }
-                        </TableBody>
-                    </Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHeaderCell>Profile Picture</TableHeaderCell>
+                        <TableHeaderCell>
+                            <div>
+                                Username
+                            </div>
+                        </TableHeaderCell>
+                        <TableHeaderCell>
+                            <div>
+                                Number Rated Movies
+                            </div>
+                        </TableHeaderCell>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    @foreach (User user in followingUserList)
+                    {
+                        <TableRow @onclick="@(() => OnUserClick(user.Id))">
+                            <TableRowCell>
+                                <img src="@user.ProfilePicture" height="150"/>
+                            </TableRowCell>
+                            <TableRowCell>@user.Username</TableRowCell>
+                            <TableRowCell>@user.RatedMovies</TableRowCell>
+                        </TableRow>
+                    }
+                </TableBody>
+            </Table>
         </ModalBody>
         <ModalFooter>
             <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
@@ -153,8 +153,10 @@
 </Modal>
 
 @code {
+
     [Parameter]
     public string UID { get; set; }
+
     public Chart<double> barChart;
     private string defaultProfilePicture = "/Images/NotFoundImage.jpg";
     private User user;
@@ -170,7 +172,7 @@
     private IList<User> followingUserList = new List<User>();
     private List<UserFeed> feedPosts;
     private bool hideChart = true;
-    
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -226,13 +228,11 @@
 
     async Task HandleRedraw()
     {
-        
-            await barChart.Clear();
+        await barChart.Clear();
 
-            await barChart.AddLabelsDatasetsAndUpdate(Labels, GetBarChartDataset());
-        
+        await barChart.AddLabelsDatasetsAndUpdate(Labels, GetBarChartDataset());
     }
-    
+
     private void OnMovieClick(string movieId)
     {
         NavManager.NavigateTo($"movieDetails/{movieId}");
@@ -257,20 +257,20 @@
     List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
 
     string[] Labels = { "One Star", "Two Stars", "Three Stars", "Four Stars", "Five Stars", "Six Stars", "Seven Stars", "Eight Stars", "Nine Stars", "Ten Stars" };
-    
+
     private async Task UpdateProfilePicture(FileUploadEventArgs e)
     {
         try
         {
-            using ( MemoryStream result = new MemoryStream() )
+            using (MemoryStream result = new MemoryStream())
             {
-                await e.File.OpenReadStream( long.MaxValue ).CopyToAsync( result );
+                await e.File.OpenReadStream(long.MaxValue).CopyToAsync(result);
                 await UserProfilePictureModel.UploadProfilePicture(FirebaseModel.CurrentUser.TokenValue, result.ToArray());
             }
         }
-        catch ( Exception exc )
+        catch (Exception exc)
         {
-            Console.WriteLine( exc.Message );
+            Console.WriteLine(exc.Message);
         }
         finally
         {
@@ -284,7 +284,7 @@
         await UserProfilesModel.FollowUser(FirebaseModel.CurrentUser.TokenValue, UID);
         isFollowing = await UserProfilesModel.IsFollowingUser(FirebaseModel.CurrentUser.TokenValue, FirebaseModel.CurrentUser.UID, UID);
     }
-    
+
     private async Task<string> GetProfilePicture(string userId)
     {
         var profilePicture = await UserProfilePictureModel.GetProfilePicture(userId);
@@ -293,7 +293,6 @@
         {
             var profilePictureString = Convert.ToBase64String(profilePicture, 0, profilePicture.Length);
             imageDataURL = $"data:image/jpg;base64,{profilePictureString}";
-
         }
         else
         {
@@ -328,7 +327,7 @@
     {
         return modalRef.Hide();
     }
-    
+
     private void OnUserClick(string userId)
     {
         NavManager.NavigateTo("/");
