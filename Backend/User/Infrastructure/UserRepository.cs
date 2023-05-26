@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Backend.User.Infrastructure;
 
 public class UserRepository : IUserRepository
+
 {
     private int NrOfResultsEachPage;
 
@@ -129,18 +130,30 @@ public class UserRepository : IUserRepository
             .Where(u => EF.Functions.Like(u.DisplayName, $"%{requestDisplayName}%"));
         return await query.CountAsync();
     }
-
-    public async Task<List<Domain.User>> GetAllUsersAsync(DbReadOnlyTransaction tx)
+    
+    public async Task<List<Domain.User>> GetAllUsersAsync(UserSortingKey userSortingKey, SortingDirection sortingDirection, int requestPageNumber, DbReadOnlyTransaction tx)
     {
-        var query = tx.DataContext.Users.AsQueryable();
-        var userDAOs = await query.ToListAsync();
+        IOrderedQueryable<UserDAO> query; // Change the type here
 
-        return userDAOs.Select(userDAO => new Domain.User 
+        switch (userSortingKey)
         {
-            Id = userDAO.Id,
-            DisplayName = userDAO.DisplayName,
-            
-        }).ToList();
+            case UserSortingKey.DisplayName:
+                query = SearchForUserOrderByUsernameAsync(tx.DataContext.Users.Include(u => u.FavoriteMovies).Include(u => u.UserRatings), sortingDirection);
+                break;
+            case UserSortingKey.MoviesVoted:
+                query = SearchForUserOrderByVotedMoviesAsync(tx.DataContext.Users.Include(u => u.FavoriteMovies).Include(u => u.UserRatings), sortingDirection);
+                break;
+            default:
+                throw new KeyNotFoundException($"{userSortingKey} not a valid user sorting key ");
+        }
+        
+        List<UserDAO> foundUsers = await query
+            .Skip(NrOfResultsEachPage * (requestPageNumber - 1))
+            .Take(NrOfResultsEachPage)
+            .ToListAsync();
+
+        return ToDomain(foundUsers);
+        
     }
 
     

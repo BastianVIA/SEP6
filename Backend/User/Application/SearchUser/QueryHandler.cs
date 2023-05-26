@@ -24,6 +24,7 @@ public class UserDto
         private readonly IUserRepository _repository;
         private readonly IUserImageRepository _imageRepository;
         private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
+        
 
     public QueryHandler(IUserRepository repository,
         IDatabaseTransactionFactory databaseTransactionFactory, IUserImageRepository imageRepository)
@@ -37,10 +38,11 @@ public class UserDto
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
         var users = new List<Domain.User>();
+        
 
         if (string.IsNullOrWhiteSpace(request.userName))
         {
-            users = await _repository.GetAllUsersAsync(transaction);
+            users = await _repository.GetAllUsersAsync(request.UserSortingKey, request.sortingDirection, request.pageNumber,transaction);
         }
         else
         {

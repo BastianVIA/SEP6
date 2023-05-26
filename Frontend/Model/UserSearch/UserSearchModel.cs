@@ -11,8 +11,14 @@ public class UserSearchModel: IUserSearchModel
     {
         _client = client;
     }
-    
-    public async Task<List<Entities.User>> SearchForUserAsync(string displayName,UserSortingKey? userSortingKey = null, SortingDirection2? sortingDirection = null, int? pageNumber = null)
+
+    public async Task<List<Entities.User>> SearchForUserAllUsersAsync(UserSortingKey? userSortingKey = null, SortingDirection? sortingDirection = null,
+        int? pageNumber = null)
+    {
+        return await _client.SearchForAllUsersAsync(userSortingKey,sortingDirection, pageNumber);
+    }
+
+    public async Task<List<Entities.User>> SearchForUserAsync(string displayName,UserSortingKey2? userSortingKey = null, SortingDirection3? sortingDirection = null, int? pageNumber = null)
     {
         return await _client.SearchForUserAsync(displayName,userSortingKey,sortingDirection, pageNumber);
     }

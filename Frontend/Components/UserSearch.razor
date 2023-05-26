@@ -43,11 +43,11 @@
                 @foreach (User user in userList)
                 {
                     <TableRow @onclick="@(() => OnUserClick(user.Id))">
-                        <TableRowCell  >
-                        <img src="@(!string.IsNullOrEmpty(user.ProfilePicture) ? user.ProfilePicture : defaultProfilePicture)" alt="profile pic" width="auto" height="200" >
+                        <TableRowCell >
+                            <img src="@(!string.IsNullOrEmpty(user.ProfilePicture) ? user.ProfilePicture : defaultProfilePicture)" alt="profile pic" width="auto" height="200">
                         </TableRowCell>
                         <TableRowCell >@user.Username</TableRowCell>
-                        <TableRowCell  >@user.RatedMovies</TableRowCell>
+                        <TableRowCell >@user.RatedMovies</TableRowCell>
 
                     </TableRow>
                 }
@@ -79,13 +79,15 @@ else
 
     [Parameter]
     public string DisplayName { get; set; }
+
     private string defaultProfilePicture = "/Images/NotFoundImage.jpg";
     private bool fetchAll = false;
     private IList<User> userList = new List<User>();
     public bool isDataFetched = false;
     private int pageNumber { get; set; }
     private int usersPerPage = 10;
-    private UserSortingKey? userSortingKey;
+    
+    private bool lastUsedMethodIsSearch;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -97,45 +99,73 @@ else
     {
         isDataFetched = false;
         userList.Clear();
-        if (userSortingKey == UserSortingKey.MoviesVoted)
+        if (userSortingKey2 == UserSortingKey2.MoviesVoted)
         {
-            sortingDirection = sortingDirection;
+            sortingDirection3 = sortingDirection3;
         }
-        else if (userSortingKey == UserSortingKey.DisplayName)
+        else if (userSortingKey2 == UserSortingKey2.DisplayName)
         {
-            sortingDirection = displayNameSortingDirection;
+            sortingDirection3 = displayNameSortingDirection;
         }
-       userList = await UserSearchModel.SearchForUserAsync(DisplayName, userSortingKey, sortingDirection, pageNumber);
+        pageNumber = 1; // Reset page number here
+        userList = await UserSearchModel.SearchForUserAsync(DisplayName, userSortingKey2, sortingDirection3, pageNumber);
         isDataFetched = true;
+        lastUsedMethodIsSearch = true;
     }
+    
    
 
-    private SortingDirection2 sortingDirection = SortingDirection2.ASC;
-    private SortingDirection2 displayNameSortingDirection = SortingDirection2.ASC;
+
+    private SortingDirection3 sortingDirection3 = SortingDirection3.ASC;
+    private SortingDirection3 displayNameSortingDirection = SortingDirection3.ASC;
+    private UserSortingKey2? userSortingKey2;
+
     private bool isConnected;
 
+   
+    
     private async Task SortByNumberOfVotedMovies()
     {
-        userSortingKey = UserSortingKey.MoviesVoted;
-        sortingDirection = sortingDirection == SortingDirection2.ASC ? SortingDirection2.DESC : SortingDirection2.ASC;
-        pageNumber = 1;
-        await SearchForUser();
+        if (lastUsedMethodIsSearch)
+        {
+            userSortingKey2 = UserSortingKey2.MoviesVoted;
+            sortingDirection3 = sortingDirection3 == SortingDirection3.ASC ? SortingDirection3.DESC : SortingDirection3.ASC;
+            pageNumber = 1;
+            await SearchForUser();
+        }
+        else
+        {
+            userSortingKeyForAll = UserSortingKey.MoviesVoted;
+            sortingDirectionForAll = sortingDirectionForAll == SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
+            pageNumber = 1;
+            await ShowAllUsers();
+        }
     }
-    
     private async Task SortByDisplayName()
     {
-        userSortingKey = UserSortingKey.DisplayName;
-        displayNameSortingDirection = displayNameSortingDirection == SortingDirection2.ASC ? SortingDirection2.DESC : SortingDirection2.ASC;
-        pageNumber = 1;
-        await SearchForUser();
+        if (lastUsedMethodIsSearch)
+        {
+            userSortingKey2 = UserSortingKey2.DisplayName;
+            displayNameSortingDirection = displayNameSortingDirection == SortingDirection3.ASC ? SortingDirection3.DESC : SortingDirection3.ASC;
+            pageNumber = 1;
+            await SearchForUser();
+        }
+        else
+        {
+            userSortingKeyForAll = UserSortingKey.DisplayName;
+            sortingDirectionForAll = sortingDirectionForAll == SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
+            pageNumber = 1;
+            await ShowAllUsers();
+        }
     }
 
-    
+
+
     private void OnUserClick(string userId)
     {
         NavManager.NavigateTo($"UserProfile/{userId}");
     }
-
+    
     private async Task GoToPreviousPage()
     {
         if (pageNumber <= 1)
@@ -143,7 +173,15 @@ else
             return;
         }
         pageNumber--;
-        await SearchForUser();
+
+        if (lastUsedMethodIsSearch)
+        {
+            await SearchForUser();
+        }
+        else
+        {
+            await ShowAllUsers();
+        }
     }
 
     private async Task GoToNextPage()
@@ -153,20 +191,43 @@ else
             return;
         }
         pageNumber++;
-        await SearchForUser();
+
+        if (lastUsedMethodIsSearch)
+        {
+            await SearchForUser();
+        }
+        else
+        {
+            await ShowAllUsers();
+        }
     }
+
 
     protected override void OnAfterRender(bool firstRender)
     {
         isConnected = !firstRender;
     }
-    
+
+    private SortingDirection sortingDirectionForAll = SortingDirection.ASC;
+    private UserSortingKey? userSortingKeyForAll;
+
+
     
     private async Task ShowAllUsers()
     {
-        DisplayName = "%"; 
         pageNumber = 1;
-        await SearchForUser();
+        userList.Clear();
+
+
+        userList = await UserSearchModel.SearchForUserAllUsersAsync(userSortingKeyForAll, sortingDirectionForAll, pageNumber);
+
+        isDataFetched = true;
+        lastUsedMethodIsSearch = false;
     }
 
 }
+
+
+
+
+

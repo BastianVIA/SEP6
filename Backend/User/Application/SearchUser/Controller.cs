@@ -7,8 +7,7 @@ namespace Backend.User.Application.SearchUser;
 
 [ApiController]
 [Route("user")]
-
-public class Controller: ControllerBase
+public class Controller : ControllerBase
 {
     private readonly IMediator _mediator;
 
@@ -30,11 +29,28 @@ public class Controller: ControllerBase
     [Tags("User")]
     [ProducesResponseType(typeof(UserSearchResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Get([Required] string displayName, UserSortingKey userSortingKey = UserSortingKey.DisplayName, SortingDirection sortingDirection = SortingDirection.DESC, int pageNumber = 1)
+    public async Task<IActionResult> Get([Required] string displayName,
+        UserSortingKey userSortingKey = UserSortingKey.DisplayName,
+        SortingDirection sortingDirection = SortingDirection.DESC, int pageNumber = 1)
     {
         var query = new Query(displayName, userSortingKey, sortingDirection, pageNumber);
         var result = _mediator.Send(query);
 
         return Ok(await result);
+    }
+
+
+    [HttpGet]
+    [Route("searchAll")]
+    [Tags("User")]
+    [ProducesResponseType(typeof(UserSearchResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchAll(UserSortingKey userSortingKey = UserSortingKey.DisplayName,
+        SortingDirection sortingDirection = SortingDirection.DESC, int pageNumber = 1)
+    {
+        var query = new Query("", userSortingKey, sortingDirection,
+            pageNumber); 
+        var result = await _mediator.Send(query);
+
+        return Ok(result);
     }
 }

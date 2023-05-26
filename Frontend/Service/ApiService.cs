@@ -53,6 +53,86 @@ namespace Frontend.Service
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<UserSearchResponse> SearchAllAsync(UserSortingKey? userSortingKey = null, SortingDirection? sortingDirection = null, int? pageNumber = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/searchAll?");
+            if (userSortingKey != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("userSortingKey") + "=").Append(System.Uri.EscapeDataString(ConvertToString(userSortingKey, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (sortingDirection != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("sortingDirection") + "=").Append(System.Uri.EscapeDataString(ConvertToString(sortingDirection, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (pageNumber != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("pageNumber") + "=").Append(System.Uri.EscapeDataString(ConvertToString(pageNumber, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            urlBuilder_.Length--;
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("text/plain"));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<UserSearchResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Search for movie on the movies title
         /// </summary>
@@ -60,7 +140,7 @@ namespace Frontend.Service
         /// <br/>            configuration with "MoviesPerPage"</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<MovieSearchResponse> SearchAsync(string title, MovieSortingKey? movieSortingKey = null, SortingDirection? sortingDirection = null, int? pageNumber = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<MovieSearchResponse> SearchAsync(string title, MovieSortingKey? movieSortingKey = null, SortingDirection2? sortingDirection = null, int? pageNumber = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (title == null)
                 throw new System.ArgumentNullException("title");
@@ -1419,7 +1499,7 @@ namespace Frontend.Service
         /// <param name="pageNumber">The number of movies per. page can be set in the configuration with "UsersPerPage"</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<UserSearchResponse> Search3Async(string displayName, UserSortingKey? userSortingKey = null, SortingDirection2? sortingDirection = null, int? pageNumber = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<UserSearchResponse> Search3Async(string displayName, UserSortingKey2? userSortingKey = null, SortingDirection3? sortingDirection = null, int? pageNumber = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (displayName == null)
                 throw new System.ArgumentNullException("displayName");
@@ -2629,17 +2709,14 @@ namespace Frontend.Service
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum MovieSortingKey
+    public enum UserSortingKey
     {
 
-        [System.Runtime.Serialization.EnumMember(Value = @"Votes")]
-        Votes = 0,
+        [System.Runtime.Serialization.EnumMember(Value = @"DisplayName")]
+        DisplayName = 0,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"ReleaseYear")]
-        ReleaseYear = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Rating")]
-        Rating = 2,
+        [System.Runtime.Serialization.EnumMember(Value = @"MoviesVoted")]
+        MoviesVoted = 1,
 
     }
 
@@ -2656,7 +2733,34 @@ namespace Frontend.Service
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum UserSortingKey
+    public enum MovieSortingKey
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Votes")]
+        Votes = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ReleaseYear")]
+        ReleaseYear = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Rating")]
+        Rating = 2,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum SortingDirection2
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DESC")]
+        DESC = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ASC")]
+        ASC = 1,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum UserSortingKey2
     {
 
         [System.Runtime.Serialization.EnumMember(Value = @"DisplayName")]
@@ -2668,7 +2772,7 @@ namespace Frontend.Service
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum SortingDirection2
+    public enum SortingDirection3
     {
 
         [System.Runtime.Serialization.EnumMember(Value = @"DESC")]
