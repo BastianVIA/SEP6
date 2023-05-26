@@ -26,6 +26,6 @@ public class CommandHandlerTests
         var command = _fixture.Create<Command>();
 
         await _handler.Handle(command, CancellationToken.None);
-        await _userImageService.Received(1).UploadImageAsync(command.userId, command.data, _fixture.Create<DbTransaction>());
+        await _userImageService.Received(1).UploadImageAsync(command.userId, command.data, Arg.Any<DbTransaction>());
     }
 }

@@ -26,7 +26,7 @@ public class QueryHandlerTests
         var query = _fixture.Create<Query>();
         var expected = _fixture.Create<byte[]>();
 
-        _userImageService.ReadImageForUserAsync(query.userId, _fixture.Create<DbReadOnlyTransaction>())
+        _userImageService.ReadImageForUserAsync(query.userId, Arg.Any<DbReadOnlyTransaction>())
             .Returns(expected);
         
         // Act
@@ -43,7 +43,7 @@ public class QueryHandlerTests
         var query = _fixture.Create<Query>();
         byte[]? expected = null;
 
-        _userImageService.ReadImageForUserAsync(query.userId, _fixture.Create<DbReadOnlyTransaction>())
+        _userImageService.ReadImageForUserAsync(query.userId, Arg.Any<DbReadOnlyTransaction>())
             .Returns(expected);
 
         var result = await _handler.Handle(query, CancellationToken.None);
