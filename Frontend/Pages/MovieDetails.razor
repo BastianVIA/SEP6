@@ -123,7 +123,7 @@
                 </ModalBody>
                 <ModalFooter>
                     <Button Color="Color.Secondary" Clicked="@CancelModal">Close</Button>
-                    <Button Color="Color.Primary" Clicked="@HideModal">Save Changes</Button>
+                    <Button Color="Color.Primary" Clicked="@HideModal">Add Review</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>
@@ -205,6 +205,8 @@ else
 
     private async Task HideModal()
     {
+        if (string.IsNullOrEmpty(reviewText.Text)) return;
+        
         await UserModel.SetReview(FirebaseModel.CurrentUser.TokenValue, MovieId, reviewText.Text);
         modalRef.Hide();
     }
