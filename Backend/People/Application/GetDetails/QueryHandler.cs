@@ -65,7 +65,7 @@ public class QueryHandler : IRequestHandler<Query, GetPersonDetailsResponse>
         }
 
         return new GetPersonDetailsResponse(person.Id, person.Name, actedMovies, directedMovies, person.BirthYear,
-            personDetails.KnownFor, personDetails.PathToProfilePic, personDetails.Bio);
+            personDetails.KnownFor, personDetails.PathToPersonPic, personDetails.Bio);
     }
 
     private List<PersonDetailsMovieDto> toDto(List<TopMoviesDto>? movies)

@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Globalization;
+using System.Net;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using TMDbLib.Client;
 using TMDbLib.Objects.General;
@@ -17,8 +19,9 @@ public class TMDBService : IImageService, IResumeService, IPersonService, ITrail
 
     public TMDBService(IConfiguration configuration)
     {
-        _apiKey = configuration.GetConnectionString("TMDBApiKey") ?? throw new InvalidOperationException("missing TMDB Key");
-        
+        _apiKey = configuration.GetConnectionString("TMDBApiKey") ??
+                  throw new InvalidOperationException("missing TMDB Key");
+
         _client = new TMDbClient(_apiKey);
         var tmdbConfig = new TMDbConfig
         {
@@ -39,8 +42,14 @@ public class TMDBService : IImageService, IResumeService, IPersonService, ITrail
             Console.WriteLine($"Could not find poster for movie with id: {id}");
             return null;
         }
-        
-        return _client.GetImageUrl(DefaultImageSize, movie.PosterPath);
+
+        var imageUrl = _client.GetImageUrl(DefaultImageSize, movie.PosterPath);
+        if (imageUrl == null || !IsImageUrl(imageUrl))
+        {
+            return null;
+        }
+
+        return imageUrl;
     }
 
     public async Task<string?> GetMovieTrailerAsync(string movieId)
@@ -60,6 +69,7 @@ public class TMDBService : IImageService, IResumeService, IPersonService, ITrail
                 return $"https://www.youtube.com/embed/{key}";
             }
         }
+
         return null;
     }
 
@@ -75,7 +85,7 @@ public class TMDBService : IImageService, IResumeService, IPersonService, ITrail
         return movie.Overview;
     }
 
-  
+
     public async Task<PersonServiceDto?> GetPersonAsync(string id)
     {
         var tmdbId = await GetIdOfPersonAsync(id);
@@ -83,23 +93,30 @@ public class TMDBService : IImageService, IResumeService, IPersonService, ITrail
         {
             return null;
         }
+
         var person = await _client.GetPersonAsync(tmdbId.Value);
         if (person == null)
         {
             return null;
         }
+
         return toDto(person);
     }
 
     private PersonServiceDto toDto(Person person)
     {
-        var pathToProfilePic = _client.GetImageUrl(DefaultImageSize, person.ProfilePath);
-        return new PersonServiceDto
+        var pathToPersonPic = _client.GetImageUrl(DefaultImageSize, person.ProfilePath);
+        var personDto = new PersonServiceDto
         {
             KnownFor = person.KnownForDepartment,
             Bio = person.Biography,
-            PathToProfilePic = pathToProfilePic
         };
+        if (pathToPersonPic != null && IsImageUrl(pathToPersonPic))
+        {
+            personDto.PathToPersonPic = pathToPersonPic;
+        }
+
+        return personDto;
     }
 
     private async Task<int?> GetIdOfPersonAsync(string id)
@@ -113,18 +130,35 @@ public class TMDBService : IImageService, IResumeService, IPersonService, ITrail
         {
             return null;
         }
+
         int personId = root.PersonResults[0].Id;
         return personId;
     }
+
+    bool IsImageUrl(Uri URL)
+    {
+        try
+        {
+            var req = (HttpWebRequest)HttpWebRequest.Create(URL);
+            req.Method = "HEAD";
+            var resp = req.GetResponse();
+
+            return resp.ContentType.ToLower(CultureInfo.InvariantCulture)
+                .StartsWith("image/");
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
 }
+
 public class TmdbResponse
 {
-    [JsonPropertyName("person_results")]
-    public List<TMDBPerson> PersonResults { get; set; }
+    [JsonPropertyName("person_results")] public List<TMDBPerson> PersonResults { get; set; }
 }
 
 public class TMDBPerson
 {
-    [JsonPropertyName("id")]
-    public int Id { get; set; }
+    [JsonPropertyName("id")] public int Id { get; set; }
 }

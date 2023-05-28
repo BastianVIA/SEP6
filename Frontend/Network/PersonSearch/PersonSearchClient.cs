@@ -14,14 +14,16 @@ public class PersonSearchClient : NSwagBaseClient, IPersonSearchClient
             {
                 ID = person.Id,
                 Name = person.Name,
-                BirthYear = person.BirthYear
+                BirthYear = person.BirthYear,
+                ImageUrl = person.PathToPic ?? new Uri(DEFUALT_PERSON_IMAGE_URL, UriKind.Relative)
             });
         }
 
         return persons;
     }
 
-    public PersonSearchClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
+    public PersonSearchClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory,
+        configuration)
     {
     }
 }
