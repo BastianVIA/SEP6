@@ -107,7 +107,7 @@
 
     private void PerformSearch()
     {
-        if (searchTerm == null) return;
+        if (string.IsNullOrEmpty(searchTerm)) return;
         NavManager.NavigateTo($"SearchResult/{searchTerm}");
     }
     
