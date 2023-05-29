@@ -82,7 +82,7 @@
 
     private void SearchForMovie()
     {
-        if (movieTitle == null) return;
+        if (string.IsNullOrEmpty(movieTitle)) return;
         NavManager.NavigateTo($"searchResult/{movieTitle}");
     }
 
