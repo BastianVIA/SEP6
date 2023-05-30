@@ -48,14 +48,14 @@ else
     
     private bool isDataFetched = false;
     private MovieSortingKey? sortingKey;
-    private SortingDirection2? sortingDirection;
+    private SortingDirection? sortingDirection;
     private int moviesPerPage = 10;
     private bool isConnected = true;
 
     [Parameter]
     public string SearchTerm { get; set; } = string.Empty;
-    private SortingDirection2? ratingSortingDirection = SortingDirection2.ASC;
-    private SortingDirection2? releaseYearSortingDirection = SortingDirection2.ASC;
+    private SortingDirection? ratingSortingDirection = SortingDirection.ASC;
+    private SortingDirection? releaseYearSortingDirection = SortingDirection.ASC;
 
 
     
@@ -90,7 +90,7 @@ else
     private async Task SortByRating()
     {
         sortingKey = MovieSortingKey.Rating;
-        ratingSortingDirection = ratingSortingDirection == SortingDirection2.ASC ? SortingDirection2.DESC : SortingDirection2.ASC;
+        ratingSortingDirection = ratingSortingDirection == SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
         pageNumber = 1;
         await SearchForMovie();
     }
@@ -98,7 +98,7 @@ else
     private async Task SortByReleaseYear()
     {
         sortingKey = MovieSortingKey.ReleaseYear;
-        releaseYearSortingDirection = releaseYearSortingDirection == SortingDirection2.ASC ? SortingDirection2.DESC : SortingDirection2.ASC;
+        releaseYearSortingDirection = releaseYearSortingDirection == SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
         pageNumber = 1;
         await SearchForMovie();
     }

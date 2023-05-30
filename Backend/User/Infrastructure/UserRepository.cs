@@ -133,7 +133,7 @@ public class UserRepository : IUserRepository
     
     public async Task<List<Domain.User>> GetAllUsersAsync(UserSortingKey userSortingKey, SortingDirection sortingDirection, int requestPageNumber, DbReadOnlyTransaction tx)
     {
-        IOrderedQueryable<UserDAO> query; // Change the type here
+        IOrderedQueryable<UserDAO> query; 
 
         switch (userSortingKey)
         {

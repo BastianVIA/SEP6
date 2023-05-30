@@ -3,7 +3,7 @@ using Backend.Enum;
 using Backend.User.Infrastructure;
 using MediatR;
 
-namespace Backend.User.Application.SearchUser;
+namespace Backend.User.Application.GetAllUsers;
 
 public record Query
 (string userName, UserSortingKey UserSortingKey, SortingDirection sortingDirection,
@@ -19,12 +19,12 @@ public class UserDto
     public byte[]? Image { get; set; }
 }
 
-public class QueryHandler : IRequestHandler<Query, UserSearchResponse>
-{
-    private readonly IUserRepository _repository;
-    private readonly IUserImageRepository _imageRepository;
-    private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
-
+    public class QueryHandler : IRequestHandler<Query, UserSearchResponse>
+    {
+        private readonly IUserRepository _repository;
+        private readonly IUserImageRepository _imageRepository;
+        private readonly IDatabaseTransactionFactory _databaseTransactionFactory;
+        
 
     public QueryHandler(IUserRepository repository,
         IDatabaseTransactionFactory databaseTransactionFactory, IUserImageRepository imageRepository)
@@ -33,15 +33,17 @@ public class QueryHandler : IRequestHandler<Query, UserSearchResponse>
         _databaseTransactionFactory = databaseTransactionFactory;
         _imageRepository = imageRepository;
     }
-
+    
     public async Task<UserSearchResponse> Handle(Query request, CancellationToken cancellationToken)
     {
         var transaction = _databaseTransactionFactory.BeginReadOnlyTransaction();
         var users = new List<Domain.User>();
+        
 
-
-        users = await _repository.SearchForUserAsync(request.userName, request.UserSortingKey, request.sortingDirection,
-            request.pageNumber, transaction);
+        if (string.IsNullOrWhiteSpace(request.userName))
+        {
+            users = await _repository.GetAllUsersAsync(request.UserSortingKey, request.sortingDirection, request.pageNumber,transaction);
+        }
         
         var userToDto = new List<UserDto>();
         foreach (var foundUser in users)
@@ -61,11 +63,12 @@ public class QueryHandler : IRequestHandler<Query, UserSearchResponse>
             {
                 userToAdd.Image = userImage;
             }
-
+            
 
             userToDto.Add(userToAdd);
         }
 
         return new UserSearchResponse(userToDto);
     }
+
 }

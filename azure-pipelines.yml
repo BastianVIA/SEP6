@@ -7,8 +7,8 @@ pool:
   vmImage: 'windows-latest'
 
 stages:
-  - stage: BuildTestPackage
-    displayName: Build, package
+  - stage: BuildAndPack
+    displayName: Clean,Restore,Test,Build and Pack
     jobs:
       - job: BuildDevVersionsJob
         displayName: Build, package

@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Backend.Enum;
+﻿using Backend.Enum;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.User.Application.SearchUser;
+namespace Backend.User.Application.GetAllUsers;
 
 [ApiController]
 [Route("user")]
@@ -24,19 +23,19 @@ public class Controller : ControllerBase
     /// <param name="sortingDirection"></param>
     /// <param name="pageNumber">The number of movies per. page can be set in the configuration with "UsersPerPage"</param>
     /// <returns></returns>
+
+    
     [HttpGet]
-    [Route("search")]
+    [Route("getAllUsers")]
     [Tags("User")]
-    [ProducesResponseType(typeof(UserSearchResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Get([Required] string displayName,
-        UserSortingKey userSortingKey = UserSortingKey.DisplayName,
+    [ProducesResponseType(typeof(SearchUser.UserSearchResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchAll(UserSortingKey userSortingKey = UserSortingKey.DisplayName,
         SortingDirection sortingDirection = SortingDirection.DESC, int pageNumber = 1)
     {
-        var query = new Query(displayName, userSortingKey, sortingDirection, pageNumber);
-        var result = _mediator.Send(query);
+        var query = new SearchUser.Query("", userSortingKey, sortingDirection,
+            pageNumber); 
+        var result = await _mediator.Send(query);
 
-        return Ok(await result);
+        return Ok(result);
     }
-    
 }

@@ -6,7 +6,7 @@ namespace Frontend.Network.MovieSearch;
 public class MovieSearchClient : NSwagBaseClient, IMovieSearchClient
 {
     public async Task<List<Movie>> SearchForMovieAsync(string title, MovieSortingKey? movieSortingKey = null,
-        SortingDirection2? sortingDirection = null, int? pageNumber = null)
+        SortingDirection? sortingDirection = null, int? pageNumber = null)
     {
         var response = await _api.SearchAsync(title, movieSortingKey, sortingDirection, pageNumber);
         List<Movie> movies = new List<Movie>();

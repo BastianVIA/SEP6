@@ -1,9 +1,12 @@
 ﻿@using Frontend.Entities
 @using Frontend.Service
 @inject IUserSearchModel UserSearchModel
+@inject IGetAllUsersModel GetAllUsers
 @inject NavigationManager NavManager
 @using Blazorise
+@using Frontend.Model.GetAllUsers
 @using Frontend.Model.UserSearch
+@using Frontend.Network.GetAllUsers
 
 <PageTitle>Search User</PageTitle>
 
@@ -59,7 +62,7 @@
                 <Icon Name="@IconName.AngleLeft"/>
             </button>
             <div class="page-number">
-                <p>Page @pageNumber </p>
+                <p> Page @(lastUsedMethodIsSearch ? searchPageNumber  : getAllPageNumber)  </p>
             </div>
             <button class="btn btn-secondary" @onclick="@GoToNextPage">
                 <Icon Name="@IconName.AngleRight"/>
@@ -84,14 +87,18 @@ else
     private bool fetchAll = false;
     private IList<User> userList = new List<User>();
     public bool isDataFetched = false;
-    private int pageNumber { get; set; }
+    private int searchPageNumber { get; set; } = 1;
+    private int getAllPageNumber { get; set; } = 1;
     private int usersPerPage = 10;
-    
+    private SortingDirection2? sortingDirection;
+
+
     private bool lastUsedMethodIsSearch;
 
     protected override async Task OnParametersSetAsync()
     {
-        pageNumber = 1;
+        DisplayName = DisplayName;
+      
         await SearchForUser();
     }
 
@@ -99,87 +106,89 @@ else
     {
         isDataFetched = false;
         userList.Clear();
-        if (userSortingKey2 == UserSortingKey2.MoviesVoted)
+        if (userSortingKey == UserSortingKey.MoviesVoted)
         {
-            sortingDirection3 = sortingDirection3;
+            sortingDirection = ratingSortingDirection;
         }
-        else if (userSortingKey2 == UserSortingKey2.DisplayName)
+        else if (userSortingKey == UserSortingKey.DisplayName)
         {
-            sortingDirection3 = displayNameSortingDirection;
+            sortingDirection = displayNameSortingDirection;
         }
-        pageNumber = 1; // Reset page number here
-        userList = await UserSearchModel.SearchForUserAsync(DisplayName, userSortingKey2, sortingDirection3, pageNumber);
+        userList = await UserSearchModel.SearchForUserAsync(DisplayName, userSortingKey, ratingSortingDirection, searchPageNumber);
         isDataFetched = true;
         lastUsedMethodIsSearch = true;
+        getAllPageNumber = 1;
     }
-    
-   
 
 
-    private SortingDirection3 sortingDirection3 = SortingDirection3.ASC;
-    private SortingDirection3 displayNameSortingDirection = SortingDirection3.ASC;
-    private UserSortingKey2? userSortingKey2;
+    private SortingDirection2 ratingSortingDirection = SortingDirection2.ASC;
+    private SortingDirection2 displayNameSortingDirection = SortingDirection2.ASC;
+    private UserSortingKey? userSortingKey;
 
     private bool isConnected;
 
-   
-    
+
     private async Task SortByNumberOfVotedMovies()
     {
         if (lastUsedMethodIsSearch)
         {
-            userSortingKey2 = UserSortingKey2.MoviesVoted;
-            sortingDirection3 = sortingDirection3 == SortingDirection3.ASC ? SortingDirection3.DESC : SortingDirection3.ASC;
-            pageNumber = 1;
+            userSortingKey = UserSortingKey.MoviesVoted;
+            ratingSortingDirection = ratingSortingDirection == SortingDirection2.ASC ? SortingDirection2.DESC : SortingDirection2.ASC;
+            searchPageNumber = 1;
             await SearchForUser();
         }
         else
         {
-            userSortingKeyForAll = UserSortingKey.MoviesVoted;
-            sortingDirectionForAll = sortingDirectionForAll == SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
-            pageNumber = 1;
-            await ShowAllUsers();
-        }
-    }
-    private async Task SortByDisplayName()
-    {
-        if (lastUsedMethodIsSearch)
-        {
-            userSortingKey2 = UserSortingKey2.DisplayName;
-            displayNameSortingDirection = displayNameSortingDirection == SortingDirection3.ASC ? SortingDirection3.DESC : SortingDirection3.ASC;
-            pageNumber = 1;
-            await SearchForUser();
-        }
-        else
-        {
-            userSortingKeyForAll = UserSortingKey.DisplayName;
-            sortingDirectionForAll = sortingDirectionForAll == SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
-            pageNumber = 1;
+            userSortingKeyForAll = UserSortingKey2.MoviesVoted;
+            sortingDirectionForAll = sortingDirectionForAll == SortingDirection3.ASC ? SortingDirection3.DESC : SortingDirection3.ASC;
+            searchPageNumber = 1;
             await ShowAllUsers();
         }
     }
 
+    private async Task SortByDisplayName()
+    {
+        if (lastUsedMethodIsSearch)
+        {
+            userSortingKey = UserSortingKey.DisplayName;
+            displayNameSortingDirection = displayNameSortingDirection == SortingDirection2.ASC ? SortingDirection2.DESC : SortingDirection2.ASC;
+            searchPageNumber = 1;
+            await SearchForUser();
+        }
+        else
+        {
+            userSortingKeyForAll = UserSortingKey2.DisplayName;
+            sortingDirectionForAll = sortingDirectionForAll == SortingDirection3.ASC ? SortingDirection3.DESC : SortingDirection3.ASC;
+            searchPageNumber = 1;
+            await ShowAllUsers();
+        }
+    }
 
 
     private void OnUserClick(string userId)
     {
         NavManager.NavigateTo($"UserProfile/{userId}");
     }
-    
+
     private async Task GoToPreviousPage()
     {
-        if (pageNumber <= 1)
-        {
-            return;
-        }
-        pageNumber--;
-
         if (lastUsedMethodIsSearch)
         {
+            if (searchPageNumber <= 1)
+            {
+                return;
+            }
+            searchPageNumber--;
             await SearchForUser();
         }
         else
         {
+            if (getAllPageNumber <= 1)
+            {
+                return;
+            }
+            getAllPageNumber--;
+
             await ShowAllUsers();
         }
     }
@@ -190,7 +199,8 @@ else
         {
             return;
         }
-        pageNumber++;
+        searchPageNumber++;
+        getAllPageNumber++;
 
         if (lastUsedMethodIsSearch)
         {
@@ -208,26 +218,20 @@ else
         isConnected = !firstRender;
     }
 
-    private SortingDirection sortingDirectionForAll = SortingDirection.ASC;
-    private UserSortingKey? userSortingKeyForAll;
-
+    private SortingDirection3 sortingDirectionForAll = SortingDirection3.ASC;
+    private UserSortingKey2? userSortingKeyForAll;
 
     
+
     private async Task ShowAllUsers()
     {
-        pageNumber = 1;
+        searchPageNumber = 1;
         userList.Clear();
-
-
-        userList = await UserSearchModel.SearchForUserAllUsersAsync(userSortingKeyForAll, sortingDirectionForAll, pageNumber);
+        userList = await GetAllUsers.GetAllUsersAsync(userSortingKeyForAll, sortingDirectionForAll, getAllPageNumber);
 
         isDataFetched = true;
         lastUsedMethodIsSearch = false;
     }
+    
 
 }
-
-
-
-
-
