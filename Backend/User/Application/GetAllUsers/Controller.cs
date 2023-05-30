@@ -18,13 +18,10 @@ public class Controller : ControllerBase
     /// <summary>
     /// Searching for users on their name
     /// </summary>
-    /// <param name="displayName"></param>
     /// <param name="userSortingKey"></param>
     /// <param name="sortingDirection"></param>
     /// <param name="pageNumber">The number of movies per. page can be set in the configuration with "UsersPerPage"</param>
     /// <returns></returns>
-
-    
     [HttpGet]
     [Route("getAllUsers")]
     [Tags("User")]
