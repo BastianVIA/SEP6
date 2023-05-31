@@ -18,7 +18,7 @@ For at køre dette projekt skal man have en movie database og en TMDB Api key.
 5. Build og run projektet
 
 ## Additional Info
-Vi har hemmelige data i denne github, som fx. connectionstring  til vores Azure-database og API-nøgle til TMDB. Disse skulle selvfølgelig IKKE være her, men i en Azure Key Vault, men på grund af en RBAC-tilladelsesfejl lykkedes det ikke at oprette en.
+Vi har hemmelige data i denne github, som fx. connectionstring til vores Azure-database og API-nøgle til TMDB. Disse skulle selvfølgelig IKKE være her, men derimod i en Azure Key Vault, men på grund af en RBAC-tilladelsesfejl lykkedes det ikke at oprette en.
 
 ## External Dependencies
 - [MediatR](https://www.nuget.org/packages/MediatR)
