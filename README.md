@@ -12,7 +12,7 @@
 ## Getting started
 For at køre dette projekt skal man have en movie database og en TMDB Api key.
 1. Klon projektet
-2. [Optinal] Hvis projektet skal køres i Dev mode, skan "Backend/appsettings.json" copies og omdøbes til "appsettings.Development.json"
+2. [Optinal] Hvis projektet skal køres i Dev mode, skal "Backend/appsettings.json" copies og omdøbes til "appsettings.Development.json"
 3. Ændre "WebApiDatabase" under connection strings i appsettings til en connection string din egen instance af databasen.
 4. Ændre "TMDBApiKey" under connection strings i appsettings til jeres Api key.
 5. Build og run projektet
