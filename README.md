@@ -17,6 +17,9 @@ For at køre dette projekt skal man have en movie database og en TMDB Api key.
 4. Ændre "TMDBApiKey" under connection strings i appsettings til jeres Api key.
 5. Build og run projektet
 
+## Additional Info
+We have secret data in this github, like connectionstring to our Azure Database and API key to TMDB. These should ofcourse NOT be here, but in an Azure Key Vault, but because of a RBAC permission error, we did not manage to create one. 
+
 
 ## External Dependencies
 - [MediatR](https://www.nuget.org/packages/MediatR)
