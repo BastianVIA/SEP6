@@ -37,8 +37,11 @@
             <BarEnd>
                 <BarItem>
                     <Addons>
+                        @* <Addon AddonType="AddonType.Body"> *@
+                        @*     <TextEdit @bind-Text="@searchTerm" Placeholder="Search"/> *@
+                        @* </Addon> *@
                         <Addon AddonType="AddonType.Body">
-                            <TextEdit @bind-Text="@searchTerm" Placeholder="Search"/>
+                            <TextEdit @bind-Text="@searchTerm" Placeholder="Search" @onkeydown="@HandleKeyDown"/>
                         </Addon>
                         <Addon AddonType="AddonType.End">
                             <Button Color="Color.Primary" Clicked="PerformSearch">

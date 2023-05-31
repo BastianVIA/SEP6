@@ -1,9 +1,12 @@
 ﻿@using Frontend.Entities
 @using Frontend.Service
 @inject IUserSearchModel UserSearchModel
+@inject IGetAllUsersModel GetAllUsers
 @inject NavigationManager NavManager
 @using Blazorise
+@using Frontend.Model.GetAllUsers
 @using Frontend.Model.UserSearch
+@using Frontend.Network.GetAllUsers
 
 <PageTitle>Search User</PageTitle>
 
@@ -11,6 +14,7 @@
 {
     <div class="page-content">
         <h3>Search Result User</h3>
+        <Button Color="Color.Primary" Clicked="@ShowAllUsers">Show All Users</Button>
 
         @if (userList.Count == 0)
         {
@@ -42,11 +46,11 @@
                 @foreach (User user in userList)
                 {
                     <TableRow @onclick="@(() => OnUserClick(user.Id))">
-                        <TableRowCell  >
-                        <img src="@(!string.IsNullOrEmpty(user.ProfilePicture) ? user.ProfilePicture : defaultProfilePicture)" alt="profile pic" width="auto" height="200" >
+                        <TableRowCell >
+                            <img src="@(!string.IsNullOrEmpty(user.ProfilePicture) ? user.ProfilePicture : defaultProfilePicture)" alt="profile pic" width="auto" height="200">
                         </TableRowCell>
                         <TableRowCell >@user.Username</TableRowCell>
-                        <TableRowCell  >@user.RatedMovies</TableRowCell>
+                        <TableRowCell >@user.RatedMovies</TableRowCell>
 
                     </TableRow>
                 }
@@ -58,7 +62,7 @@
                 <Icon Name="@IconName.AngleLeft"/>
             </button>
             <div class="page-number">
-                <p>Page @pageNumber </p>
+                <p> Page @(lastUsedMethodIsSearch ? searchPageNumber  : getAllPageNumber)  </p>
             </div>
             <button class="btn btn-secondary" @onclick="@GoToNextPage">
                 <Icon Name="@IconName.AngleRight"/>
@@ -78,16 +82,23 @@ else
 
     [Parameter]
     public string DisplayName { get; set; }
+
     private string defaultProfilePicture = "/Images/NotFoundImage.jpg";
+    private bool fetchAll = false;
     private IList<User> userList = new List<User>();
     public bool isDataFetched = false;
-    private int pageNumber { get; set; }
+    private int searchPageNumber { get; set; } = 1;
+    private int getAllPageNumber { get; set; } = 1;
     private int usersPerPage = 10;
-    private UserSortingKey? userSortingKey;
+    private SortingDirection2? sortingDirection;
+
+
+    private bool lastUsedMethodIsSearch;
 
     protected override async Task OnParametersSetAsync()
     {
-        pageNumber = 1;
+        DisplayName = DisplayName;
+      
         await SearchForUser();
     }
 
@@ -97,38 +108,63 @@ else
         userList.Clear();
         if (userSortingKey == UserSortingKey.MoviesVoted)
         {
-            sortingDirection = sortingDirection;
+            sortingDirection = ratingSortingDirection;
         }
         else if (userSortingKey == UserSortingKey.DisplayName)
         {
             sortingDirection = displayNameSortingDirection;
         }
-       userList = await UserSearchModel.SearchForUserAsync(DisplayName, userSortingKey, sortingDirection, pageNumber);
+        userList = await UserSearchModel.SearchForUserAsync(DisplayName, userSortingKey, ratingSortingDirection, searchPageNumber);
         isDataFetched = true;
+        lastUsedMethodIsSearch = true;
+        getAllPageNumber = 1;
     }
-   
 
-    private SortingDirection2 sortingDirection = SortingDirection2.ASC;
+
+    private SortingDirection2 ratingSortingDirection = SortingDirection2.ASC;
     private SortingDirection2 displayNameSortingDirection = SortingDirection2.ASC;
+    private UserSortingKey? userSortingKey;
+
     private bool isConnected;
+
 
     private async Task SortByNumberOfVotedMovies()
     {
-        userSortingKey = UserSortingKey.MoviesVoted;
-        sortingDirection = sortingDirection == SortingDirection2.ASC ? SortingDirection2.DESC : SortingDirection2.ASC;
-        pageNumber = 1;
-        await SearchForUser();
-    }
-    
-    private async Task SortByDisplayName()
-    {
-        userSortingKey = UserSortingKey.DisplayName;
-        displayNameSortingDirection = displayNameSortingDirection == SortingDirection2.ASC ? SortingDirection2.DESC : SortingDirection2.ASC;
-        pageNumber = 1;
-        await SearchForUser();
+        if (lastUsedMethodIsSearch)
+        {
+            userSortingKey = UserSortingKey.MoviesVoted;
+            ratingSortingDirection = ratingSortingDirection == SortingDirection2.ASC ? SortingDirection2.DESC : SortingDirection2.ASC;
+            searchPageNumber = 1;
+            await SearchForUser();
+        }
+        else
+        {
+            userSortingKeyForAll = UserSortingKey2.MoviesVoted;
+            sortingDirectionForAll = sortingDirectionForAll == SortingDirection3.ASC ? SortingDirection3.DESC : SortingDirection3.ASC;
+            searchPageNumber = 1;
+            await ShowAllUsers();
+        }
     }
 
-    
+    private async Task SortByDisplayName()
+    {
+        if (lastUsedMethodIsSearch)
+        {
+            userSortingKey = UserSortingKey.DisplayName;
+            displayNameSortingDirection = displayNameSortingDirection == SortingDirection2.ASC ? SortingDirection2.DESC : SortingDirection2.ASC;
+            searchPageNumber = 1;
+            await SearchForUser();
+        }
+        else
+        {
+            userSortingKeyForAll = UserSortingKey2.DisplayName;
+            sortingDirectionForAll = sortingDirectionForAll == SortingDirection3.ASC ? SortingDirection3.DESC : SortingDirection3.ASC;
+            searchPageNumber = 1;
+            await ShowAllUsers();
+        }
+    }
+
+
     private void OnUserClick(string userId)
     {
         NavManager.NavigateTo($"UserProfile/{userId}");
@@ -136,12 +172,25 @@ else
 
     private async Task GoToPreviousPage()
     {
-        if (pageNumber <= 1)
+        if (lastUsedMethodIsSearch)
         {
-            return;
+            if (searchPageNumber <= 1)
+            {
+                return;
+            }
+            searchPageNumber--;
+            await SearchForUser();
         }
-        pageNumber--;
-        await SearchForUser();
+        else
+        {
+            if (getAllPageNumber <= 1)
+            {
+                return;
+            }
+            getAllPageNumber--;
+
+            await ShowAllUsers();
+        }
     }
 
     private async Task GoToNextPage()
@@ -150,12 +199,39 @@ else
         {
             return;
         }
-        pageNumber++;
-        await SearchForUser();
+        searchPageNumber++;
+        getAllPageNumber++;
+
+        if (lastUsedMethodIsSearch)
+        {
+            await SearchForUser();
+        }
+        else
+        {
+            await ShowAllUsers();
+        }
     }
+
 
     protected override void OnAfterRender(bool firstRender)
     {
         isConnected = !firstRender;
     }
+
+    private SortingDirection3 sortingDirectionForAll = SortingDirection3.ASC;
+    private UserSortingKey2? userSortingKeyForAll;
+
+    
+
+    private async Task ShowAllUsers()
+    {
+        searchPageNumber = 1;
+        userList.Clear();
+        userList = await GetAllUsers.GetAllUsersAsync(userSortingKeyForAll, sortingDirectionForAll, getAllPageNumber);
+
+        isDataFetched = true;
+        lastUsedMethodIsSearch = false;
+    }
+    
+
 }

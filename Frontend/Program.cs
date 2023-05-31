@@ -9,6 +9,7 @@ using Frontend.Authentication;
 using Frontend.Events;
 using Frontend.Model.FavoriteMovies;
 using Frontend.Model.Firebase;
+using Frontend.Model.GetAllUsers;
 using Frontend.Model.MovieDetail;
 using Frontend.Model.MovieSearch;
 using Frontend.Model.PersonSearch;
@@ -22,6 +23,7 @@ using Frontend.Model.UserProfiles;
 using Frontend.Model.UserSearch;
 using Frontend.Network.FavoriteMovies;
 using Frontend.Network.Firebase;
+using Frontend.Network.GetAllUsers;
 using Frontend.Network.MovieDetail;
 using Frontend.Network.MovieSearch;
 using Frontend.Network.PersonDetail;
@@ -55,6 +57,8 @@ builder.Services.AddScoped<ISocialFeedClient, SocialFeedClient>();
 builder.Services.AddScoped<ITop100Client, Top100Client>();
 builder.Services.AddScoped<IUserProfilePictureClient, UserProfilePictureClient>();
 builder.Services.AddScoped<IUserSearchClient, UserSearchClient>();
+builder.Services.AddScoped<IGetAllUsersClient, GetAllUsersClient>();
+
 
 
 // Add services to the container.
@@ -74,6 +78,8 @@ builder.Services.AddScoped<ISocialFeedModel, SocialFeedModel>();
 builder.Services.AddScoped<ITop100Model, Top100Model>();
 builder.Services.AddScoped<IUserProfilePictureModel, UserProfilePictureModel>();
 builder.Services.AddScoped<IUserSearchModel, UserSearchModel>();
+builder.Services.AddScoped<IGetAllUsersModel,GetAllUsersModel>();
+
 builder.Services.AddScoped<ProtectedLocalStorage>();
 
 builder.Services.AddHttpClient();

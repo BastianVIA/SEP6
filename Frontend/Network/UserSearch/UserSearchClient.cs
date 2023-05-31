@@ -5,7 +5,8 @@ namespace Frontend.Network.UserSearch;
 
 public class UserSearchClient : NSwagBaseClient, IUserSearchClient
 {
-    public async Task<List<Entities.User>> SearchForUserAsync(string displayName,UserSortingKey? userSortingKey = null,
+    
+    public async Task<List<Entities.User>> SearchForUserAsync(string displayName, UserSortingKey? userSortingKey = null,
         SortingDirection2? sortingDirection = null, int? pageNumber = null)
     {
         var response = await _api.Search3Async(displayName,userSortingKey,sortingDirection,pageNumber);
@@ -27,9 +28,9 @@ public class UserSearchClient : NSwagBaseClient, IUserSearchClient
         
         }
 
-        return users;
-    }
-
+        return users;    }
+    
+    
     public UserSearchClient(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory, configuration)
     {
     }

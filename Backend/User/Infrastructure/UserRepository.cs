@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Backend.User.Infrastructure;
 
 public class UserRepository : IUserRepository
+
 {
     private int NrOfResultsEachPage;
 
@@ -129,7 +130,33 @@ public class UserRepository : IUserRepository
             .Where(u => EF.Functions.Like(u.DisplayName, $"%{requestDisplayName}%"));
         return await query.CountAsync();
     }
+    
+    public async Task<List<Domain.User>> GetAllUsersAsync(UserSortingKey userSortingKey, SortingDirection sortingDirection, int requestPageNumber, DbReadOnlyTransaction tx)
+    {
+        IOrderedQueryable<UserDAO> query; 
 
+        switch (userSortingKey)
+        {
+            case UserSortingKey.DisplayName:
+                query = SearchForUserOrderByUsernameAsync(tx.DataContext.Users.Include(u => u.FavoriteMovies).Include(u => u.UserRatings), sortingDirection);
+                break;
+            case UserSortingKey.MoviesVoted:
+                query = SearchForUserOrderByVotedMoviesAsync(tx.DataContext.Users.Include(u => u.FavoriteMovies).Include(u => u.UserRatings), sortingDirection);
+                break;
+            default:
+                throw new KeyNotFoundException($"{userSortingKey} not a valid user sorting key ");
+        }
+        
+        List<UserDAO> foundUsers = await query
+            .Skip(NrOfResultsEachPage * (requestPageNumber - 1))
+            .Take(NrOfResultsEachPage)
+            .ToListAsync();
+
+        return ToDomain(foundUsers);
+        
+    }
+
+    
     private IOrderedQueryable<UserDAO> SearchForUserOrderByUsernameAsync(IQueryable<UserDAO> query,
         SortingDirection sortingDirection)
     {
